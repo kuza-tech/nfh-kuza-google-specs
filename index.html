@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFH-Kuza-Google | Specification Documents</title>
+  <style>
+    :root {
+      --blue: #2563EB;
+      --blue-light: #DBEAFE;
+      --blue-dark: #1E40AF;
+      --text: #111827;
+      --text-secondary: #4B5563;
+      --bg: #FFFFFF;
+      --bg-alt: #F9FAFB;
+      --border: #E5E7EB;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+      background: var(--bg-alt);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      max-width: 720px;
+      width: 100%;
+      padding: 2rem;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 0.5rem;
+    }
+    .header p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+    }
+    .header .meta {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-color: var(--blue);
+    }
+    .card h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .card h2 a {
+      color: var(--blue-dark);
+      text-decoration: none;
+    }
+    .card h2 a:hover {
+      text-decoration: underline;
+    }
+    .card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+    .card .tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tag {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .tag-blue { background: var(--blue-light); color: var(--blue-dark); }
+    .tag-green { background: #D1FAE5; color: #047857; }
+    .tag-orange { background: #FED7AA; color: #C2410C; }
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>NFH-Kuza-Google</h1>
+      <p>Rural Service Delivery Marketplace &mdash; Specification Documents</p>
+      <div class="meta">Domain: <code>local-services</code> &nbsp;|&nbsp; Beckn Protocol v2.0.0 &nbsp;|&nbsp; April 2026</div>
+    </div>
+
+    <div class="card">
+      <h2><a href="architecture.html">Architecture Document</a></h2>
+      <p>System architecture with 7-layer diagram, data flows, component ownership, database schema, and deployment topology. SVG architecture diagram included.</p>
+      <div class="tags">
+        <span class="tag tag-blue">7 Layers</span>
+        <span class="tag tag-green">5 Data Flows</span>
+        <span class="tag tag-orange">GCC Deployment</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><a href="beckn-schemas.html">Beckn Schema Definitions</a></h2>
+      <p>All 7 extension schemas with field reference tables, OpenAPI 3.1 YAML definitions, JSON message examples, and service status lifecycle state diagram.</p>
+      <div class="tags">
+        <span class="tag tag-blue">7 Schemas</span>
+        <span class="tag tag-green">OpenAPI 3.1</span>
+        <span class="tag tag-orange">JSON Examples</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><a href="specification.html">Specification Document</a></h2>
+      <p>Master requirements specification covering all 4 flows (Livelihood, Household, Market, Advisory), data model, WhatsApp interactions, payment model, location matching, and integration points.</p>
+      <div class="tags">
+        <span class="tag tag-blue">4 Flows</span>
+        <span class="tag tag-green">13 Sections</span>
+        <span class="tag tag-orange">Complete Spec</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>NFH-Kuza-Google Pilot &mdash; Beckn Open Network for Rural Service Delivery</p>
+    </div>
+  </div>
+</body>
+</html>

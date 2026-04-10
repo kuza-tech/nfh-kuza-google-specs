@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFH-Kuza-Google Architecture Specification</title>
+  <style>
+    :root {
+      --blue-kuza: #2563EB;
+      --blue-kuza-light: #DBEAFE;
+      --blue-kuza-dark: #1E40AF;
+      --green-beckn: #059669;
+      --green-beckn-light: #D1FAE5;
+      --green-beckn-dark: #047857;
+      --orange-google: #EA580C;
+      --orange-google-light: #FED7AA;
+      --orange-google-dark: #C2410C;
+      --gray-wa: #6B7280;
+      --gray-wa-light: #F3F4F6;
+      --gray-wa-dark: #374151;
+      --bg: #FFFFFF;
+      --bg-alt: #F9FAFB;
+      --text: #111827;
+      --text-secondary: #4B5563;
+      --border: #E5E7EB;
+      --sidebar-bg: #F8FAFC;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+      background: var(--bg);
+    }
+
+    /* Header */
+    .doc-header {
+      background: linear-gradient(135deg, var(--blue-kuza-dark) 0%, var(--blue-kuza) 50%, #3B82F6 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    .doc-header .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+    .doc-header .meta {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 0.875rem;
+      opacity: 0.85;
+    }
+    .doc-header .meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Sidebar / TOC */
+    .sidebar {
+      width: 280px;
+      min-width: 280px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      padding: 0 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .sidebar nav a {
+      display: block;
+      padding: 0.4rem 1.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      color: var(--blue-kuza);
+      background: var(--blue-kuza-light);
+      border-left-color: var(--blue-kuza);
+    }
+    .sidebar nav a.sub {
+      padding-left: 2.5rem;
+      font-size: 0.8125rem;
+    }
+
+    /* Main content */
+    .content {
+      flex: 1;
+      padding: 2.5rem 3rem;
+      max-width: 900px;
+      min-width: 0;
+    }
+
+    .content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .content h2:first-of-type { margin-top: 0; }
+
+    .content h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 1.75rem 0 0.75rem;
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    .content p {
+      margin-bottom: 1rem;
+      color: var(--text-secondary);
+    }
+
+    .content ul, .content ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+    .content li {
+      margin-bottom: 0.35rem;
+      color: var(--text-secondary);
+    }
+    .content li strong {
+      color: var(--text);
+    }
+
+    /* Code blocks */
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+      font-size: 0.85em;
+      background: #F1F5F9;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: #0F172A;
+    }
+    pre {
+      background: #0F172A;
+      color: #E2E8F0;
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-size: 0.825rem;
+      line-height: 1.6;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: var(--bg-alt);
+      border-bottom: 2px solid var(--border);
+      font-weight: 600;
+      color: var(--text);
+    }
+    td {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    tr:hover td {
+      background: #FAFBFC;
+    }
+
+    /* Callout boxes */
+    .callout {
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid;
+    }
+    .callout.info {
+      background: var(--blue-kuza-light);
+      border-color: var(--blue-kuza);
+    }
+    .callout.info .callout-title { color: var(--blue-kuza-dark); }
+    .callout.warning {
+      background: #FEF3C7;
+      border-color: #F59E0B;
+    }
+    .callout.warning .callout-title { color: #92400E; }
+    .callout.success {
+      background: var(--green-beckn-light);
+      border-color: var(--green-beckn);
+    }
+    .callout.success .callout-title { color: var(--green-beckn-dark); }
+    .callout-title {
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+    .callout p {
+      font-size: 0.875rem;
+      margin-bottom: 0;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+    }
+    .legend-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    /* Flow diagram text blocks */
+    .flow-block {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .flow-block h4 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+    .flow-block pre {
+      margin-bottom: 0;
+      font-size: 0.8rem;
+    }
+
+    /* SVG diagram container */
+    .diagram-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 1.5rem 0 2rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #FAFBFC;
+      padding: 1rem;
+    }
+    .diagram-container svg {
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .content { padding: 1.5rem; }
+      .doc-header h1 { font-size: 1.5rem; }
+      .doc-header .meta { flex-direction: column; gap: 0.5rem; }
+    }
+
+    /* Print */
+    @media print {
+      .sidebar { display: none; }
+      .doc-header { padding: 1.5rem; }
+      .content { max-width: 100%; padding: 1rem; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="doc-header">
+  <h1>NFH-Kuza-Google Platform</h1>
+  <div class="subtitle">Architecture Specification &mdash; Rural Service Delivery Marketplace</div>
+  <div class="meta">
+    <span>Domain Code: <strong>local-services</strong></span>
+    <span>Version: 1.0</span>
+    <span>Date: April 2026</span>
+    <span>Status: Draft</span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar / Table of Contents -->
+  <aside class="sidebar">
+    <h3>Table of Contents</h3>
+    <nav>
+      <a href="#overview">1. Project Overview</a>
+      <a href="#architecture-diagram">2. Architecture Diagram</a>
+      <a href="#layers">3. Architecture Layers</a>
+      <a href="#layer-1" class="sub">3.1 Frontend Interfaces</a>
+      <a href="#layer-2" class="sub">3.2 WhatsApp Handler</a>
+      <a href="#layer-3" class="sub">3.3 BAP</a>
+      <a href="#layer-4" class="sub">3.4 BPP</a>
+      <a href="#layer-5" class="sub">3.5 Beckn Network</a>
+      <a href="#layer-6" class="sub">3.6 Kuza Platform</a>
+      <a href="#layer-7" class="sub">3.7 Google AI Services</a>
+      <a href="#data-flows">4. Key Data Flows</a>
+      <a href="#flow-a" class="sub">4.1 Service Discovery &amp; Booking</a>
+      <a href="#flow-b" class="sub">4.2 Provider Order Acceptance</a>
+      <a href="#flow-c" class="sub">4.3 Service Completion</a>
+      <a href="#flow-d" class="sub">4.4 Advisory Content</a>
+      <a href="#flow-e" class="sub">4.5 Market Produce</a>
+      <a href="#ownership">5. Component Ownership</a>
+      <a href="#database-schema">6. Database Schema</a>
+      <a href="#deployment">7. Deployment Topology</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+
+    <!-- 1. Overview -->
+    <h2 id="overview">1. Project Overview</h2>
+    <p>
+      NFH-Kuza-Google is a rural service delivery marketplace that connects rural households with local service
+      providers through WhatsApp and a lightweight web application. The platform is built on the
+      <strong>Beckn open network protocol</strong>, enabling decentralized discovery and fulfillment of services
+      across four domains: livelihood services, household services, market produce trading, and agricultural advisory.
+    </p>
+    <div class="callout info">
+      <div class="callout-title">Design Principle</div>
+      <p>
+        100% of farmer interaction occurs through WhatsApp &mdash; no app installation required.
+        Providers use a lightweight Ionic Angular web app opened via WhatsApp button links.
+      </p>
+    </div>
+    <h3>Service Domains</h3>
+    <ul>
+      <li><strong>Livelihood Services</strong> &mdash; agricultural inputs, equipment rental, veterinary services, soil testing, etc.</li>
+      <li><strong>Household Services</strong> &mdash; plumbing, electrical, cleaning, construction, etc.</li>
+      <li><strong>Market Produce</strong> &mdash; connecting farmers with aggregators and buyers (reversed economics: buyer pays farmer)</li>
+      <li><strong>Advisory</strong> &mdash; agricultural content and guidance delivered as media through WhatsApp (no order lifecycle)</li>
+    </ul>
+
+    <!-- 2. Architecture Diagram -->
+    <h2 id="architecture-diagram">2. Architecture Diagram</h2>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:#2563EB;"></div> Kuza-built components</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#059669;"></div> Beckn infrastructure</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#EA580C;"></div> Google services</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#6B7280;"></div> WhatsApp / external</div>
+    </div>
+    <div class="diagram-container">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 820" width="1020" height="820" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+        <defs>
+          <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#2563EB">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#059669">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <marker id="arrow-gray" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#6B7280">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <marker id="arrow-orange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#EA580C">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+          </filter>
+        </defs>
+
+        <!-- Layer labels -->
+        <text x="12" y="52" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">LAYER 1</text>
+        <text x="12" y="172" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">LAYER 2</text>
+        <text x="12" y="302" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">LAYER 3/4</text>
+        <text x="12" y="432" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">LAYER 5</text>
+        <text x="12" y="572" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">LAYER 5</text>
+        <text x="12" y="682" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">LAYER 6</text>
+        <text x="12" y="762" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">LAYER 7</text>
+
+        <!-- ============ LAYER 1: Frontend Interfaces ============ -->
+        <!-- WhatsApp (Farmer) -->
+        <rect x="110" y="25" width="240" height="65" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2" filter="url(#shadow)"/>
+        <text x="230" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#374151">WhatsApp</text>
+        <text x="230" y="73" text-anchor="middle" font-size="11" fill="#6B7280">Farmer-Facing (100% interaction)</text>
+
+        <!-- Kuza Web App (Provider) -->
+        <rect x="650" y="25" width="240" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="770" y="55" text-anchor="middle" font-size="14" font-weight="700" fill="#1E40AF">Kuza Web App</text>
+        <text x="770" y="73" text-anchor="middle" font-size="11" fill="#2563EB">Provider-Facing (Ionic Angular)</text>
+
+        <!-- ============ LAYER 2: WhatsApp Handler ============ -->
+        <!-- webhook.php + beckn handler -->
+        <rect x="110" y="140" width="310" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="265" y="167" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">WhatsApp Handler</text>
+        <text x="265" y="185" text-anchor="middle" font-size="10" fill="#2563EB">webhook.php &rarr; beckn_marketplace_handler.php</text>
+
+        <!-- Provider Notifications -->
+        <rect x="580" y="140" width="240" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="700" y="167" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Provider Notifications</text>
+        <text x="700" y="185" text-anchor="middle" font-size="10" fill="#2563EB">Messaging Queue / Cron</text>
+
+        <!-- ============ LAYER 3/4: BAP and BPP ============ -->
+        <!-- BAP -->
+        <rect x="110" y="270" width="270" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="245" y="297" text-anchor="middle" font-size="14" font-weight="700" fill="#1E40AF">BAP</text>
+        <text x="245" y="315" text-anchor="middle" font-size="11" fill="#2563EB">Beckn Application Platform (Farmer-side)</text>
+
+        <!-- BPP -->
+        <rect x="600" y="270" width="270" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="735" y="297" text-anchor="middle" font-size="14" font-weight="700" fill="#1E40AF">BPP</text>
+        <text x="735" y="315" text-anchor="middle" font-size="11" fill="#2563EB">Beckn Provider Platform (Provider-side)</text>
+
+        <!-- ============ LAYER 5: ONIX Adapters + Beckn Network ============ -->
+        <!-- ONIX-BAP -->
+        <rect x="130" y="400" width="200" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="230" y="424" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">ONIX-BAP</text>
+        <text x="230" y="442" text-anchor="middle" font-size="10" fill="#059669">Adapter (Go / Docker)</text>
+
+        <!-- Beckn Network cloud -->
+        <rect x="400" y="395" width="190" height="65" rx="32" fill="#D1FAE5" stroke="#059669" stroke-width="2" stroke-dasharray="6,3" filter="url(#shadow)"/>
+        <text x="495" y="425" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">Beckn Network</text>
+        <text x="495" y="443" text-anchor="middle" font-size="10" fill="#059669">Protocol Routing</text>
+
+        <!-- ONIX-BPP -->
+        <rect x="650" y="400" width="200" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="750" y="424" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">ONIX-BPP</text>
+        <text x="750" y="442" text-anchor="middle" font-size="10" fill="#059669">Adapter (Go / Docker)</text>
+
+        <!-- ============ LAYER 5b: Beckn Fabric Services ============ -->
+        <!-- DeDi Registry -->
+        <rect x="110" y="530" width="210" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="215" y="554" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">DeDi Registry</text>
+        <text x="215" y="571" text-anchor="middle" font-size="10" fill="#059669">Identity &amp; Public Keys</text>
+
+        <!-- Catalog Service -->
+        <rect x="385" y="530" width="210" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="490" y="554" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">Catalog Service</text>
+        <text x="490" y="571" text-anchor="middle" font-size="10" fill="#059669">Provider Catalogs</text>
+
+        <!-- Discovery Service -->
+        <rect x="660" y="530" width="210" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="765" y="554" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">Discovery Service</text>
+        <text x="765" y="571" text-anchor="middle" font-size="10" fill="#059669">Search &amp; Matching</text>
+
+        <!-- Beckn Fabric label -->
+        <rect x="100" y="515" width="780" height="80" rx="12" fill="none" stroke="#059669" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+        <text x="490" y="608" text-anchor="middle" font-size="10" fill="#059669" font-style="italic">Beckn Fabric (fabric.nfh.global) &mdash; externally hosted</text>
+
+        <!-- ============ LAYER 6: Kuza Platform ============ -->
+        <rect x="110" y="650" width="620" height="60" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="420" y="676" text-anchor="middle" font-size="14" font-weight="700" fill="#1E40AF">Kuza Platform (MySQL 8)</text>
+        <text x="420" y="694" text-anchor="middle" font-size="11" fill="#2563EB">Users, Providers, Catalogs, Orders, Payments, Conversations</text>
+
+        <!-- ============ LAYER 7: Google AI ============ -->
+        <rect x="790" y="650" width="190" height="60" rx="10" fill="#FED7AA" stroke="#EA580C" stroke-width="2" filter="url(#shadow)"/>
+        <text x="885" y="670" text-anchor="middle" font-size="13" font-weight="700" fill="#C2410C">Google AI</text>
+        <text x="885" y="686" text-anchor="middle" font-size="9" fill="#EA580C">1. Location Normalization</text>
+        <text x="885" y="700" text-anchor="middle" font-size="9" fill="#EA580C">2. Advisory Content Generation</text>
+
+        <!-- ============ ARROWS / DATA FLOWS ============ -->
+        <!-- WhatsApp -> Handler -->
+        <line x1="230" y1="90" x2="230" y2="140" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow-gray)"/>
+        <line x1="265" y1="140" x2="265" y2="90" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow-gray)" stroke-dasharray="5,3"/>
+
+        <!-- Handler -> BAP -->
+        <line x1="245" y1="205" x2="245" y2="270" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+        <line x1="265" y1="270" x2="265" y2="205" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)" stroke-dasharray="5,3"/>
+
+        <!-- BAP -> ONIX-BAP -->
+        <line x1="230" y1="335" x2="230" y2="400" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+        <!-- ONIX-BAP <-> Beckn Network -->
+        <line x1="330" y1="427" x2="400" y2="427" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+        <line x1="400" y1="435" x2="330" y2="435" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)" stroke-dasharray="5,3"/>
+
+        <!-- Beckn Network <-> ONIX-BPP -->
+        <line x1="590" y1="427" x2="650" y2="427" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+        <line x1="650" y1="435" x2="590" y2="435" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)" stroke-dasharray="5,3"/>
+
+        <!-- ONIX-BPP -> BPP -->
+        <line x1="750" y1="400" x2="750" y2="335" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+        <!-- BPP <-> Kuza Web App -->
+        <line x1="770" y1="270" x2="770" y2="90" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+        <line x1="750" y1="90" x2="750" y2="270" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)" stroke-dasharray="5,3"/>
+
+        <!-- BPP <-> Provider Notifications -->
+        <line x1="700" y1="270" x2="700" y2="205" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+        <!-- Provider Notifications -> WhatsApp (curved path to farmer) -->
+        <path d="M 580 172 L 480 172 Q 460 172 460 152 L 460 57 L 350 57" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow-gray)" stroke-dasharray="5,3"/>
+        <text x="468" y="120" font-size="9" fill="#6B7280" transform="rotate(-90, 468, 120)">outbound msg</text>
+
+        <!-- BAP -> Kuza Platform (data store) -->
+        <path d="M 200 335 L 200 650" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)" stroke-dasharray="5,3" opacity="0.5"/>
+
+        <!-- BPP -> Kuza Platform (data store) -->
+        <path d="M 680 335 L 680 650" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)" stroke-dasharray="5,3" opacity="0.5"/>
+
+        <!-- Handler -> Google AI (location normalization) -->
+        <path d="M 420 185 Q 650 250 885 650" stroke="#EA580C" stroke-width="1.5" fill="none" marker-end="url(#arrow-orange)" stroke-dasharray="5,3" opacity="0.6"/>
+        <text x="590" y="300" font-size="9" fill="#EA580C" opacity="0.8">1. location normalization</text>
+
+        <!-- BPP -> Google AI (advisory content generation) -->
+        <path d="M 780 310 Q 860 450 885 650" stroke="#EA580C" stroke-width="2" fill="none" marker-end="url(#arrow-orange)" stroke-dasharray="5,3" opacity="0.6"/>
+        <text x="860" y="480" font-size="9" fill="#EA580C" opacity="0.8" transform="rotate(75, 860, 480)">2. advisory AI</text>
+
+        <!-- ONIX adapters -> Beckn Fabric services (vertical dashed) -->
+        <line x1="215" y1="455" x2="215" y2="530" stroke="#059669" stroke-width="1" stroke-dasharray="4,3" opacity="0.5" marker-end="url(#arrow-green)"/>
+        <line x1="765" y1="455" x2="765" y2="530" stroke="#059669" stroke-width="1" stroke-dasharray="4,3" opacity="0.5" marker-end="url(#arrow-green)"/>
+
+        <!-- Arrow labels -->
+        <text x="207" y="118" font-size="9" fill="#6B7280">msgs</text>
+        <text x="222" y="245" font-size="9" fill="#2563EB">API</text>
+        <text x="355" y="420" font-size="9" fill="#059669">beckn</text>
+        <text x="612" y="420" font-size="9" fill="#059669">beckn</text>
+
+        <!-- GCC hosting boundary -->
+        <rect x="60" y="130" width="950" height="605" rx="16" fill="none" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="8,5" opacity="0.3"/>
+        <text x="75" y="725" font-size="11" fill="#93C5FD" font-weight="600">GCC (Google Cloud Compute)</text>
+
+        <!-- External label for Beckn Fabric -->
+        <text x="880" y="610" font-size="9" fill="#059669" font-weight="600">External</text>
+      </svg>
+    </div>
+
+    <!-- 3. Architecture Layers -->
+    <h2 id="layers">3. Architecture Layers</h2>
+
+    <h3 id="layer-1">3.1 Layer 1: Frontend Interfaces</h3>
+
+    <h4>WhatsApp (Farmer-Facing)</h4>
+    <p>
+      WhatsApp is the sole farmer-facing interface. 100% of farmer interactions &mdash; service discovery, provider
+      selection, order confirmation, payment declaration, and feedback &mdash; occur through WhatsApp messages.
+    </p>
+    <ul>
+      <li><strong>Interactive buttons</strong> for small binary/ternary choices (Accept/Reject, Yes/No, payment method selection)</li>
+      <li><strong>Numbered text lists</strong> for longer option sets (provider lists, service categories, sub-categories)</li>
+      <li><strong>Free text input</strong> for location, quantity, and other open-ended fields</li>
+      <li>Connected via <strong>WhatsApp Cloud API</strong></li>
+    </ul>
+
+    <h4>Kuza Web App (Provider-Facing)</h4>
+    <p>
+      A lightweight Ionic Angular web application opened from WhatsApp button links &mdash; no native app installation
+      required. Providers use it to:
+    </p>
+    <ul>
+      <li>Manage their service catalog (add/edit services, set pricing)</li>
+      <li>View and accept/reject incoming orders</li>
+      <li>Update order status (in-progress, completed)</li>
+      <li>Report payment received</li>
+      <li>Manage their profile and service areas</li>
+    </ul>
+
+    <h3 id="layer-2">3.2 Layer 2: WhatsApp Handler</h3>
+    <div class="callout warning">
+      <div class="callout-title">Design Constraint</div>
+      <p>
+        The existing <code>webhook.php</code> remains UNTOUCHED. Only routing logic is added to branch
+        marketplace conversations to the new <code>beckn_marketplace_handler.php</code> based on trigger words
+        or message IDs.
+      </p>
+    </div>
+    <ul>
+      <li><strong>File:</strong> <code>beckn_marketplace_handler.php</code> (new PHP file on Kuza Platform)</li>
+      <li><strong>State machine:</strong> manages conversational flow for the 4 marketplace domains (Livelihood, Household, Market, Advisory)</li>
+      <li><strong>Translates</strong> WhatsApp interactions into BAP API calls</li>
+      <li><strong>Receives</strong> async callbacks from BAP and formats WhatsApp response messages</li>
+      <li><strong>Own tables:</strong> conversation state, session tracking &mdash; separate from existing poultry chatbot tables (<code>chatbot_nodes</code>, <code>chatbot_transitions</code>)</li>
+      <li><strong>Provider notifications</strong> are triggered via a messaging queue/cron job, NOT through <code>webhook.php</code></li>
+    </ul>
+
+    <h3 id="layer-3">3.3 Layer 3: BAP (Beckn Application Platform)</h3>
+    <p>
+      The BAP is the farmer-side Beckn participant. It acts as the bridge between the WhatsApp Handler
+      and the Beckn network.
+    </p>
+    <ul>
+      <li>Receives translated requests from the WhatsApp Handler</li>
+      <li>Constructs Beckn v2 protocol messages: <code>discover</code>, <code>select</code>, <code>init</code>, <code>confirm</code>, <code>status</code>, <code>cancel</code>, <code>rate</code></li>
+      <li>Sends protocol messages through the ONIX-BAP adapter</li>
+      <li>Receives async callbacks (<code>on_discover</code>, <code>on_select</code>, <code>on_init</code>, <code>on_confirm</code>, <code>on_status</code>, <code>on_cancel</code>, <code>on_rate</code>)</li>
+      <li>Pushes results back to WhatsApp Handler for farmer delivery</li>
+      <li>Hosted by Kuza on GCC</li>
+    </ul>
+
+    <h3 id="layer-4">3.4 Layer 4: BPP (Beckn Provider Platform)</h3>
+    <p>
+      The BPP is the provider-side Beckn participant. It manages the provider catalog, order lifecycle,
+      and serves the provider web interface.
+    </p>
+    <ul>
+      <li>Receives Beckn protocol requests from the network (via ONIX-BPP adapter)</li>
+      <li>Connects to Kuza Platform to fetch provider catalogs, service areas, and pricing</li>
+      <li>Manages order lifecycle on the provider side (create, accept, update status, complete)</li>
+      <li>Sends async Beckn responses back through ONIX-BPP adapter</li>
+      <li>Serves the <strong>Kuza Web App</strong> (provider interface) for catalog and order management</li>
+      <li>Hosted by Kuza on GCC</li>
+    </ul>
+
+    <h3 id="layer-5">3.5 Layer 5: Beckn Network Infrastructure</h3>
+    <p>
+      All Beckn network components are external to Kuza infrastructure, provided by Beckn Fabric.
+    </p>
+
+    <h4>ONIX Adapters</h4>
+    <ul>
+      <li>Plugin-based Go servers running the <code>fidedocker/onix-adapter</code> Docker image</li>
+      <li>Two instances: ONIX-BAP (farmer side) and ONIX-BPP (provider side)</li>
+      <li>Handle message signing, signature validation, schema validation, and network routing</li>
+      <li>Hosted on GCC as Docker containers</li>
+    </ul>
+
+    <h4>DeDi Registry</h4>
+    <ul>
+      <li>Endpoint: <code>fabric.nfh.global/registry/dedi</code></li>
+      <li>Stores participant identity, public keys, and callback URIs</li>
+      <li>Used for signature validation and dynamic routing between BAP and BPP</li>
+    </ul>
+
+    <h4>Catalog Service</h4>
+    <ul>
+      <li>Endpoint: <code>fabric.nfh.global/beckn/catalog</code></li>
+      <li>BPP publishes provider catalogs here</li>
+      <li>Queried by Discovery Service during <code>discover</code> requests</li>
+    </ul>
+
+    <h4>Discovery Service</h4>
+    <ul>
+      <li>Handles <code>discover</code> requests from BAP</li>
+      <li>Queries Catalog Service for matching providers</li>
+      <li>Returns results to BAP via <code>on_discover</code> callback</li>
+    </ul>
+
+    <h3 id="layer-6">3.6 Layer 6: Kuza Platform (Data Store)</h3>
+    <p>
+      MySQL 8 on GCC serves as the single source of truth. The Beckn network is stateless &mdash; all
+      persistent data lives here.
+    </p>
+
+    <h4>Existing Tables Used</h4>
+    <ul>
+      <li><code>user</code> &mdash; agripreneurs (providers) and farmers</li>
+      <li>Partner and organization data</li>
+      <li>Content library (for advisory domain)</li>
+    </ul>
+
+    <h4>New Tables Required</h4>
+    <table>
+      <thead>
+        <tr><th>Table</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>beckn_provider_catalog</code></td><td>Services offered by providers, with pricing per service</td></tr>
+        <tr><td><code>beckn_provider_service_areas</code></td><td>County + Sub-County mappings for provider coverage areas</td></tr>
+        <tr><td><code>beckn_subcategory_master</code></td><td>Dynamic taxonomy of service sub-categories</td></tr>
+        <tr><td><code>beckn_orders</code></td><td>Order records with full lifecycle tracking</td></tr>
+        <tr><td><code>beckn_order_status_history</code></td><td>Audit trail of status transitions per order</td></tr>
+        <tr><td><code>beckn_payments</code></td><td>Payment records (farmer-side and provider-side)</td></tr>
+        <tr><td><code>beckn_feedback</code></td><td>Feedback and ratings from both parties</td></tr>
+        <tr><td><code>beckn_conversation_state</code></td><td>Marketplace conversation state machine data</td></tr>
+        <tr><td><code>beckn_farmer_profile</code></td><td>One-time farmer profile fields (location, preferences)</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="layer-7">3.7 Layer 7: Google AI Services</h3>
+    <p>Google AI is integrated directly into the request processing pipeline &mdash; not a standalone service. It is called from the PHP handler and the response flows back through the same handler to WhatsApp.</p>
+    <ul>
+      <li><strong>Location normalization (all flows):</strong> Farmer enters free-text location (village/ward/county) &rarr; PHP handler sends text to Google AI &rarr; AI maps to structured County + Sub-County &rarr; PHP handler sends confirmation message to farmer on WhatsApp &rarr; farmer confirms or corrects.</li>
+      <li><strong>Advisory content generation (Advisory flow):</strong> Farmer selects Advisory &rarr; picks domain (Agri, Health, Finance) &rarr; category &rarr; sub-category &rarr; these attributes are sent from the PHP handler to Google AI &rarr; AI processes the request and generates the advisory response &rarr; PHP handler receives the AI-generated content &rarr; sends it back to farmer on WhatsApp. This flow goes through Beckn (BAP &rarr; BPP &rarr; Google AI &rarr; BPP &rarr; BAP) with Google AI called from the BPP side.</li>
+      <li>Exposed as REST APIs on GCC</li>
+      <li>Called synchronously from the PHP handler during request processing</li>
+      <li>Co-located on GCC</li>
+    </ul>
+
+    <!-- 4. Key Data Flows -->
+    <h2 id="data-flows">4. Key Data Flows</h2>
+
+    <div class="flow-block" id="flow-a">
+      <h4>Flow A: Farmer Discovers and Books a Service (Livelihood / Household)</h4>
+      <pre><code>Farmer (WhatsApp): Selects category --> service --> enters quantity
+  --> webhook.php --> beckn_marketplace_handler.php
+    Farmer types location (free text, e.g. "Naivasha")
+    --> PHP Handler calls Google AI for location normalization
+    <-- Google AI returns {county: "Nakuru", subCounty: "Naivasha"}
+    --> WhatsApp: "Nakuru County, Naivasha Sub-County. Correct?" [Yes] [No]
+    Farmer confirms [Yes]
+    --> BAP Client --> ONIX-BAP --> [Beckn Network / Discovery Service] --> ONIX-BPP --> BPP
+      --> Kuza Platform (query providers by location + category + subCategory)
+    <-- BPP --> ONIX-BPP --> [Beckn Network] --> ONIX-BAP --> BAP Client
+  <-- beckn_marketplace_handler.php --> WhatsApp (list of providers with prices)
+
+Farmer selects provider --> select --> on_select (quote)
+Farmer confirms        --> init   --> on_init  (payment terms)
+Farmer books           --> confirm --> on_confirm (order created)</code></pre>
+    </div>
+
+    <div class="flow-block" id="flow-b">
+      <h4>Flow B: Provider Receives and Accepts Order</h4>
+      <pre><code>Order confirmed in Beckn
+  --> BPP --> Kuza Platform (create order record)
+  --> Messaging Queue / Cron --> WhatsApp Cloud API --> Provider WhatsApp
+    Provider taps [Accept] button in WhatsApp
+      --> webhook.php --> provider routing --> BPP --> Beckn update
+    Provider taps [View Details] link
+      --> Opens Kuza Web App in browser --> reads from Kuza Platform</code></pre>
+    </div>
+
+    <div class="flow-block" id="flow-c">
+      <h4>Flow C: Provider Completes Service, Farmer Confirms</h4>
+      <pre><code>Provider (Kuza Web App):
+  --> Marks service complete, enters payment details, notes
+  --> BPP --> Beckn status update --> ONIX-BAP --> BAP
+  --> beckn_marketplace_handler.php --> WhatsApp to Farmer
+    "Was the service completed?" [Yes] [No]
+  Farmer taps [Yes]
+  --> webhook.php --> beckn_marketplace_handler.php
+    --> "How did you pay?" [Cash] [M-Pesa]
+  Farmer selects payment method
+  --> Order marked FARMER_CONFIRMED --> CLOSED</code></pre>
+    </div>
+
+    <div class="flow-block" id="flow-d">
+      <h4>Flow D: Farmer Gets Advisory Content (Google AI Integrated)</h4>
+      <pre><code>Farmer (WhatsApp): Selects Advisory --> Domain (Agri/Health/Finance) --> Category --> Sub-category
+  --> webhook.php --> beckn_marketplace_handler.php
+    --> BAP Client --> ONIX-BAP --> [Beckn Network] --> ONIX-BPP --> BPP
+      --> BPP calls Google AI with {domain, category, subCategory, farmerContext}
+      <-- Google AI returns generated advisory content
+    <-- BPP --> ONIX-BPP --> [Beckn Network] --> ONIX-BAP --> BAP Client
+  <-- beckn_marketplace_handler.php --> WhatsApp (AI-generated advisory message/content)
+
+Google AI is called from BPP during on_discover processing.
+Advisory is free, no order lifecycle. Content generated and delivered immediately.</code></pre>
+    </div>
+
+    <div class="flow-block" id="flow-e">
+      <h4>Flow E: Market Produce (Farmer Sells)</h4>
+      <pre><code>Same flow as A but with reversed economics:
+- Farmer has produce to sell (quantity + type)
+- discover returns aggregators/buyers with buying prices
+- Aggregator collects produce from farmer
+- Aggregator pays farmer (not farmer pays provider)
+- Both parties confirm and provide feedback</code></pre>
+    </div>
+
+    <!-- 5. Component Ownership -->
+    <h2 id="ownership">5. Component Ownership</h2>
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Built By</th><th>Hosted On</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>WhatsApp Handler (<code>beckn_marketplace_handler.php</code>)</td><td>Kuza</td><td>GCC</td></tr>
+        <tr><td>BAP application logic</td><td>Kuza</td><td>GCC</td></tr>
+        <tr><td>BPP application logic</td><td>Kuza</td><td>GCC</td></tr>
+        <tr><td>Kuza Web App (provider interface)</td><td>Kuza</td><td>GCC</td></tr>
+        <tr><td>Provider WhatsApp notifications</td><td>Kuza</td><td>GCC</td></tr>
+        <tr><td>ONIX Adapters (BAP + BPP)</td><td>Beckn (open source, Go)</td><td>GCC (Docker)</td></tr>
+        <tr><td>DeDi Registry</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
+        <tr><td>Catalog Service</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
+        <tr><td>Discovery Service</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
+        <tr><td>Google AI (location normalization + advisory content generation)</td><td>Google</td><td>GCC</td></tr>
+        <tr><td>MySQL database</td><td>Kuza</td><td>GCC</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 6. Database Schema -->
+    <h2 id="database-schema">6. Database Schema</h2>
+    <p>
+      The following schema additions are required on MySQL 8 (GCC). These tables live alongside existing
+      Kuza Platform tables and reference the existing <code>user</code> table via foreign keys.
+    </p>
+
+    <h3>Entity Relationship Summary</h3>
+    <pre><code>user (existing)
+  |-- beckn_farmer_profile      (1:1, farmer-specific fields)
+  |-- beckn_provider_catalog    (1:N, provider's services)
+  |-- beckn_provider_service_areas (1:N, coverage areas)
+
+beckn_subcategory_master        (standalone taxonomy)
+
+beckn_orders
+  |-- beckn_order_status_history (1:N, audit trail)
+  |-- beckn_payments             (1:N, farmer + provider payments)
+  |-- beckn_feedback             (1:N, ratings from both parties)
+
+beckn_conversation_state        (keyed by phone + session)</code></pre>
+
+    <h3>Key Table Definitions</h3>
+
+    <h4><code>beckn_orders</code></h4>
+    <pre><code>order_id          BIGINT AUTO_INCREMENT PRIMARY KEY
+order_uuid        VARCHAR(36) UNIQUE NOT NULL
+beckn_order_id    VARCHAR(255)        -- Beckn network order ID
+farmer_user_id    INT                 -- FK to user.id
+provider_user_id  INT                 -- FK to user.id
+category          VARCHAR(100)        -- livelihood | household | market | advisory
+sub_category      VARCHAR(255)
+service_name      VARCHAR(255)
+quantity          DECIMAL(10,2)
+unit              VARCHAR(50)
+quoted_price      DECIMAL(10,2)
+currency          VARCHAR(10) DEFAULT 'KES'
+status            ENUM('ORDER_PLACED','PROVIDER_ACCEPTED','PROVIDER_REJECTED',
+                       'IN_PROGRESS','COMPLETED','FARMER_CONFIRMED',
+                       'CANCELLED','CLOSED')
+farmer_location   VARCHAR(255)        -- normalized county/sub-county
+provider_location VARCHAR(255)
+payment_method    VARCHAR(50)         -- cash | mpesa
+created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+partner_id        VARCHAR(50)         -- multi-tenancy scope</code></pre>
+
+    <h4><code>beckn_conversation_state</code></h4>
+    <pre><code>id                BIGINT AUTO_INCREMENT PRIMARY KEY
+phone_number      VARCHAR(20) NOT NULL
+session_id        VARCHAR(100)
+current_flow      ENUM('livelihood','household','market','advisory')
+current_step      VARCHAR(100)
+state_data        JSON                -- accumulated selections, context
+beckn_txn_id      VARCHAR(255)        -- Beckn transaction correlation
+last_activity     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+partner_id        VARCHAR(50)
+INDEX idx_phone_session (phone_number, session_id)</code></pre>
+
+    <!-- 7. Deployment -->
+    <h2 id="deployment">7. Deployment Topology</h2>
+    <p>
+      All Kuza-built components are deployed on Google Cloud Compute (GCC). Beckn Fabric services
+      are externally hosted and accessed over HTTPS.
+    </p>
+
+    <h3>GCC Instance Layout</h3>
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Runtime</th><th>Port</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Kuza Platform (PHP)</td><td>Apache + PHP 7.4</td><td>443</td><td>Existing platform + WhatsApp Handler + BAP + BPP</td></tr>
+        <tr><td>Kuza Web App</td><td>Nginx (static)</td><td>443</td><td>Ionic Angular build served as static files</td></tr>
+        <tr><td>ONIX-BAP</td><td>Docker (<code>fidedocker/onix-adapter</code>)</td><td>5001</td><td>BAP-side adapter configuration</td></tr>
+        <tr><td>ONIX-BPP</td><td>Docker (<code>fidedocker/onix-adapter</code>)</td><td>5002</td><td>BPP-side adapter configuration</td></tr>
+        <tr><td>Google AI APIs</td><td>Cloud Functions / API</td><td>443</td><td>Location normalization + Advisory content generation</td></tr>
+        <tr><td>MySQL 8</td><td>MySQL Server</td><td>3306</td><td>Single database instance</td></tr>
+      </tbody>
+    </table>
+
+    <h3>External Dependencies</h3>
+    <table>
+      <thead>
+        <tr><th>Service</th><th>Endpoint</th><th>Protocol</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>WhatsApp Cloud API</td><td><code>graph.facebook.com</code></td><td>HTTPS REST</td></tr>
+        <tr><td>DeDi Registry</td><td><code>fabric.nfh.global/registry/dedi</code></td><td>HTTPS REST</td></tr>
+        <tr><td>Beckn Catalog Service</td><td><code>fabric.nfh.global/beckn/catalog</code></td><td>HTTPS REST</td></tr>
+        <tr><td>Beckn Discovery Service</td><td><code>fabric.nfh.global</code></td><td>HTTPS REST (Beckn v2)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout success">
+      <div class="callout-title">Deployment Note</div>
+      <p>
+        ONIX adapters run as Docker containers on the same GCC instance. They require outbound HTTPS access to
+        Beckn Fabric endpoints and inbound access from the BAP/BPP application logic on localhost.
+      </p>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

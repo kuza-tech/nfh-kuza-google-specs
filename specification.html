@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFH-Kuza-Google Pilot &mdash; Master Specification</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #1a1a2e;
+    background: #f8f9fc;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ───────────────────────────────────────────── */
+  .page-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 2.5rem 4rem; background: #fff; min-height: 100vh; box-shadow: 0 0 40px rgba(0,0,0,.06); }
+
+  /* ── Cover ────────────────────────────────────────────── */
+  .cover { text-align: center; padding: 3rem 0 2.5rem; border-bottom: 3px solid #1a73e8; margin-bottom: 2.5rem; }
+  .cover h1 { font-size: 2.2rem; font-weight: 700; color: #1a1a2e; letter-spacing: -.02em; margin-bottom: .35rem; }
+  .cover .subtitle { font-size: 1.15rem; color: #5f6368; margin-bottom: 1.5rem; }
+  .cover .meta { font-size: .85rem; color: #80868b; }
+  .cover .meta span { display: inline-block; margin: 0 .75rem; }
+  .partner-logos { display: flex; justify-content: center; gap: 2rem; margin-top: 1.2rem; }
+  .partner-badge { display: inline-block; padding: .4rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: .82rem; letter-spacing: .03em; }
+  .partner-badge.kuza   { background: #e8f5e9; color: #2e7d32; }
+  .partner-badge.google { background: #e3f2fd; color: #1565c0; }
+  .partner-badge.beckn  { background: #fce4ec; color: #c62828; }
+
+  /* ── Typography ───────────────────────────────────────── */
+  h2 { font-size: 1.55rem; font-weight: 700; color: #1a1a2e; margin: 2.8rem 0 1rem; padding-bottom: .45rem; border-bottom: 2px solid #e8eaed; }
+  h3 { font-size: 1.2rem; font-weight: 600; color: #202124; margin: 2rem 0 .75rem; }
+  h4 { font-size: 1.05rem; font-weight: 600; color: #3c4043; margin: 1.5rem 0 .6rem; }
+  p  { margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.6rem; }
+  li { margin-bottom: .35rem; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+  a { color: #1a73e8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Table of Contents ────────────────────────────────── */
+  .toc { background: #f1f3f4; border-radius: 8px; padding: 1.5rem 2rem; margin-bottom: 2.5rem; }
+  .toc h2 { font-size: 1.15rem; margin: 0 0 .8rem; border: none; padding: 0; color: #3c4043; }
+  .toc ol { margin: 0; padding: 0; list-style: none; counter-reset: toc-counter; }
+  .toc > ol > li { counter-increment: toc-counter; margin-bottom: .3rem; }
+  .toc > ol > li > a::before { content: counter(toc-counter) ". "; font-weight: 600; color: #5f6368; }
+  .toc a { color: #1a73e8; font-size: .95rem; }
+  .toc ol ol { margin: .2rem 0 .2rem 1.4rem; }
+  .toc ol ol li { margin-bottom: .15rem; }
+  .toc ol ol a { font-size: .88rem; color: #5f6368; }
+
+  /* ── Tables ───────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: .9rem; }
+  thead th { background: #1a73e8; color: #fff; font-weight: 600; padding: .6rem .75rem; text-align: left; }
+  tbody td { padding: .55rem .75rem; border-bottom: 1px solid #e8eaed; vertical-align: top; }
+  tbody tr:nth-child(even) { background: #f8f9fa; }
+  tbody tr:hover { background: #e8f0fe; }
+  td code, th code { background: rgba(255,255,255,.25); padding: .1rem .35rem; border-radius: 3px; font-size: .85em; }
+
+  /* ── Code Blocks ──────────────────────────────────────── */
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 1.1rem 1.3rem; border-radius: 8px; overflow-x: auto; font-size: .85rem; line-height: 1.6; margin: 1rem 0 1.5rem; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+  p code, li code { background: #f1f3f4; color: #c62828; padding: .15rem .4rem; border-radius: 4px; font-size: .88em; }
+
+  /* ── Callout Boxes ────────────────────────────────────── */
+  .callout { border-left: 4px solid; border-radius: 0 8px 8px 0; padding: 1rem 1.2rem; margin: 1.2rem 0; }
+  .callout-info    { border-color: #1a73e8; background: #e8f0fe; }
+  .callout-warning { border-color: #f9a825; background: #fff8e1; }
+  .callout-success { border-color: #34a853; background: #e8f5e9; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout-label { font-weight: 700; font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .3rem; }
+  .callout-info .callout-label    { color: #1a73e8; }
+  .callout-warning .callout-label { color: #e65100; }
+  .callout-success .callout-label { color: #2e7d32; }
+
+  /* ── SVG Diagrams ─────────────────────────────────────── */
+  .diagram-wrap { margin: 1.5rem 0; text-align: center; overflow-x: auto; }
+  .diagram-wrap svg { max-width: 100%; height: auto; }
+  .diagram-caption { font-size: .82rem; color: #80868b; margin-top: .5rem; font-style: italic; }
+
+  /* ── Print ────────────────────────────────────────────── */
+  @media print {
+    body { background: #fff; }
+    .page-wrap { box-shadow: none; padding: 0; max-width: 100%; }
+    h2 { break-before: page; }
+    .toc { break-after: page; }
+    pre { white-space: pre-wrap; word-break: break-all; }
+    table { font-size: .8rem; }
+    .no-print { display: none; }
+  }
+
+  /* ── Responsive ───────────────────────────────────────── */
+  @media (max-width: 700px) {
+    .page-wrap { padding: 1rem 1.2rem 2rem; }
+    .cover h1 { font-size: 1.6rem; }
+    table { font-size: .8rem; }
+    pre { font-size: .78rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ════════════════════════════════════════════════════════
+     COVER
+     ════════════════════════════════════════════════════════ -->
+<header class="cover">
+  <h1>NFH-Kuza-Google Pilot</h1>
+  <p class="subtitle">Master Requirements Specification</p>
+  <p class="subtitle" style="font-size:.95rem;color:#3c4043;">Single-Window Rural Service Delivery Marketplace</p>
+  <div class="partner-logos">
+    <span class="partner-badge kuza">Kuza &mdash; Platform</span>
+    <span class="partner-badge google">Google &mdash; Cloud &amp; AI</span>
+    <span class="partner-badge beckn">Beckn &mdash; Open Network</span>
+  </div>
+  <p class="meta">
+    <span>Version 1.0</span>
+    <span>|</span>
+    <span>10 April 2026</span>
+    <span>|</span>
+    <span>Status: Draft</span>
+  </p>
+</header>
+
+<!-- ════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+     ════════════════════════════════════════════════════════ -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#s1">Executive Summary</a></li>
+    <li><a href="#s2">Actors</a></li>
+    <li><a href="#s3">Service Categories &amp; Taxonomy</a></li>
+    <li><a href="#s4">Detailed Flow Specifications</a>
+      <ol>
+        <li><a href="#s4-1">Livelihood Services Flow</a></li>
+        <li><a href="#s4-2">Household Services Flow</a></li>
+        <li><a href="#s4-3">Market Produce Flow</a></li>
+        <li><a href="#s4-4">Advisory Content Flow</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5">Data Model</a>
+      <ol>
+        <li><a href="#s5-1">Farmer Profile</a></li>
+        <li><a href="#s5-2">Provider Profile</a></li>
+        <li><a href="#s5-3">Transaction Fields &mdash; Farmer Side</a></li>
+        <li><a href="#s5-4">Transaction Fields &mdash; Provider Side</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6">Service Status Lifecycle</a></li>
+    <li><a href="#s7">WhatsApp Message Formats</a></li>
+    <li><a href="#s8">Location &amp; Matching</a></li>
+    <li><a href="#s9">Payment Model</a></li>
+    <li><a href="#s10">Provider Onboarding &amp; Catalog Management</a></li>
+    <li><a href="#s11">Integration Points</a>
+      <ol>
+        <li><a href="#s11-1">WhatsApp Cloud API</a></li>
+        <li><a href="#s11-2">Beckn Network</a></li>
+        <li><a href="#s11-3">Google AI</a></li>
+        <li><a href="#s11-4">Kuza Platform</a></li>
+      </ol>
+    </li>
+    <li><a href="#s12">Non-Functional Requirements</a></li>
+    <li><a href="#s13">Pilot Scope &amp; Future Extensions</a></li>
+  </ol>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════
+     1. EXECUTIVE SUMMARY
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s1">1. Executive Summary</h2>
+
+<p><strong>NFH-Kuza-Google</strong> is a pilot project to build a <strong>single-window rural service delivery marketplace</strong>. It connects rural households with local service providers through <strong>WhatsApp</strong> (farmer side) and a <strong>web app</strong> (provider side), using the <strong>Beckn open network protocol</strong> for interoperability.</p>
+
+<div class="callout callout-info">
+  <p class="callout-label">Partners</p>
+  <p><strong>Kuza</strong> &mdash; Platform technology, farmer &amp; provider networks, domain expertise.<br>
+  <strong>Google</strong> &mdash; Cloud infrastructure (GCC), AI services (location normalisation, advisory).<br>
+  <strong>Beckn</strong> &mdash; Open network protocol, DeDi Registry, ONIX adapters, Catalog &amp; Discovery Services.</p>
+</div>
+
+<h3>Key Characteristics</h3>
+<table>
+  <thead><tr><th>Characteristic</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Rural-focused</strong></td><td>Designed for cash-and-carry transactions. No e-commerce features (shopping cart, shipping, online payments).</td></tr>
+    <tr><td><strong>WhatsApp-first</strong></td><td>The farmer's entire experience is through WhatsApp &mdash; no app installation required.</td></tr>
+    <tr><td><strong>Provider hybrid</strong></td><td>Providers receive WhatsApp notifications and manage operations through a browser-based web app (no app installation).</td></tr>
+    <tr><td><strong>Cross-domain</strong></td><td>A single provider can offer services across all four categories simultaneously.</td></tr>
+    <tr><td><strong>Single window</strong></td><td>Everything a rural household needs &mdash; livelihood services, household services, market access, advisory content &mdash; through one interface.</td></tr>
+    <tr><td><strong>Location-based</strong></td><td>Providers matched by registered service areas (County + Sub-County).</td></tr>
+    <tr><td><strong>Kenya pilot</strong></td><td>47 Counties / Sub-Counties, KES currency, M-Pesa mobile money.</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     2. ACTORS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s2">2. Actors</h2>
+
+<h3>2.1 Farmers / Rural Households (Seekers)</h3>
+<ul>
+  <li><strong>Primary interface:</strong> WhatsApp</li>
+  <li><strong>Actions:</strong> Discover services, select providers, confirm orders, confirm service delivery, report payment method, provide feedback</li>
+  <li><strong>Profile captured once:</strong> name, phone (auto from WhatsApp), village/ward/county, GPS (optional), primary enterprise (optional), preferred language (optional)</li>
+</ul>
+
+<h3>2.2 Service Providers / Agripreneurs / Aggregators (Providers)</h3>
+<ul>
+  <li><strong>Primary interface:</strong> WhatsApp (notifications + quick actions) + Kuza Web App (detailed management)</li>
+  <li><strong>Actions:</strong> Receive order notifications on WhatsApp with action buttons; manage catalog, accept/reject orders, update status, report payment, provide feedback via web app</li>
+  <li><strong>Profile:</strong> name, phone, service area (counties/sub-counties), services offered, price list, capacity, availability, provider type</li>
+  <li>A <strong>single provider can serve across all four categories</strong></li>
+  <li>Agripreneurs already exist in Kuza Platform; other providers need onboarding</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════
+     3. SERVICE CATEGORIES & TAXONOMY
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s3">3. Service Categories &amp; Taxonomy</h2>
+
+<p><strong>Domain code:</strong> <code>local-services</code> (Beckn v2)</p>
+
+<p>Four top-level categories with dynamic sub-categories managed as master data:</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Example Sub-Categories</th><th>Example Services</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Livelihood-Services</strong></td>
+      <td>Livestock Services, Crop Services, Trades &amp; Skills</td>
+      <td>Vaccination, brooding, deworming, feed supply, ploughing, spraying, tailoring, welding, carpentry</td>
+    </tr>
+    <tr>
+      <td><strong>Household-Services</strong></td>
+      <td>Education, Health, Insurance, Consumer Goods</td>
+      <td>School fees, tutoring, books, hospital checkup, pharmacy, crop/health insurance, household items</td>
+    </tr>
+    <tr>
+      <td><strong>Market-Produce</strong></td>
+      <td>Farm Produce, Livestock Products, Handicrafts &amp; Goods</td>
+      <td>Vegetables, grains, fruits, eggs, milk, meat, live birds, handmade goods</td>
+    </tr>
+    <tr>
+      <td><strong>Advisory-Content</strong></td>
+      <td>Agricultural Advisory, Financial Literacy, Health &amp; Nutrition, Business Skills</td>
+      <td>Poultry care, crop management, budgeting, nutrition guides</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout callout-warning">
+  <p class="callout-label">Dynamic Taxonomy</p>
+  <p>Sub-categories are <strong>not</strong> hardcoded. They are managed as master data in Kuza Platform and pulled dynamically. New sub-categories can be added without schema changes.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     4. DETAILED FLOW SPECIFICATIONS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s4">4. Detailed Flow Specifications</h2>
+
+<!-- ── 4.1 Livelihood ──────────────────────────────────── -->
+<h3 id="s4-1">4.1 Livelihood Services Flow (Full Lifecycle)</h3>
+
+<p><strong>Example:</strong> Poultry Vaccination in Nakuru County</p>
+
+<!-- SVG: Livelihood Flow Diagram -->
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <defs>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#1a73e8"/></marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#34a853"/></marker>
+  </defs>
+  <!-- Title -->
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Livelihood Services &mdash; Farmer WhatsApp Flow</text>
+
+  <!-- Row 1 -->
+  <rect x="10" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="75" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">1</text>
+  <text x="75" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Farmer says "Hi"</text>
+  <line x1="140" y1="62" x2="165" y2="62" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="168" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="233" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">2-3</text>
+  <text x="233" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Select [Livelihood]</text>
+  <line x1="298" y1="62" x2="323" y2="62" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="326" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="391" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">4-5</text>
+  <text x="391" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Select service type</text>
+  <line x1="456" y1="62" x2="481" y2="62" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="484" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="549" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">6-7</text>
+  <text x="549" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Enter quantity</text>
+  <line x1="614" y1="62" x2="639" y2="62" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="642" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="707" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">8-9</text>
+  <text x="707" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Share location</text>
+
+  <!-- Connector down -->
+  <line x1="707" y1="84" x2="707" y2="110" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- Row 2 -->
+  <rect x="642" y="112" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="707" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">10-11</text>
+  <text x="707" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Select date</text>
+  <line x1="642" y1="134" x2="614" y2="134" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="484" y="112" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="549" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">12</text>
+  <text x="549" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">View providers list</text>
+  <line x1="484" y1="134" x2="456" y2="134" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="326" y="112" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="391" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">13</text>
+  <text x="391" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Select provider</text>
+  <line x1="326" y1="134" x2="298" y2="134" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="168" y="112" width="130" height="44" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="233" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">14-15</text>
+  <text x="233" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Confirm booking</text>
+  <line x1="168" y1="134" x2="140" y2="134" stroke="#e65100" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="10" y="112" width="130" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="75" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">16</text>
+  <text x="75" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Order ID issued</text>
+
+  <!-- Connector down to provider section -->
+  <line x1="75" y1="156" x2="75" y2="185" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- Provider section label -->
+  <rect x="10" y="188" width="762" height="28" rx="4" fill="#fce4ec"/>
+  <text x="391" y="207" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">Provider Side</text>
+
+  <!-- Row 3 - Provider -->
+  <rect x="10" y="226" width="155" height="44" rx="8" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+  <text x="87" y="244" text-anchor="middle" font-size="10" font-weight="600" fill="#c62828">17</text>
+  <text x="87" y="259" text-anchor="middle" font-size="10" fill="#1a1a2e">WhatsApp notification</text>
+  <line x1="165" y1="248" x2="195" y2="248" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="198" y="226" width="155" height="44" rx="8" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+  <text x="275" y="244" text-anchor="middle" font-size="10" font-weight="600" fill="#c62828">17</text>
+  <text x="275" y="259" text-anchor="middle" font-size="10" fill="#1a1a2e">Accept / Reject</text>
+  <line x1="353" y1="248" x2="383" y2="248" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="386" y="226" width="155" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="463" y="244" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">18</text>
+  <text x="463" y="259" text-anchor="middle" font-size="10" fill="#1a1a2e">Farmer notified</text>
+
+  <!-- Completion section label -->
+  <rect x="10" y="290" width="762" height="28" rx="4" fill="#e8f5e9"/>
+  <text x="391" y="309" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Fulfillment &amp; Completion</text>
+
+  <!-- Row 4 - Completion -->
+  <rect x="10" y="328" width="145" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="82" y="346" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">19-20</text>
+  <text x="82" y="361" text-anchor="middle" font-size="10" fill="#1a1a2e">Confirm delivery</text>
+  <line x1="155" y1="350" x2="185" y2="350" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="188" y="328" width="145" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="260" y="346" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">21-22</text>
+  <text x="260" y="361" text-anchor="middle" font-size="10" fill="#1a1a2e">Report payment</text>
+  <line x1="333" y1="350" x2="363" y2="350" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="366" y="328" width="145" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="438" y="346" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">23</text>
+  <text x="438" y="361" text-anchor="middle" font-size="10" fill="#1a1a2e">Order complete</text>
+</svg>
+<p class="diagram-caption">Figure 4.1 &mdash; Livelihood Services: End-to-end flow from farmer request to completion</p>
+</div>
+
+<h4>Farmer WhatsApp Flow (Step by Step)</h4>
+<ol>
+  <li>Farmer sends <strong>"Hi"</strong></li>
+  <li>System: <em>"Welcome. What do you need help with?"</em> &mdash; 4 buttons: Livelihood, Household, Market, Advisory</li>
+  <li>Farmer selects <strong>[Livelihood]</strong></li>
+  <li>System: <em>"What service do you need?"</em> &mdash; Numbered list: 1. Vaccination 2. Inputs 3. Brooding 4. Incubation (pulled from master data)</li>
+  <li>Farmer selects "1" (Vaccination)</li>
+  <li>System: <em>"How many birds do you need vaccinated?"</em></li>
+  <li>Farmer enters number (e.g., "200")</li>
+  <li>System: <em>"Please share your location"</em> &mdash; farmer shares village/ward/county or live GPS location</li>
+  <li>Google AI normalises location. System confirms: <em>"Nakuru County, Naivasha Sub-County. Correct?"</em> [Yes] [No]</li>
+  <li>System: <em>"When do you need the service?"</em> &mdash; buttons: Today, Tomorrow, Choose date</li>
+  <li>Farmer selects preferred date</li>
+  <li>System: <em>"Available service providers near you:"</em> &mdash; Numbered list showing provider name, price, rating<br>
+      <code>1. John Kariuki - KES 30/bird - 4.5 stars</code><br>
+      <code>2. Peter Omondi - KES 25/bird - 4.2 stars</code></li>
+  <li>Farmer selects provider (e.g., "1")</li>
+  <li>System shows booking summary: Service, Date, Provider, Total Cost (200 birds x KES 30 = KES 6,000) &mdash; [Confirm] [Cancel]</li>
+  <li>Farmer taps <strong>[Confirm]</strong></li>
+  <li>System: <em>"Your request has been sent to the provider. Order ID: ORD-20260412-001"</em></li>
+  <li>Provider receives WhatsApp notification with Accept/Reject buttons</li>
+  <li>System updates farmer: <em>"Your request has been accepted by John Kariuki. Visit on 12 Apr 2026. Contact: +254 712 345 678"</em></li>
+  <li>After service, System asks: <em>"Was the vaccination completed?"</em> [Yes] [No]</li>
+  <li>Farmer taps <strong>[Yes]</strong></li>
+  <li>System asks: <em>"How did you pay?"</em> &mdash; buttons: [Cash] [M-Pesa]</li>
+  <li>Farmer selects payment method</li>
+  <li>System: <em>"Thank you. Your request is completed."</em></li>
+</ol>
+
+<h4>Provider Flow for Same Order</h4>
+<ol>
+  <li>Provider receives WhatsApp: <em>"New order received! Vaccination - 200 birds. Farmer: Mary Wanjiku, Naivasha, Nakuru. Date: 12 Apr 2026. Amount: KES 6,000"</em> &mdash; [Accept] [Reject] [View Details]</li>
+  <li>Provider taps <strong>[Accept]</strong> &rarr; order status changes to <code>PROVIDER_ACCEPTED</code> &rarr; farmer notified</li>
+  <li>Provider taps <strong>[View Details]</strong> &rarr; opens Kuza Web App showing full order</li>
+  <li>After completing service, provider opens web app &rarr; marks complete &rarr; enters: actual service date, payment received (yes/no), amount, payment method, notes ("Vaccinated 200 birds, all healthy"), follow-up required (yes/no)</li>
+  <li>System triggers farmer confirmation flow (steps 19&ndash;23 above)</li>
+</ol>
+
+<h4>Beckn API Mapping</h4>
+<table>
+  <thead><tr><th>Flow Step</th><th>Beckn Action</th><th>Direction</th><th>Payload Summary</th></tr></thead>
+  <tbody>
+    <tr><td>Steps 3&ndash;11 (category + service + location + date)</td><td><code>discover</code></td><td>BAP &rarr; Network</td><td>category, subCategory, quantityRequired, farmerLocation, scheduledDate</td></tr>
+    <tr><td>Step 12 (provider list)</td><td><code>on_discover</code></td><td>Network &rarr; BAP</td><td>Catalog with providers, items (LivelihoodItemAttributes), offers filtered by service area</td></tr>
+    <tr><td>Step 13 (select provider)</td><td><code>select</code></td><td>BAP &rarr; BPP</td><td>Selected provider ID + item ID + offer ID</td></tr>
+    <tr><td>Quote confirmation</td><td><code>on_select</code></td><td>BPP &rarr; BAP</td><td>Price quote, cancellation policy, provider details</td></tr>
+    <tr><td>Steps 14&ndash;15 (confirm booking)</td><td><code>init</code> + <code>confirm</code></td><td>BAP &rarr; BPP</td><td>Farmer contact, scheduled date, quantity, confirmation</td></tr>
+    <tr><td>Step 16 (order created)</td><td><code>on_confirm</code></td><td>BPP &rarr; BAP</td><td>Order ID, provider details, status=ORDER_PLACED</td></tr>
+    <tr><td>Steps 17&ndash;18 (provider accepts)</td><td><code>status</code> update</td><td>BPP &rarr; BAP</td><td>status=PROVIDER_ACCEPTED, confirmedVisitTime</td></tr>
+    <tr><td>Steps 19&ndash;22 (completion + payment)</td><td><code>status</code> update</td><td>Both</td><td>status=COMPLETED &rarr; FARMER_CONFIRMED, payment details</td></tr>
+    <tr><td>Feedback</td><td><code>rate</code> / <code>on_rate</code></td><td>Both</td><td>Feedback objects</td></tr>
+  </tbody>
+</table>
+
+<!-- ── 4.2 Household ──────────────────────────────────── -->
+<h3 id="s4-2">4.2 Household Services Flow (Full Lifecycle)</h3>
+
+<!-- SVG: Household Flow Diagram -->
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Household Services &mdash; Farmer WhatsApp Flow</text>
+
+  <!-- Row 1 -->
+  <rect x="10" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="70" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">1-2</text>
+  <text x="70" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Welcome menu</text>
+  <line x1="130" y1="65" x2="148" y2="65" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="151" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="211" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">3</text>
+  <text x="211" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select [Household]</text>
+  <line x1="271" y1="65" x2="289" y2="65" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="292" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="352" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">4-5</text>
+  <text x="352" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select sub-category</text>
+  <line x1="412" y1="65" x2="430" y2="65" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="433" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="493" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">6-7</text>
+  <text x="493" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Enter details</text>
+  <line x1="553" y1="65" x2="571" y2="65" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="574" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="634" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">8-11</text>
+  <text x="634" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Location + date</text>
+
+  <line x1="634" y1="86" x2="634" y2="108" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- Row 2 -->
+  <rect x="574" y="110" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="634" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">12-13</text>
+  <text x="634" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select provider</text>
+  <line x1="574" y1="131" x2="553" y2="131" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="433" y="110" width="120" height="42" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="493" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#e65100">14-15</text>
+  <text x="493" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Confirm booking</text>
+  <line x1="433" y1="131" x2="412" y2="131" stroke="#e65100" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="292" y="110" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="352" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">16-18</text>
+  <text x="352" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Order + provider</text>
+  <line x1="292" y1="131" x2="271" y2="131" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="151" y="110" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="211" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">19-22</text>
+  <text x="211" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Deliver + pay</text>
+  <line x1="151" y1="131" x2="130" y2="131" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="10" y="110" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="70" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">23</text>
+  <text x="70" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Complete</text>
+</svg>
+<p class="diagram-caption">Figure 4.2 &mdash; Household Services: Structurally identical to Livelihood with domain-specific details</p>
+</div>
+
+<p>Structurally identical to Livelihood. Key differences:</p>
+<ul>
+  <li><strong>Sub-categories:</strong> Education, Health, Insurance, Consumer Goods</li>
+  <li><strong>Step 6 equivalent:</strong> Quantity/details question varies by service type (e.g., "Which school?" for fees, "How many items?" for products)</li>
+  <li><strong><code>serviceMode</code></strong> may be <code>FACILITY_VISIT</code> (hospital), <code>PRODUCT_DELIVERY</code> (items), <code>SERVICE_DELIVERY</code> (insurance agent)</li>
+  <li><strong><code>beneficiaryType</code></strong> can indicate CHILD, ELDERLY, etc.</li>
+  <li>Some services may require documents (school admission letter, hospital card)</li>
+</ul>
+
+<h4>Example: School Fees Payment in Kiambu</h4>
+<ol>
+  <li>Steps 1&ndash;5: Same pattern &mdash; select Household &rarr; Education &rarr; School Fees Payment</li>
+  <li>Step 6: <em>"Which school and class?"</em> (free text)</li>
+  <li>Step 7: <em>"School fee amount?"</em></li>
+  <li>Steps 8&ndash;11: Location + date (same pattern)</li>
+  <li>Steps 12&ndash;23: Provider selection &rarr; confirmation &rarr; fulfilment &rarr; payment (same pattern)</li>
+</ol>
+
+<!-- ── 4.3 Market Produce ─────────────────────────────── -->
+<h3 id="s4-3">4.3 Market Produce Flow (Full Lifecycle &mdash; Reversed Economics)</h3>
+
+<div class="callout callout-warning">
+  <p class="callout-label">Key Difference</p>
+  <p>In this flow the farmer is the <strong>seller</strong> and the provider is the <strong>buyer/aggregator</strong>. Money flows from provider to farmer.</p>
+</div>
+
+<!-- SVG: Market Produce Flow Diagram -->
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Market Produce &mdash; Reversed Economics Flow</text>
+
+  <!-- Legend -->
+  <rect x="10" y="38" width="12" height="12" rx="2" fill="#e8f0fe"/>
+  <text x="28" y="49" font-size="9" fill="#5f6368">Discovery</text>
+  <rect x="90" y="38" width="12" height="12" rx="2" fill="#fff3e0"/>
+  <text x="108" y="49" font-size="9" fill="#5f6368">Confirmation</text>
+  <rect x="190" y="38" width="12" height="12" rx="2" fill="#e8f5e9"/>
+  <text x="208" y="49" font-size="9" fill="#5f6368">Fulfilment</text>
+  <rect x="280" y="38" width="12" height="12" rx="2" fill="#fce4ec"/>
+  <text x="298" y="49" font-size="9" fill="#5f6368">Provider side</text>
+
+  <!-- Row 1 -->
+  <rect x="10" y="60" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="75" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">1-3</text>
+  <text x="75" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select [Market]</text>
+  <line x1="140" y1="81" x2="160" y2="81" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="163" y="60" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="228" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">4-7</text>
+  <text x="228" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select produce type</text>
+  <line x1="293" y1="81" x2="313" y2="81" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="316" y="60" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="381" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">8-9</text>
+  <text x="381" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Enter quantity</text>
+  <line x1="446" y1="81" x2="466" y2="81" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="469" y="60" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="534" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">10-11</text>
+  <text x="534" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Share location</text>
+  <line x1="599" y1="81" x2="619" y2="81" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="622" y="60" width="150" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="697" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">12</text>
+  <text x="697" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">View buyers list</text>
+
+  <line x1="697" y1="102" x2="697" y2="124" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- Row 2 -->
+  <rect x="622" y="126" width="150" height="42" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="697" y="144" text-anchor="middle" font-size="9.5" font-weight="600" fill="#e65100">13-15</text>
+  <text x="697" y="158" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select buyer + confirm</text>
+  <line x1="622" y1="147" x2="599" y2="147" stroke="#e65100" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="469" y="126" width="130" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="534" y="144" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">16-18</text>
+  <text x="534" y="158" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Order + buyer accepts</text>
+  <line x1="469" y1="147" x2="446" y2="147" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="316" y="126" width="130" height="42" rx="8" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+  <text x="381" y="144" text-anchor="middle" font-size="9.5" font-weight="600" fill="#c62828">Collection</text>
+  <text x="381" y="158" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Pickup / deliver</text>
+  <line x1="316" y1="147" x2="293" y2="147" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="163" y="126" width="130" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="228" y="144" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">19-22</text>
+  <text x="228" y="158" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Confirm + payment</text>
+  <line x1="163" y1="147" x2="140" y2="147" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="10" y="126" width="130" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="75" y="148" text-anchor="middle" font-size="10" font-weight="700" fill="#34a853">DONE</text>
+
+  <!-- Money flow annotation -->
+  <rect x="10" y="190" width="762" height="32" rx="6" fill="#fff8e1" stroke="#f9a825" stroke-width="1"/>
+  <text x="391" y="211" text-anchor="middle" font-size="11" font-weight="600" fill="#e65100">Money flows: Buyer/Aggregator (Provider) &#8594; Farmer (Seller)</text>
+</svg>
+<p class="diagram-caption">Figure 4.3 &mdash; Market Produce: Farmer is the seller, provider is the buyer. Money direction is reversed.</p>
+</div>
+
+<h4>Example: Joseph in Kiambu has 20 trays of eggs to sell</h4>
+<ol>
+  <li>Steps 1&ndash;2: Same welcome</li>
+  <li>Farmer selects <strong>[Market]</strong></li>
+  <li><em>"What would you like to sell?"</em> &mdash; 1. Farm Produce 2. Livestock Products 3. Handicrafts &amp; Goods</li>
+  <li>Farmer selects "2" (Livestock Products)</li>
+  <li><em>"What livestock product?"</em> &mdash; 1. Eggs 2. Milk 3. Live Birds 4. Meat</li>
+  <li>Farmer selects "1" (Eggs)</li>
+  <li><em>"How many trays of eggs do you have?"</em></li>
+  <li>Farmer enters "20"</li>
+  <li>Steps 10&ndash;11: Location (same pattern)</li>
+  <li><em>"Here are buyers near you:"</em> &mdash; <code>1. Mama Eggs Traders - KES 380/tray - Farm gate pickup - 4.3 stars</code></li>
+  <li>Farmer selects buyer</li>
+  <li>Summary: <em>"Selling: Eggs - 20 trays. Buyer: Mama Eggs Traders. Price: KES 380/tray (Total: KES 7,600). Collection: Farm gate pickup"</em> &mdash; [Confirm] [Cancel]</li>
+  <li>Steps 15&ndash;23: Same confirmation &rarr; provider notification &rarr; fulfilment &rarr; payment confirmation pattern</li>
+</ol>
+
+<h4>Key Schema Differences</h4>
+<ul>
+  <li><code>discover</code> intent includes <code>produceCategory</code>, <code>quantityAvailable</code></li>
+  <li><code>on_discover</code> returns aggregators with <strong>buying prices</strong>, <code>collectionMode</code>, <code>minimumQuantity</code></li>
+  <li>In <code>OrderAttributes</code>, <code>amountPaid</code> represents what aggregator pays farmer (reversed direction)</li>
+  <li><code>collectionMode</code> drives fulfilment: <code>FARM_GATE_PICKUP</code> | <code>COLLECTION_POINT</code> | <code>FARMER_DELIVERS</code></li>
+</ul>
+
+<!-- ── 4.4 Advisory ───────────────────────────────────── -->
+<h3 id="s4-4">4.4 Advisory Content Flow (Discover-Only)</h3>
+
+<!-- SVG: Advisory Flow Diagram -->
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Advisory Content &mdash; Discover-Only Flow</text>
+
+  <rect x="10" y="48" width="110" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="65" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">1-3</text>
+  <text x="65" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select [Advisory]</text>
+  <line x1="120" y1="69" x2="143" y2="69" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="146" y="48" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="206" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">4-5</text>
+  <text x="206" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select topic area</text>
+  <line x1="266" y1="69" x2="289" y2="69" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="292" y="48" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="352" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">6-7</text>
+  <text x="352" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select sub-topic</text>
+  <line x1="412" y1="69" x2="435" y2="69" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="438" y="48" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="503" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">8</text>
+  <text x="503" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">View content list</text>
+  <line x1="568" y1="69" x2="591" y2="69" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="594" y="48" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="654" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">9</text>
+  <text x="654" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select content</text>
+  <line x1="714" y1="69" x2="737" y2="69" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="740" y="48" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="800" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">10</text>
+  <text x="800" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Content delivered</text>
+
+  <!-- No lifecycle annotation -->
+  <rect x="10" y="112" width="850" height="28" rx="6" fill="#e8f5e9" stroke="#34a853" stroke-width="1"/>
+  <text x="435" y="131" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">No order lifecycle. Only discover / on_discover. Content delivered immediately.</text>
+</svg>
+<p class="diagram-caption">Figure 4.4 &mdash; Advisory Content: Discover-only, no transaction lifecycle</p>
+</div>
+
+<h4>Example: Ruth in Bungoma wants to learn about poultry disease prevention</h4>
+<ol>
+  <li>Steps 1&ndash;2: Same welcome</li>
+  <li>Farmer selects <strong>[Advisory]</strong></li>
+  <li><em>"What topic are you interested in?"</em> &mdash; 1. Agricultural Advisory 2. Financial Literacy 3. Health &amp; Nutrition 4. Business Skills</li>
+  <li>Farmer selects "1"</li>
+  <li><em>"Agricultural advisory topics:"</em> &mdash; 1. Poultry Care 2. Crop Management 3. Soil Health 4. Market Readiness</li>
+  <li>Farmer selects "1" (Poultry Care)</li>
+  <li>System sends request through Beckn (BAP &rarr; BPP). BPP calls <strong>Google AI</strong> with domain, category, sub-category, and farmer context.</li>
+  <li>Google AI generates advisory content and returns it to BPP.</li>
+  <li>BPP sends AI-generated response back through Beckn (BPP &rarr; BAP).</li>
+  <li>System delivers AI-generated advisory content to farmer on WhatsApp. <em>"Was this helpful?"</em> [Yes] [No]</li>
+</ol>
+
+<p><strong>Beckn mapping:</strong> <code>discover</code> / <code>on_discover</code>. The BPP calls Google AI during <code>on_discover</code> processing to generate advisory content. The AI-generated response is returned in the <code>on_discover</code> callback. Advisory is free &mdash; no <code>select</code> / <code>init</code> / <code>confirm</code> / <code>status</code>.</p>
+
+<div class="callout callout-info">
+  <strong>Google AI in Advisory flow:</strong> Unlike the other three flows where content comes from provider catalogs stored in Kuza Platform, Advisory content is <strong>generated by Google AI</strong> in real-time. The farmer's selections (domain, category, sub-category) plus their profile context are sent to Google AI, which produces the advisory response. This happens within the Beckn flow &mdash; the BPP calls Google AI as part of processing the <code>discover</code> request.
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     5. DATA MODEL
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s5">5. Data Model</h2>
+
+<h3 id="s5-1">5.1 Farmer Profile (One-time Fields)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Required</th></tr></thead>
+  <tbody>
+    <tr><td><code>farmer_name</code></td><td>string</td><td>WhatsApp registration</td><td>Yes</td></tr>
+    <tr><td><code>phone_number</code></td><td>string</td><td>Auto from WhatsApp (<code>wa_id</code>)</td><td>Yes</td></tr>
+    <tr><td><code>village</code></td><td>string</td><td>Captured once</td><td>No</td></tr>
+    <tr><td><code>ward</code></td><td>string</td><td>Captured once</td><td>No</td></tr>
+    <tr><td><code>county</code></td><td>string</td><td>Captured once</td><td>Yes</td></tr>
+    <tr><td><code>sub_county</code></td><td>string</td><td>Captured / derived</td><td>Yes</td></tr>
+    <tr><td><code>gps_latitude</code></td><td>decimal</td><td>Optional live location</td><td>No</td></tr>
+    <tr><td><code>gps_longitude</code></td><td>decimal</td><td>Optional live location</td><td>No</td></tr>
+    <tr><td><code>primary_enterprise</code></td><td>string</td><td>Optional</td><td>No</td></tr>
+    <tr><td><code>preferred_language</code></td><td>string</td><td>Optional (ISO 639-1)</td><td>No</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-2">5.2 Provider Profile (One-time Fields)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Required</th></tr></thead>
+  <tbody>
+    <tr><td><code>provider_name</code></td><td>string</td><td>Registration / onboarding</td><td>Yes</td></tr>
+    <tr><td><code>phone_number</code></td><td>string</td><td>Auto from WhatsApp</td><td>Yes</td></tr>
+    <tr><td><code>provider_type</code></td><td>string</td><td>Registration (vet, agrovet, aggregator, trainer, etc.)</td><td>Yes</td></tr>
+    <tr><td><code>services_offered</code></td><td>relation</td><td>Links to catalog items</td><td>Yes</td></tr>
+    <tr><td><code>price_list</code></td><td>relation</td><td>Links to offers per service</td><td>Yes</td></tr>
+    <tr><td><code>service_areas</code></td><td>relation</td><td>Counties + Sub-Counties served</td><td>Yes</td></tr>
+    <tr><td><code>capacity</code></td><td>object</td><td><code>{value, unit, period}</code> per service</td><td>No</td></tr>
+    <tr><td><code>availability</code></td><td>object</td><td><code>{availableDays, timeSlots}</code></td><td>No</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-3">5.3 Transaction Fields &mdash; Farmer Side (per request)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Captured When</th></tr></thead>
+  <tbody>
+    <tr><td><code>service_needed</code></td><td>string</td><td>Steps 4&ndash;5</td></tr>
+    <tr><td><code>quantity</code> / <code>details</code></td><td>varies</td><td>Steps 6&ndash;7 (e.g., number of birds)</td></tr>
+    <tr><td><code>preferred_date</code></td><td>date</td><td>Steps 10&ndash;11</td></tr>
+    <tr><td><code>selected_provider</code></td><td>relation</td><td>Step 13</td></tr>
+    <tr><td><code>booking_confirmed</code></td><td>boolean</td><td>Step 15</td></tr>
+    <tr><td><code>order_id</code></td><td>string</td><td>Step 16 (system generated)</td></tr>
+    <tr><td><code>order_status</code></td><td>enum</td><td>Throughout lifecycle</td></tr>
+    <tr><td><code>service_confirmed</code></td><td>boolean</td><td>Step 19</td></tr>
+    <tr><td><code>payment_method</code></td><td>enum (<code>CASH</code> | <code>MPESA</code>)</td><td>Step 21</td></tr>
+    <tr><td><code>payment_status</code></td><td>enum</td><td>Step 22</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s5-4">5.4 Transaction Fields &mdash; Provider Side (per request)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Captured When</th></tr></thead>
+  <tbody>
+    <tr><td><code>request_id</code></td><td>string</td><td>On notification</td></tr>
+    <tr><td><code>service_requested</code></td><td>string</td><td>From order</td></tr>
+    <tr><td><code>farmer_location</code></td><td>object</td><td>From order</td></tr>
+    <tr><td><code>quantity</code></td><td>varies</td><td>From order</td></tr>
+    <tr><td><code>requested_date</code></td><td>date</td><td>From order</td></tr>
+    <tr><td><code>acceptance_status</code></td><td>enum (<code>ACCEPTED</code> | <code>REJECTED</code>)</td><td>Provider action</td></tr>
+    <tr><td><code>confirmed_visit_time</code></td><td>datetime</td><td>Provider confirms</td></tr>
+    <tr><td><code>fulfillment_status</code></td><td>enum (<code>COMPLETED</code> | <code>NOT_COMPLETED</code>)</td><td>After service</td></tr>
+    <tr><td><code>payment_received</code></td><td>boolean</td><td>Provider reports</td></tr>
+    <tr><td><code>amount_received</code></td><td>number</td><td>Provider reports</td></tr>
+    <tr><td><code>notes_from_visit</code></td><td>string</td><td>Provider reports</td></tr>
+    <tr><td><code>follow_up_required</code></td><td>boolean</td><td>Provider flags</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     6. SERVICE STATUS LIFECYCLE
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s6">6. Service Status Lifecycle</h2>
+
+<!-- SVG: Status Lifecycle Diagram -->
+<div class="diagram-wrap">
+<svg viewBox="0 0 860 400" xmlns="http://www.w3.org/2000/svg" style="max-width:830px;">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3c4043"/></marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#c62828"/></marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2e7d32"/></marker>
+  </defs>
+
+  <text x="430" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Service Status Lifecycle</text>
+
+  <!-- ORDER_PLACED -->
+  <rect x="30" y="60" width="160" height="48" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="110" y="89" text-anchor="middle" font-size="12" font-weight="600" fill="#1a73e8">ORDER_PLACED</text>
+
+  <!-- Arrow to PROVIDER_ACCEPTED -->
+  <line x1="190" y1="84" x2="260" y2="84" stroke="#3c4043" stroke-width="1.8" marker-end="url(#arr)"/>
+  <text x="225" y="76" text-anchor="middle" font-size="8.5" fill="#5f6368">accept</text>
+
+  <!-- PROVIDER_ACCEPTED -->
+  <rect x="265" y="60" width="190" height="48" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="360" y="89" text-anchor="middle" font-size="12" font-weight="600" fill="#1a73e8">PROVIDER_ACCEPTED</text>
+
+  <!-- Arrow to IN_PROGRESS -->
+  <line x1="455" y1="84" x2="525" y2="84" stroke="#3c4043" stroke-width="1.8" marker-end="url(#arr)"/>
+  <text x="490" y="76" text-anchor="middle" font-size="8.5" fill="#5f6368">start</text>
+
+  <!-- IN_PROGRESS -->
+  <rect x="530" y="60" width="150" height="48" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="605" y="89" text-anchor="middle" font-size="12" font-weight="600" fill="#e65100">IN_PROGRESS</text>
+
+  <!-- Arrow to COMPLETED -->
+  <line x1="605" y1="108" x2="605" y2="155" stroke="#3c4043" stroke-width="1.8" marker-end="url(#arr)"/>
+  <text x="620" y="136" font-size="8.5" fill="#5f6368">done</text>
+
+  <!-- COMPLETED -->
+  <rect x="530" y="160" width="150" height="48" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="605" y="189" text-anchor="middle" font-size="12" font-weight="600" fill="#34a853">COMPLETED</text>
+
+  <!-- Arrow to FARMER_CONFIRMED -->
+  <line x1="530" y1="184" x2="455" y2="184" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arr-green)"/>
+  <text x="492" y="176" text-anchor="middle" font-size="8.5" fill="#5f6368">farmer confirms</text>
+
+  <!-- FARMER_CONFIRMED -->
+  <rect x="265" y="160" width="190" height="48" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="360" y="189" text-anchor="middle" font-size="12" font-weight="600" fill="#34a853">FARMER_CONFIRMED</text>
+
+  <!-- Arrow to CLOSED from FARMER_CONFIRMED -->
+  <line x1="265" y1="184" x2="190" y2="184" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#arr-green)"/>
+
+  <!-- CLOSED (main) -->
+  <rect x="30" y="160" width="160" height="48" rx="10" fill="#f1f3f4" stroke="#5f6368" stroke-width="2.5"/>
+  <text x="110" y="189" text-anchor="middle" font-size="13" font-weight="700" fill="#3c4043">CLOSED</text>
+
+  <!-- PROVIDER_REJECTED branch -->
+  <line x1="110" y1="108" x2="110" y2="155" stroke="#c62828" stroke-width="1.8" stroke-dasharray="6,3" marker-end="url(#arr-red)"/>
+  <text x="90" y="136" text-anchor="middle" font-size="8.5" fill="#c62828" transform="rotate(-90 90 136)">reject</text>
+
+  <!-- PROVIDER_REJECTED box (below ORDER_PLACED, pointing to CLOSED) -->
+  <!-- Actually let's draw it branching down from ORDER_PLACED -->
+  <rect x="30" y="270" width="190" height="48" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="125" y="299" text-anchor="middle" font-size="12" font-weight="600" fill="#c62828">PROVIDER_REJECTED</text>
+
+  <!-- Arrow ORDER_PLACED down to PROVIDER_REJECTED -->
+  <line x1="80" y1="108" x2="80" y2="215" stroke="#c62828" stroke-width="1.8" marker-end="url(#arr-red)"/>
+  <text x="65" y="165" font-size="8.5" fill="#c62828">reject</text>
+  <line x1="80" y1="215" x2="80" y2="265" stroke="#c62828" stroke-width="1.8" marker-end="url(#arr-red)"/>
+
+  <!-- Arrow PROVIDER_REJECTED to CLOSED -->
+  <line x1="125" y1="270" x2="125" y2="215" stroke="#5f6368" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <!-- Let's use a simpler approach: arrow from PROVIDER_REJECTED right to a CLOSED label -->
+  <line x1="220" y1="294" x2="310" y2="294" stroke="#5f6368" stroke-width="1.8" marker-end="url(#arr)"/>
+  <rect x="315" y="270" width="100" height="48" rx="10" fill="#f1f3f4" stroke="#5f6368" stroke-width="2"/>
+  <text x="365" y="299" text-anchor="middle" font-size="12" font-weight="700" fill="#3c4043">CLOSED</text>
+
+  <!-- CANCELLED branch -->
+  <rect x="530" y="270" width="150" height="48" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="605" y="299" text-anchor="middle" font-size="12" font-weight="600" fill="#c62828">CANCELLED</text>
+
+  <line x1="680" y1="294" x2="740" y2="294" stroke="#5f6368" stroke-width="1.8" marker-end="url(#arr)"/>
+  <rect x="745" y="270" width="100" height="48" rx="10" fill="#f1f3f4" stroke="#5f6368" stroke-width="2"/>
+  <text x="795" y="299" text-anchor="middle" font-size="12" font-weight="700" fill="#3c4043">CLOSED</text>
+
+  <!-- Note about CANCELLED -->
+  <text x="605" y="345" text-anchor="middle" font-size="9.5" fill="#5f6368" font-style="italic">Any state before COMPLETED</text>
+  <text x="605" y="358" text-anchor="middle" font-size="9.5" fill="#5f6368" font-style="italic">can transition to CANCELLED</text>
+
+  <!-- Advisory note -->
+  <rect x="530" y="375" width="315" height="22" rx="4" fill="#e8f5e9"/>
+  <text x="687" y="391" text-anchor="middle" font-size="9" font-weight="600" fill="#2e7d32">Advisory: No lifecycle. Content delivered immediately.</text>
+</svg>
+<p class="diagram-caption">Figure 6.1 &mdash; Service status lifecycle state machine. Green path = happy path. Red = rejection/cancellation.</p>
+</div>
+
+<h3>State Definitions</h3>
+<table>
+  <thead><tr><th>State</th><th>Description</th><th>Triggered By</th></tr></thead>
+  <tbody>
+    <tr><td><code>ORDER_PLACED</code></td><td>Order created after farmer confirms</td><td>Farmer taps [Confirm]</td></tr>
+    <tr><td><code>PROVIDER_ACCEPTED</code></td><td>Provider accepts the order</td><td>Provider taps [Accept]</td></tr>
+    <tr><td><code>PROVIDER_REJECTED</code></td><td>Provider rejects the order</td><td>Provider taps [Reject]</td></tr>
+    <tr><td><code>IN_PROGRESS</code></td><td>Provider has started the service</td><td>Provider updates via web app</td></tr>
+    <tr><td><code>COMPLETED</code></td><td>Provider marks service as done, reports payment</td><td>Provider updates via web app</td></tr>
+    <tr><td><code>FARMER_CONFIRMED</code></td><td>Farmer confirms service was delivered and reports payment method</td><td>Farmer taps [Yes] via WhatsApp</td></tr>
+    <tr><td><code>CANCELLED</code></td><td>Either party cancels before COMPLETED</td><td>Farmer or provider action</td></tr>
+    <tr><td><code>CLOSED</code></td><td>Terminal state</td><td>System (after FARMER_CONFIRMED, PROVIDER_REJECTED, or CANCELLED)</td></tr>
+  </tbody>
+</table>
+
+<h3>Transition Rules</h3>
+<pre>
+ORDER_PLACED  ──→  PROVIDER_ACCEPTED  ──→  IN_PROGRESS  ──→  COMPLETED  ──→  FARMER_CONFIRMED  ──→  CLOSED
+     │
+     └──→  PROVIDER_REJECTED  ──→  CLOSED
+
+Any state before COMPLETED  ──→  CANCELLED  ──→  CLOSED
+</pre>
+
+<!-- ════════════════════════════════════════════════════════
+     7. WHATSAPP MESSAGE FORMATS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s7">7. WhatsApp Message Formats</h2>
+
+<table>
+  <thead><tr><th>Format</th><th>When Used</th><th>Constraints</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Interactive Buttons</strong></td>
+      <td>Binary or small choices: Confirm/Cancel, Yes/No, category selection (when 3 or fewer options)</td>
+      <td>Maximum 3 buttons per message. Each button label max 20 characters.</td>
+    </tr>
+    <tr>
+      <td><strong>Numbered Text List</strong></td>
+      <td>Lists with more than 3 items: sub-categories, services, provider results</td>
+      <td>Format: <code>1. Option A\n2. Option B\n3. Option C</code>. User replies with number.</td>
+    </tr>
+    <tr>
+      <td><strong>Free Text Input</strong></td>
+      <td>Quantities (number of birds), location (village name), dates, feedback text</td>
+      <td>Validated by conversation engine. Re-prompted on invalid input.</td>
+    </tr>
+    <tr>
+      <td><strong>Media Messages</strong></td>
+      <td>Advisory content delivery: video, audio, PDF, images</td>
+      <td>Content URL in message payload. Supported: MP4, MP3, PDF, JPEG/PNG.</td>
+    </tr>
+    <tr>
+      <td><strong>Template Messages</strong></td>
+      <td>Provider outbound notifications (order alerts, status updates)</td>
+      <td>Requires pre-approved WhatsApp Business templates. Must include all required parameters.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     8. LOCATION & MATCHING
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s8">8. Location &amp; Matching</h2>
+
+<h3>Location Capture</h3>
+<ul>
+  <li>Farmer provides location as <strong>free text</strong> (village/ward/county) or <strong>GPS live location</strong> (WhatsApp location share)</li>
+  <li><strong>Google AI normalises</strong> free text to structured <code>County + Sub-County</code></li>
+  <li>System confirms normalised location with farmer before proceeding (<em>"Nakuru County, Naivasha Sub-County. Correct?"</em> [Yes] [No])</li>
+</ul>
+
+<h3>Provider Matching</h3>
+<ul>
+  <li>Providers register <strong>explicit service areas</strong>: one or more County + Sub-County combinations</li>
+  <li><strong>Match logic:</strong> farmer's <code>county + sub_county</code> must exist in provider's registered service areas</li>
+  <li>A provider near a county border can register <strong>neighbouring counties/sub-counties</strong></li>
+</ul>
+
+<h3>Kenya Geography</h3>
+<ul>
+  <li><strong>47 Counties</strong>, each with multiple Sub-Counties</li>
+  <li>Pilot will start with selected counties and expand</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════
+     9. PAYMENT MODEL
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s9">9. Payment Model</h2>
+
+<div class="callout callout-warning">
+  <p class="callout-label">Pilot Constraint</p>
+  <p>All payments are <strong>offline and self-reported</strong>. There is no online payment processing in the pilot.</p>
+</div>
+
+<table>
+  <thead><tr><th>Aspect</th><th>Details</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Accepted methods</strong></td><td>Cash and M-Pesa only</td></tr>
+    <tr><td><strong>Processing</strong></td><td>All payments happen offline &mdash; no online payment gateway</td></tr>
+    <tr><td><strong>Farmer reports</strong></td><td>Payment method (Cash / M-Pesa) via WhatsApp buttons</td></tr>
+    <tr><td><strong>Provider reports</strong></td><td>Payment received (yes/no), amount, method via Kuza Web App</td></tr>
+    <tr><td><strong>Reconciliation</strong></td><td>No automated reconciliation in pilot. Feedback flow handles disputes.</td></tr>
+    <tr><td><strong>Market flow</strong></td><td>Payment direction is <strong>reversed</strong>: provider/aggregator pays farmer</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     10. PROVIDER ONBOARDING & CATALOG
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s10">10. Provider Onboarding &amp; Catalog Management</h2>
+
+<h3>Existing Agripreneurs</h3>
+<p>Agripreneurs already exist in the Kuza Platform <code>user</code> table. They need supplementary data added:</p>
+<ul>
+  <li>Service offerings (linked to catalog items)</li>
+  <li>Per-unit pricing</li>
+  <li>Service areas (County + Sub-County selections)</li>
+</ul>
+
+<h3>New Provider Onboarding</h3>
+<p>Full onboarding flow for providers not already in Kuza Platform:</p>
+<ol>
+  <li><strong>Registration</strong> &mdash; name, phone, provider type (vet, agrovet, aggregator, trainer, etc.)</li>
+  <li><strong>Service area setup</strong> &mdash; select one or more Counties + Sub-Counties</li>
+  <li><strong>Catalog creation</strong> &mdash; list services with category, sub-category, pricing, capacity</li>
+  <li><strong>Price list management</strong> &mdash; per-unit pricing, availability windows</li>
+</ol>
+
+<p>All management is performed through the <strong>Kuza Web App</strong>. Catalog is published to the Beckn network via <code>BPP &rarr; ONIX &rarr; Catalog Service</code>.</p>
+
+<!-- ════════════════════════════════════════════════════════
+     11. INTEGRATION POINTS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s11">11. Integration Points</h2>
+
+<!-- SVG: High-level architecture -->
+<div class="diagram-wrap">
+<svg viewBox="0 0 860 340" xmlns="http://www.w3.org/2000/svg" style="max-width:830px;">
+  <defs>
+    <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#1a73e8"/></marker>
+    <marker id="arr2r" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M8,0 L0,3 L8,6" fill="#1a73e8"/></marker>
+  </defs>
+  <text x="430" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">System Architecture &mdash; Integration Points</text>
+
+  <!-- Farmer -->
+  <rect x="10" y="120" width="120" height="70" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="70" y="150" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Farmer</text>
+  <text x="70" y="168" text-anchor="middle" font-size="9.5" fill="#3c4043">WhatsApp</text>
+
+  <!-- WhatsApp Cloud API -->
+  <rect x="170" y="105" width="130" height="100" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="235" y="140" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">WhatsApp</text>
+  <text x="235" y="155" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">Cloud API</text>
+  <text x="235" y="175" text-anchor="middle" font-size="8.5" fill="#5f6368">webhook.php</text>
+  <text x="235" y="188" text-anchor="middle" font-size="8.5" fill="#5f6368">marketplace_handler</text>
+  <line x1="130" y1="155" x2="165" y2="155" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#arr2)"/>
+
+  <!-- BAP -->
+  <rect x="340" y="50" width="120" height="70" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="400" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">BAP</text>
+  <text x="400" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Seeker-side adapter</text>
+  <line x1="300" y1="135" x2="340" y2="100" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <!-- Beckn Network (center) -->
+  <rect x="500" y="110" width="140" height="90" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="570" y="140" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">Beckn Network</text>
+  <text x="570" y="158" text-anchor="middle" font-size="9" fill="#3c4043">DeDi Registry</text>
+  <text x="570" y="172" text-anchor="middle" font-size="9" fill="#3c4043">Catalog + Discovery</text>
+  <text x="570" y="186" text-anchor="middle" font-size="9" fill="#3c4043">ONIX Adapters</text>
+  <line x1="460" y1="85" x2="500" y2="130" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <!-- BPP -->
+  <rect x="340" y="190" width="120" height="70" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="400" y="220" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">BPP</text>
+  <text x="400" y="236" text-anchor="middle" font-size="9" fill="#3c4043">Provider-side adapter</text>
+  <line x1="500" y1="180" x2="460" y2="210" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <!-- Kuza Platform / MySQL -->
+  <rect x="170" y="215" width="130" height="70" rx="10" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="235" y="245" text-anchor="middle" font-size="10" font-weight="600" fill="#7b1fa2">Kuza Platform</text>
+  <text x="235" y="263" text-anchor="middle" font-size="9" fill="#3c4043">MySQL / Web App</text>
+  <line x1="300" y1="250" x2="335" y2="235" stroke="#7b1fa2" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <line x1="235" y1="215" x2="235" y2="210" stroke="#7b1fa2" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <!-- Google AI -->
+  <rect x="680" y="50" width="140" height="70" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="750" y="78" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">Google AI</text>
+  <text x="750" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Location normalisation</text>
+  <line x1="640" y1="130" x2="680" y2="100" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr2)"/>
+
+  <!-- Provider -->
+  <rect x="700" y="190" width="120" height="70" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="760" y="218" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Provider</text>
+  <text x="760" y="236" text-anchor="middle" font-size="9.5" fill="#3c4043">WhatsApp + Web</text>
+  <line x1="640" y1="180" x2="700" y2="210" stroke="#34a853" stroke-width="1.5" marker-end="url(#arr2)"/>
+</svg>
+<p class="diagram-caption">Figure 11.1 &mdash; High-level integration architecture</p>
+</div>
+
+<h3 id="s11-1">11.1 WhatsApp Cloud API</h3>
+<table>
+  <thead><tr><th>Direction</th><th>Mechanism</th><th>Details</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Inbound</strong></td><td><code>webhook.php</code></td><td>Receives all WhatsApp messages, routes marketplace flows to <code>beckn_marketplace_handler.php</code></td></tr>
+    <tr><td><strong>Outbound to farmer</strong></td><td><code>beckn_marketplace_handler.php</code></td><td>Sends interactive messages, text, media via WhatsApp Cloud API</td></tr>
+    <tr><td><strong>Outbound to provider</strong></td><td>Messaging queue / cron</td><td>Triggers pre-approved template messages with action button links</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s11-2">11.2 Beckn Network</h3>
+<ul>
+  <li><strong>BAP</strong> registered with DeDi Registry (identity + public key + callback URI)</li>
+  <li><strong>BPP</strong> registered with DeDi Registry</li>
+  <li><strong>ONIX adapters</strong> deployed on GCC (Docker containers)</li>
+  <li>Catalog published to <strong>Beckn Catalog Service</strong></li>
+  <li>Discovery routed through <strong>Beckn Discovery Service</strong></li>
+  <li>Transaction messages (<code>select</code> / <code>init</code> / <code>confirm</code> / <code>status</code>) routed directly BAP &harr; BPP via DeDi Registry</li>
+</ul>
+
+<h3 id="s11-3">11.3 Google AI</h3>
+<p>Google AI is integrated into two distinct points in the processing pipeline:</p>
+<ul>
+  <li><strong>Location normalisation (all flows):</strong> Called from the PHP handler (WhatsApp Handler layer). Farmer types free-text location &rarr; handler sends to Google AI &rarr; AI returns structured County + Sub-County &rarr; handler sends confirmation to farmer on WhatsApp.</li>
+  <li><strong>Advisory content generation (Advisory flow):</strong> Called from the BPP during <code>on_discover</code> processing. Farmer selects domain, category, sub-category &rarr; BAP sends <code>discover</code> through Beckn &rarr; BPP receives request &rarr; BPP calls Google AI with {domain, category, subCategory, farmerContext} &rarr; AI generates advisory content &rarr; BPP returns AI-generated response in <code>on_discover</code> callback &rarr; farmer receives content on WhatsApp.</li>
+</ul>
+
+<h3 id="s11-4">11.4 Kuza Platform</h3>
+<ul>
+  <li>BAP and BPP connect to <strong>MySQL</strong> for all data operations</li>
+  <li>Provider catalog read from MySQL tables</li>
+  <li>Orders, payments, feedback written to MySQL tables</li>
+  <li>Conversation state managed in MySQL tables</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════
+     12. NON-FUNCTIONAL REQUIREMENTS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s12">12. Non-Functional Requirements</h2>
+
+<table>
+  <thead><tr><th>Requirement</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td><strong>No shopping cart</strong></td><td>Each order is a single service/product transaction. No multi-item baskets.</td></tr>
+    <tr><td><strong>No shipping</strong></td><td>Services delivered on-site or at provider location. Market produce collected at farm gate or collection point.</td></tr>
+    <tr><td><strong>No online payments</strong></td><td>All payments are offline, self-reported by both parties.</td></tr>
+    <tr><td><strong>No app installation</strong></td><td>Farmer uses WhatsApp only. Provider uses WhatsApp + browser-based web app.</td></tr>
+    <tr><td><strong>Offline-friendly</strong></td><td>Critical WhatsApp flows work on low bandwidth. Minimal data transfer per interaction.</td></tr>
+    <tr><td><strong>Multilingual</strong></td><td>System should support English and Swahili at minimum.</td></tr>
+    <tr><td><strong>Data privacy</strong></td><td>Farmer phone numbers and personal data stored only in Kuza Platform, not transmitted beyond what Beckn protocol requires.</td></tr>
+    <tr><td><strong>Availability</strong></td><td>WhatsApp webhook must be highly available (provider = Meta). Kuza backend targets 99% uptime during pilot.</td></tr>
+    <tr><td><strong>Response time</strong></td><td>WhatsApp replies within 5 seconds for interactive flows. Provider discovery within 10 seconds.</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     13. PILOT SCOPE & FUTURE
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s13">13. Pilot Scope &amp; Future Extensions</h2>
+
+<h3>In Scope for Pilot</h3>
+<table>
+  <thead><tr><th>#</th><th>Feature</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>All four flows (Livelihood, Household, Market, Advisory)</td><td>Required</td></tr>
+    <tr><td>2</td><td>Farmer-initiated discovery for all flows</td><td>Required</td></tr>
+    <tr><td>3</td><td>Provider onboarding and catalog management via web app</td><td>Required</td></tr>
+    <tr><td>4</td><td>Full order lifecycle for paid flows (Livelihood, Household, Market)</td><td>Required</td></tr>
+    <tr><td>5</td><td>Advisory content delivery (discover-only)</td><td>Required</td></tr>
+    <tr><td>6</td><td>Location-based provider matching (County + Sub-County)</td><td>Required</td></tr>
+    <tr><td>7</td><td>WhatsApp conversations for farmer + notifications for provider</td><td>Required</td></tr>
+    <tr><td>8</td><td>Kenya deployment (counties, KES, M-Pesa)</td><td>Required</td></tr>
+  </tbody>
+</table>
+
+<h3>Future Extensions (NOT in Pilot)</h3>
+<table>
+  <thead><tr><th>Extension</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>Buyer-initiated discovery for Market</td><td>External buyers seeking produce via agripreneur aggregators</td></tr>
+    <tr><td>Online M-Pesa payment processing</td><td>Integrated payment gateway with real-time confirmation</td></tr>
+    <tr><td>Provider ratings &amp; reviews aggregation</td><td>Cumulative rating system influencing provider ranking</td></tr>
+    <tr><td>Multi-language AI advisory</td><td>AI-powered content delivery in multiple local languages</td></tr>
+    <tr><td>Feedback-driven provider ranking</td><td>Algorithmic ranking based on completion rate, ratings, response time</td></tr>
+    <tr><td>Provider WhatsApp conversational menu</td><td>Catalog management via WhatsApp (no web app needed)</td></tr>
+  </tbody>
+</table>
+
+<!-- ── Footer ──────────────────────────────────────────── -->
+<hr style="margin-top:3rem; border:none; border-top:2px solid #e8eaed;">
+<p style="text-align:center; font-size:.82rem; color:#80868b; margin-top:1.5rem;">
+  NFH-Kuza-Google Pilot &mdash; Master Specification v1.0 &mdash; 10 April 2026<br>
+  This document is the primary requirements specification. All development must conform to these specifications.
+</p>
+
+</div><!-- .page-wrap -->
+</body>
+</html>

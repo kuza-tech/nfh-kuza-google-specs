@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beckn Protocol Extension Schemas &mdash; NFH-Kuza-Google Pilot</title>
+<style>
+  :root {
+    --color-primary: #1a56db;
+    --color-primary-light: #e8eefb;
+    --color-primary-dark: #0f3a8e;
+    --color-bg: #ffffff;
+    --color-surface: #f8f9fb;
+    --color-border: #dde1e8;
+    --color-text: #1e2a3a;
+    --color-text-secondary: #5a6577;
+    --color-code-bg: #f0f2f5;
+    --color-required: #c0392b;
+    --color-optional: #7f8c8d;
+    --color-enum: #8e44ad;
+    --color-success: #27ae60;
+    --color-warning: #f39c12;
+    --color-info: #2980b9;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+    --max-width: 1120px;
+    --sidebar-width: 280px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background: var(--color-bg);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* --- Layout --- */
+  .page-wrapper { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--color-surface);
+    border-right: 1px solid var(--color-border);
+    padding: 24px 0;
+    z-index: 100;
+    font-size: 13px;
+  }
+
+  .sidebar-header {
+    padding: 0 20px 16px;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 12px;
+  }
+
+  .sidebar-header h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-header p {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+  }
+
+  .sidebar nav ul { list-style: none; }
+
+  .sidebar nav > ul > li { margin-bottom: 2px; }
+
+  .sidebar nav a {
+    display: block;
+    padding: 5px 20px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .sidebar nav a:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    border-left-color: var(--color-primary);
+  }
+
+  .sidebar nav .nav-section {
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text);
+    padding: 12px 20px 4px;
+    pointer-events: none;
+  }
+
+  .sidebar nav .nav-sub { padding-left: 32px; font-size: 12px; }
+
+  .main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    max-width: calc(var(--max-width) + 80px);
+    padding: 40px 48px 80px;
+  }
+
+  /* --- Typography --- */
+  h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; color: var(--color-text); }
+  h2 { font-size: 24px; font-weight: 700; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--color-border); }
+  h3 { font-size: 19px; font-weight: 700; margin: 36px 0 12px; color: var(--color-primary-dark); }
+  h4 { font-size: 15px; font-weight: 700; margin: 24px 0 8px; }
+  p { margin-bottom: 12px; }
+
+  .subtitle { font-size: 17px; color: var(--color-text-secondary); margin-bottom: 32px; }
+
+  /* --- Meta badges --- */
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .meta-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+
+  .meta-card .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    margin-bottom: 2px;
+  }
+
+  .meta-card .value { font-size: 15px; font-weight: 600; color: var(--color-text); }
+  .meta-card code { font-family: var(--font-mono); font-size: 14px; color: var(--color-primary); }
+
+  /* --- Tables --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 24px;
+    font-size: 13.5px;
+  }
+
+  thead th {
+    background: var(--color-surface);
+    font-weight: 700;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text-secondary);
+  }
+
+  tbody td {
+    padding: 9px 14px;
+    border: 1px solid var(--color-border);
+    vertical-align: top;
+  }
+
+  tbody tr:nth-child(even) { background: #fafbfc; }
+
+  td code, th code {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    background: var(--color-code-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  .badge-required { background: #fce4e4; color: var(--color-required); }
+  .badge-optional { background: #eef0f2; color: var(--color-optional); }
+  .badge-enum { background: #f3e8f9; color: var(--color-enum); }
+  .badge-conditional { background: #fef3cd; color: #856404; }
+
+  /* --- Code blocks --- */
+  pre {
+    background: #1e2638;
+    color: #d4dae5;
+    border-radius: 8px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 12px 0 24px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    tab-size: 2;
+  }
+
+  pre .comment { color: #6b7a90; }
+  pre .key { color: #7ec8e3; }
+  pre .string { color: #a8d8a8; }
+  pre .number { color: #f0b67f; }
+  pre .bool { color: #e8a0bf; }
+  pre .enum-val { color: #c9a0dc; }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  /* --- Schema card --- */
+  .schema-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin: 20px 0 36px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .schema-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .schema-card-header h3 { margin: 0; font-size: 20px; }
+
+  .schema-prefix {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--color-primary);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .schema-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 8px 0 16px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  }
+
+  .schema-meta span { display: flex; align-items: center; gap: 4px; }
+  .schema-meta strong { color: var(--color-text); font-weight: 600; }
+
+  /* --- Note boxes --- */
+  .note {
+    border-left: 4px solid var(--color-info);
+    background: #f0f6fb;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 12px 0 20px;
+    font-size: 13.5px;
+  }
+
+  .note.note-warning {
+    border-left-color: var(--color-warning);
+    background: #fef9ed;
+  }
+
+  .note.note-success {
+    border-left-color: var(--color-success);
+    background: #edf8f0;
+  }
+
+  .note strong { font-weight: 700; }
+
+  /* --- SVG diagram --- */
+  .diagram-container {
+    margin: 20px 0 28px;
+    overflow-x: auto;
+  }
+
+  .diagram-container svg { display: block; margin: 0 auto; }
+
+  /* --- Mapping table --- */
+  .mapping-table { margin: 16px 0; }
+  .mapping-table td:first-child { font-weight: 600; }
+
+  /* --- Category cards --- */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 16px 0 28px;
+  }
+
+  .category-card {
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    background: var(--color-surface);
+  }
+
+  .category-card .cat-code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .category-card .cat-flow {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+  }
+
+  .category-card .cat-desc {
+    font-size: 13px;
+    margin-top: 6px;
+    color: var(--color-text);
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main-content { margin-left: 0; padding: 24px 20px 60px; }
+  }
+
+  @media print {
+    .sidebar { display: none; }
+    .main-content { margin-left: 0; }
+    pre { white-space: pre-wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+<!-- ==================== SIDEBAR ==================== -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h2>Beckn Schemas</h2>
+    <p>NFH-Kuza-Google Pilot</p>
+  </div>
+  <nav>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#categories">Category Codes</a></li>
+      <li><a href="#beckn-mapping">Beckn v2 Mapping</a></li>
+
+      <li class="nav-section">Item Attributes</li>
+      <li><a href="#lia" class="nav-sub">1. LivelihoodItemAttributes</a></li>
+      <li><a href="#hia" class="nav-sub">2. HouseholdItemAttributes</a></li>
+      <li><a href="#mpia" class="nav-sub">3. MarketProduceItemAttributes</a></li>
+      <li><a href="#acia" class="nav-sub">4. AdvisoryContentItemAttributes</a></li>
+
+      <li class="nav-section">Offer / Fulfillment / Order</li>
+      <li><a href="#lsoa" class="nav-sub">5. LocalServiceOfferAttributes</a></li>
+      <li><a href="#lsfa" class="nav-sub">6. LocalServiceFulfillmentAttributes</a></li>
+      <li><a href="#lsor" class="nav-sub">7. LocalServiceOrderAttributes</a></li>
+
+      <li class="nav-section">Supporting</li>
+      <li><a href="#sub-schemas">Sub-schemas</a></li>
+      <li><a href="#lifecycle">Service Status Lifecycle</a></li>
+      <li><a href="#openapi-full">Full OpenAPI Bundle</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="main-content">
+
+<!-- ============================== OVERVIEW ============================== -->
+<h1 id="overview">Beckn Protocol Extension Schemas</h1>
+<p class="subtitle">Domain extension specifications for the NFH-Kuza-Google rural service delivery pilot</p>
+
+<div class="meta-grid">
+  <div class="meta-card">
+    <div class="label">Domain Code</div>
+    <div class="value"><code>local-services</code></div>
+  </div>
+  <div class="meta-card">
+    <div class="label">Protocol Version</div>
+    <div class="value">Beckn v2.0.0</div>
+  </div>
+  <div class="meta-card">
+    <div class="label">Extension Schemas</div>
+    <div class="value">7 schemas</div>
+  </div>
+  <div class="meta-card">
+    <div class="label">Sub-schemas</div>
+    <div class="value">4 shared types</div>
+  </div>
+</div>
+
+<p>This document defines the domain extension schemas for a <strong>local-services</strong> domain within Beckn v2.0.0. The domain enables rural households to discover and transact with local service providers across any service category through a single window, using WhatsApp as the consumer-side BAP interface and a web app as the provider-side BPP interface.</p>
+
+<div class="note">
+  <strong>Sub-categories are dynamic.</strong> Within each category, sub-categories are managed as master data in the Kuza Platform and are not hardcoded in these schemas. The <code>subCategory</code> field uses a generic <code>{code, name}</code> structure to support any sub-categorization.
+</div>
+
+<!-- ============================== CATEGORIES ============================== -->
+<h2 id="categories">Category Codes</h2>
+
+<div class="category-grid">
+  <div class="category-card">
+    <div class="cat-code">Livelihood-Services</div>
+    <div class="cat-flow">Livelihood Flow</div>
+    <div class="cat-desc">Any income/livelihood-related service or input (veterinary, crop, trades/skills services)</div>
+  </div>
+  <div class="category-card">
+    <div class="cat-code">Household-Services</div>
+    <div class="cat-flow">Household Flow</div>
+    <div class="cat-desc">Any household need (education, health, insurance, consumer goods)</div>
+  </div>
+  <div class="category-card">
+    <div class="cat-code">Market-Produce</div>
+    <div class="cat-flow">Market Flow</div>
+    <div class="cat-desc">Aggregation and sale of any goods/produce. Farmer is the seller, provider is the buyer/aggregator.</div>
+  </div>
+  <div class="category-card">
+    <div class="cat-code">Advisory-Content</div>
+    <div class="cat-flow">Advisory Flow</div>
+    <div class="cat-desc">Any informational/training content delivery. Free, discover-only &mdash; no order lifecycle.</div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr><th>Category Code</th><th>Flow</th><th>Has Order Lifecycle</th><th>Payment</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Livelihood-Services</code></td><td>Livelihood</td><td>Yes</td><td>Paid</td></tr>
+    <tr><td><code>Household-Services</code></td><td>Household</td><td>Yes</td><td>Paid</td></tr>
+    <tr><td><code>Market-Produce</code></td><td>Market</td><td>Yes</td><td>Paid</td></tr>
+    <tr><td><code>Advisory-Content</code></td><td>Advisory</td><td>No &mdash; discover only</td><td>Free</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================== BECKN MAPPING ============================== -->
+<h2 id="beckn-mapping">Beckn v2 Core Entity Mapping</h2>
+
+<p>These extension schemas attach to Beckn v2 core entities through the designated extension containers:</p>
+
+<table class="mapping-table">
+  <thead>
+    <tr><th>Extension Container</th><th>Beckn v2 Core Entity</th><th>Schemas</th><th>Purpose</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>itemAttributes</code></td>
+      <td>Resource / Item</td>
+      <td>LivelihoodItemAttributes, HouseholdItemAttributes, MarketProduceItemAttributes, AdvisoryContentItemAttributes</td>
+      <td>Describes what the service/item is and what the consumer needs</td>
+    </tr>
+    <tr>
+      <td><code>offerAttributes</code></td>
+      <td>Offer</td>
+      <td>LocalServiceOfferAttributes</td>
+      <td>Pricing, payment methods, availability, and capacity</td>
+    </tr>
+    <tr>
+      <td><code>fulfillmentAttributes</code></td>
+      <td>Performance / Fulfillment</td>
+      <td>LocalServiceFulfillmentAttributes</td>
+      <td>Location, scheduling, delivery mode, and service status tracking</td>
+    </tr>
+    <tr>
+      <td><code>orderAttributes</code></td>
+      <td>Contract / Order</td>
+      <td>LocalServiceOrderAttributes</td>
+      <td>Payment confirmation, service confirmation, and feedback from both parties</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note note-success">
+  <strong>Schema selection is driven by category.</strong> A Beckn message for <code>Livelihood-Services</code> would carry <code>LivelihoodItemAttributes</code> in <code>itemAttributes</code>, <code>LocalServiceOfferAttributes</code> in <code>offerAttributes</code>, <code>LocalServiceFulfillmentAttributes</code> in <code>fulfillmentAttributes</code>, and <code>LocalServiceOrderAttributes</code> in <code>orderAttributes</code>. Advisory uses only itemAttributes and fulfillmentAttributes (for location context).
+</div>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== SCHEMA 1: LIA ================================= -->
+<!-- ====================================================================== -->
+<h2 id="lia">1. LivelihoodItemAttributes</h2>
+
+<div class="schema-card">
+  <div class="schema-card-header">
+    <span class="schema-prefix">lia:</span>
+    <h3>LivelihoodItemAttributes</h3>
+  </div>
+  <div class="schema-meta">
+    <span>Container: <strong>itemAttributes</strong></span>
+    <span>Applies to: <strong>Livelihood-Services</strong></span>
+  </div>
+  <p>Describes a livelihood-related service or input that a farmer is seeking. Covers veterinary services, crop services, input supply, and trades/skills.</p>
+</div>
+
+<h4>Field Reference</h4>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>subCategory</code></td>
+      <td><code>object</code><br>{code, name}</td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Domain grouping within Livelihood</td>
+      <td><code>{"code": "livestock-services", "name": "Livestock Services"}</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceName</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Human-readable name of the service</td>
+      <td><code>"Poultry Vaccination"</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceDescription</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Detailed description of the service</td>
+      <td><code>"Newcastle Disease vaccination for broiler chickens"</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceMode</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>How the service is delivered. Values: <span class="badge badge-enum">ON_SITE_VISIT</span> <span class="badge badge-enum">PROVIDER_LOCATION</span> <span class="badge badge-enum">INPUT_DELIVERY</span></td>
+      <td><code>"ON_SITE_VISIT"</code></td>
+    </tr>
+    <tr>
+      <td><code>quantityRequired</code></td>
+      <td><code>QuantitySpec</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>What the farmer needs serviced/supplied</td>
+      <td><code>{"value": 200, "unit": "birds", "description": "Birds to vaccinate"}</code></td>
+    </tr>
+    <tr>
+      <td><code>estimatedDuration</code></td>
+      <td><code>string</code><br>ISO 8601</td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Estimated time to deliver the service</td>
+      <td><code>"PT2H"</code></td>
+    </tr>
+    <tr>
+      <td><code>inputDetails</code></td>
+      <td><code>object</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>For input supply: {inputName, unit, quantityPerUnit}</td>
+      <td><code>{"inputName": "Broiler Feed", "unit": "Kg", "quantityPerUnit": 50}</code></td>
+    </tr>
+    <tr>
+      <td><code>sectorContext</code></td>
+      <td><code>object</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Domain-specific context: {livestockType, breed, cropType, tradeType}</td>
+      <td><code>{"livestockType": "Poultry", "breed": "Broiler"}</code></td>
+    </tr>
+    <tr>
+      <td><code>availableLanguages</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>ISO 639-1 language codes</td>
+      <td><code>["en", "sw"]</code></td>
+    </tr>
+    <tr>
+      <td><code>tags</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Free-form tags for discoverability</td>
+      <td><code>["vaccination", "poultry", "broiler"]</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>OpenAPI 3.1 Definition</h4>
+<pre><span class="comment"># LivelihoodItemAttributes (lia:)</span>
+<span class="key">LivelihoodItemAttributes</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">required</span>:
+    - <span class="string">subCategory</span>
+    - <span class="string">serviceName</span>
+    - <span class="string">serviceMode</span>
+  <span class="key">properties</span>:
+    <span class="key">subCategory</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">code</span>, <span class="string">name</span>]
+      <span class="key">properties</span>:
+        <span class="key">code</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">description</span>: <span class="string">Domain grouping code within Livelihood</span>
+          <span class="key">examples</span>: [<span class="string">"livestock-services"</span>, <span class="string">"crop-services"</span>, <span class="string">"trades-skills"</span>]
+        <span class="key">name</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">description</span>: <span class="string">Human-readable sub-category name</span>
+    <span class="key">serviceName</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">description</span>: <span class="string">Human-readable name of the service</span>
+    <span class="key">serviceDescription</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">description</span>: <span class="string">Detailed description of the service</span>
+    <span class="key">serviceMode</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">ON_SITE_VISIT</span>, <span class="enum-val">PROVIDER_LOCATION</span>, <span class="enum-val">INPUT_DELIVERY</span>]
+      <span class="key">description</span>: <span class="string">How the service is delivered</span>
+    <span class="key">quantityRequired</span>:
+      <span class="key">$ref</span>: <span class="string">"#/components/schemas/QuantitySpec"</span>
+    <span class="key">estimatedDuration</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">format</span>: <span class="string">duration</span>
+      <span class="key">description</span>: <span class="string">ISO 8601 duration</span>
+    <span class="key">inputDetails</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">inputName</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">unit</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">quantityPerUnit</span>:
+          <span class="key">type</span>: <span class="string">number</span>
+    <span class="key">sectorContext</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">livestockType</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">breed</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">cropType</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">tradeType</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">availableLanguages</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">pattern</span>: <span class="string">"^[a-z]{2}$"</span>
+    <span class="key">tags</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span></pre>
+
+<h4>JSON Example &mdash; Beckn Message Fragment</h4>
+<pre>{
+  <span class="key">"context"</span>: {
+    <span class="key">"domain"</span>: <span class="string">"local-services"</span>,
+    <span class="key">"action"</span>: <span class="string">"on_discover"</span>,
+    <span class="key">"version"</span>: <span class="string">"2.0.0"</span>
+  },
+  <span class="key">"message"</span>: {
+    <span class="key">"catalog"</span>: {
+      <span class="key">"providers"</span>: [{
+        <span class="key">"id"</span>: <span class="string">"provider-uuid-001"</span>,
+        <span class="key">"descriptor"</span>: { <span class="key">"name"</span>: <span class="string">"Dr. Wanjiku Veterinary Services"</span> },
+        <span class="key">"items"</span>: [{
+          <span class="key">"id"</span>: <span class="string">"item-uuid-001"</span>,
+          <span class="key">"descriptor"</span>: { <span class="key">"name"</span>: <span class="string">"Poultry Vaccination"</span> },
+          <span class="key">"category_ids"</span>: [<span class="string">"Livelihood-Services"</span>],
+          <span class="key">"itemAttributes"</span>: {
+            <span class="key">"subCategory"</span>: { <span class="key">"code"</span>: <span class="string">"livestock-services"</span>, <span class="key">"name"</span>: <span class="string">"Livestock Services"</span> },
+            <span class="key">"serviceName"</span>: <span class="string">"Poultry Vaccination"</span>,
+            <span class="key">"serviceDescription"</span>: <span class="string">"Newcastle Disease vaccination for broiler chickens"</span>,
+            <span class="key">"serviceMode"</span>: <span class="string">"ON_SITE_VISIT"</span>,
+            <span class="key">"quantityRequired"</span>: { <span class="key">"value"</span>: <span class="number">200</span>, <span class="key">"unit"</span>: <span class="string">"birds"</span>, <span class="key">"description"</span>: <span class="string">"Birds to vaccinate"</span> },
+            <span class="key">"estimatedDuration"</span>: <span class="string">"PT2H"</span>,
+            <span class="key">"sectorContext"</span>: { <span class="key">"livestockType"</span>: <span class="string">"Poultry"</span>, <span class="key">"breed"</span>: <span class="string">"Broiler"</span> },
+            <span class="key">"availableLanguages"</span>: [<span class="string">"en"</span>, <span class="string">"sw"</span>],
+            <span class="key">"tags"</span>: [<span class="string">"vaccination"</span>, <span class="string">"poultry"</span>, <span class="string">"newcastle"</span>]
+          }
+        }]
+      }]
+    }
+  }
+}</pre>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== SCHEMA 2: HIA ================================= -->
+<!-- ====================================================================== -->
+<h2 id="hia">2. HouseholdItemAttributes</h2>
+
+<div class="schema-card">
+  <div class="schema-card-header">
+    <span class="schema-prefix">hia:</span>
+    <h3>HouseholdItemAttributes</h3>
+  </div>
+  <div class="schema-meta">
+    <span>Container: <strong>itemAttributes</strong></span>
+    <span>Applies to: <strong>Household-Services</strong></span>
+  </div>
+  <p>Describes a household-level need: education, health, insurance, consumer goods, or any non-livelihood service.</p>
+</div>
+
+<h4>Field Reference</h4>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>subCategory</code></td>
+      <td><code>object</code><br>{code, name}</td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Domain grouping within Household</td>
+      <td><code>{"code": "education", "name": "Education"}</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceName</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Human-readable name</td>
+      <td><code>"School Enrollment Assistance"</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceDescription</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Detailed description</td>
+      <td><code>"Help with primary school enrollment forms and fee payment"</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceMode</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>How the service is delivered. Values: <span class="badge badge-enum">SERVICE_DELIVERY</span> <span class="badge badge-enum">PRODUCT_DELIVERY</span> <span class="badge badge-enum">FACILITY_VISIT</span> <span class="badge badge-enum">DIGITAL</span></td>
+      <td><code>"SERVICE_DELIVERY"</code></td>
+    </tr>
+    <tr>
+      <td><code>quantityRequired</code></td>
+      <td><code>QuantitySpec</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>What the household needs</td>
+      <td><code>{"value": 2, "unit": "children", "description": "Children to enroll"}</code></td>
+    </tr>
+    <tr>
+      <td><code>beneficiaryType</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Who the service is for. Values: <span class="badge badge-enum">INDIVIDUAL</span> <span class="badge badge-enum">HOUSEHOLD</span> <span class="badge badge-enum">CHILD</span> <span class="badge badge-enum">ELDERLY</span></td>
+      <td><code>"CHILD"</code></td>
+    </tr>
+    <tr>
+      <td><code>documentsRequired</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Documents the household needs to provide</td>
+      <td><code>["Birth Certificate", "National ID"]</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceFrequency</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>How often the service occurs. Values: <span class="badge badge-enum">ONE_TIME</span> <span class="badge badge-enum">RECURRING</span> <span class="badge badge-enum">SEASONAL</span></td>
+      <td><code>"ONE_TIME"</code></td>
+    </tr>
+    <tr>
+      <td><code>availableLanguages</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>ISO 639-1 language codes</td>
+      <td><code>["en", "sw"]</code></td>
+    </tr>
+    <tr>
+      <td><code>tags</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Free-form tags for discoverability</td>
+      <td><code>["education", "enrollment", "primary-school"]</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>OpenAPI 3.1 Definition</h4>
+<pre><span class="comment"># HouseholdItemAttributes (hia:)</span>
+<span class="key">HouseholdItemAttributes</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">required</span>:
+    - <span class="string">subCategory</span>
+    - <span class="string">serviceName</span>
+    - <span class="string">serviceMode</span>
+  <span class="key">properties</span>:
+    <span class="key">subCategory</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">code</span>, <span class="string">name</span>]
+      <span class="key">properties</span>:
+        <span class="key">code</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">examples</span>: [<span class="string">"education"</span>, <span class="string">"health"</span>, <span class="string">"insurance"</span>, <span class="string">"consumer-goods"</span>]
+        <span class="key">name</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">serviceName</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">serviceDescription</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">serviceMode</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">SERVICE_DELIVERY</span>, <span class="enum-val">PRODUCT_DELIVERY</span>, <span class="enum-val">FACILITY_VISIT</span>, <span class="enum-val">DIGITAL</span>]
+    <span class="key">quantityRequired</span>:
+      <span class="key">$ref</span>: <span class="string">"#/components/schemas/QuantitySpec"</span>
+    <span class="key">beneficiaryType</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">INDIVIDUAL</span>, <span class="enum-val">HOUSEHOLD</span>, <span class="enum-val">CHILD</span>, <span class="enum-val">ELDERLY</span>]
+    <span class="key">documentsRequired</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">serviceFrequency</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">ONE_TIME</span>, <span class="enum-val">RECURRING</span>, <span class="enum-val">SEASONAL</span>]
+    <span class="key">availableLanguages</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">pattern</span>: <span class="string">"^[a-z]{2}$"</span>
+    <span class="key">tags</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span></pre>
+
+<h4>JSON Example &mdash; Beckn Message Fragment</h4>
+<pre>{
+  <span class="key">"context"</span>: {
+    <span class="key">"domain"</span>: <span class="string">"local-services"</span>,
+    <span class="key">"action"</span>: <span class="string">"on_discover"</span>,
+    <span class="key">"version"</span>: <span class="string">"2.0.0"</span>
+  },
+  <span class="key">"message"</span>: {
+    <span class="key">"catalog"</span>: {
+      <span class="key">"providers"</span>: [{
+        <span class="key">"id"</span>: <span class="string">"provider-uuid-020"</span>,
+        <span class="key">"descriptor"</span>: { <span class="key">"name"</span>: <span class="string">"Kiambu Education Services"</span> },
+        <span class="key">"items"</span>: [{
+          <span class="key">"id"</span>: <span class="string">"item-uuid-020"</span>,
+          <span class="key">"descriptor"</span>: { <span class="key">"name"</span>: <span class="string">"School Enrollment Assistance"</span> },
+          <span class="key">"category_ids"</span>: [<span class="string">"Household-Services"</span>],
+          <span class="key">"itemAttributes"</span>: {
+            <span class="key">"subCategory"</span>: { <span class="key">"code"</span>: <span class="string">"education"</span>, <span class="key">"name"</span>: <span class="string">"Education"</span> },
+            <span class="key">"serviceName"</span>: <span class="string">"School Enrollment Assistance"</span>,
+            <span class="key">"serviceDescription"</span>: <span class="string">"Help with primary school enrollment forms and fee payment"</span>,
+            <span class="key">"serviceMode"</span>: <span class="string">"SERVICE_DELIVERY"</span>,
+            <span class="key">"beneficiaryType"</span>: <span class="string">"CHILD"</span>,
+            <span class="key">"documentsRequired"</span>: [<span class="string">"Birth Certificate"</span>, <span class="string">"National ID"</span>],
+            <span class="key">"serviceFrequency"</span>: <span class="string">"ONE_TIME"</span>,
+            <span class="key">"availableLanguages"</span>: [<span class="string">"en"</span>, <span class="string">"sw"</span>],
+            <span class="key">"tags"</span>: [<span class="string">"education"</span>, <span class="string">"enrollment"</span>]
+          }
+        }]
+      }]
+    }
+  }
+}</pre>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== SCHEMA 3: MPIA ================================ -->
+<!-- ====================================================================== -->
+<h2 id="mpia">3. MarketProduceItemAttributes</h2>
+
+<div class="schema-card">
+  <div class="schema-card-header">
+    <span class="schema-prefix">mpia:</span>
+    <h3>MarketProduceItemAttributes</h3>
+  </div>
+  <div class="schema-meta">
+    <span>Container: <strong>itemAttributes</strong></span>
+    <span>Applies to: <strong>Market-Produce</strong></span>
+  </div>
+  <p>Describes the aggregation/buying service. In this flow the farmer is the seller and the provider is the buyer/aggregator.</p>
+</div>
+
+<div class="note note-warning">
+  <strong>Inverted roles.</strong> Unlike other categories where the provider delivers a service to the farmer, in Market-Produce the &ldquo;item&rdquo; is the aggregation/buying service. The provider (aggregator) buys produce from the farmer.
+</div>
+
+<h4>Field Reference</h4>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>subCategory</code></td>
+      <td><code>object</code><br>{code, name}</td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Domain grouping within Market</td>
+      <td><code>{"code": "livestock-products", "name": "Livestock Products"}</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceName</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Human-readable name</td>
+      <td><code>"Egg Collection Service"</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceDescription</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Detailed description</td>
+      <td><code>"Weekly egg collection from farm gate"</code></td>
+    </tr>
+    <tr>
+      <td><code>produceCategory</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>What the aggregator buys</td>
+      <td><code>"Eggs"</code></td>
+    </tr>
+    <tr>
+      <td><code>acceptedGrades</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Quality grades the aggregator accepts</td>
+      <td><code>["Grade A", "Grade B"]</code></td>
+    </tr>
+    <tr>
+      <td><code>unitOfMeasure</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Pricing/quantity unit</td>
+      <td><code>"Tray (30 eggs)"</code></td>
+    </tr>
+    <tr>
+      <td><code>minimumQuantity</code></td>
+      <td><code>number</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Minimum lot size the aggregator will collect</td>
+      <td><code>5</code></td>
+    </tr>
+    <tr>
+      <td><code>quantityAvailable</code></td>
+      <td><code>object</code><br>{value, unit}</td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>What the farmer has available to sell</td>
+      <td><code>{"value": 10, "unit": "Trays"}</code></td>
+    </tr>
+    <tr>
+      <td><code>collectionMode</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>How produce is collected. Values: <span class="badge badge-enum">FARM_GATE_PICKUP</span> <span class="badge badge-enum">COLLECTION_POINT</span> <span class="badge badge-enum">FARMER_DELIVERS</span></td>
+      <td><code>"FARM_GATE_PICKUP"</code></td>
+    </tr>
+    <tr>
+      <td><code>paymentTimeline</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>When farmer gets paid. Values: <span class="badge badge-enum">IMMEDIATE</span> <span class="badge badge-enum">UPON_COLLECTION</span> <span class="badge badge-enum">AFTER_SALE</span></td>
+      <td><code>"UPON_COLLECTION"</code></td>
+    </tr>
+    <tr>
+      <td><code>availableLanguages</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>ISO 639-1 language codes</td>
+      <td><code>["en", "sw"]</code></td>
+    </tr>
+    <tr>
+      <td><code>tags</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Free-form tags</td>
+      <td><code>["eggs", "poultry-products", "collection"]</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>OpenAPI 3.1 Definition</h4>
+<pre><span class="comment"># MarketProduceItemAttributes (mpia:)</span>
+<span class="key">MarketProduceItemAttributes</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">required</span>:
+    - <span class="string">subCategory</span>
+    - <span class="string">serviceName</span>
+    - <span class="string">produceCategory</span>
+    - <span class="string">unitOfMeasure</span>
+    - <span class="string">collectionMode</span>
+  <span class="key">properties</span>:
+    <span class="key">subCategory</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">code</span>, <span class="string">name</span>]
+      <span class="key">properties</span>:
+        <span class="key">code</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">examples</span>: [<span class="string">"livestock-products"</span>, <span class="string">"farm-produce"</span>, <span class="string">"handicrafts"</span>]
+        <span class="key">name</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">serviceName</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">serviceDescription</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">produceCategory</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">description</span>: <span class="string">What the aggregator buys</span>
+    <span class="key">acceptedGrades</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">unitOfMeasure</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">description</span>: <span class="string">Pricing/quantity unit</span>
+    <span class="key">minimumQuantity</span>:
+      <span class="key">type</span>: <span class="string">number</span>
+      <span class="key">description</span>: <span class="string">Minimum lot size</span>
+    <span class="key">quantityAvailable</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">value</span>:
+          <span class="key">type</span>: <span class="string">number</span>
+        <span class="key">unit</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">collectionMode</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">FARM_GATE_PICKUP</span>, <span class="enum-val">COLLECTION_POINT</span>, <span class="enum-val">FARMER_DELIVERS</span>]
+    <span class="key">paymentTimeline</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">IMMEDIATE</span>, <span class="enum-val">UPON_COLLECTION</span>, <span class="enum-val">AFTER_SALE</span>]
+    <span class="key">availableLanguages</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">pattern</span>: <span class="string">"^[a-z]{2}$"</span>
+    <span class="key">tags</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span></pre>
+
+<h4>JSON Example &mdash; Beckn Message Fragment</h4>
+<pre>{
+  <span class="key">"context"</span>: {
+    <span class="key">"domain"</span>: <span class="string">"local-services"</span>,
+    <span class="key">"action"</span>: <span class="string">"on_discover"</span>,
+    <span class="key">"version"</span>: <span class="string">"2.0.0"</span>
+  },
+  <span class="key">"message"</span>: {
+    <span class="key">"catalog"</span>: {
+      <span class="key">"providers"</span>: [{
+        <span class="key">"id"</span>: <span class="string">"provider-uuid-030"</span>,
+        <span class="key">"descriptor"</span>: { <span class="key">"name"</span>: <span class="string">"Kienyeji Egg Traders Ltd"</span> },
+        <span class="key">"items"</span>: [{
+          <span class="key">"id"</span>: <span class="string">"item-uuid-030"</span>,
+          <span class="key">"descriptor"</span>: { <span class="key">"name"</span>: <span class="string">"Egg Collection Service"</span> },
+          <span class="key">"category_ids"</span>: [<span class="string">"Market-Produce"</span>],
+          <span class="key">"itemAttributes"</span>: {
+            <span class="key">"subCategory"</span>: { <span class="key">"code"</span>: <span class="string">"livestock-products"</span>, <span class="key">"name"</span>: <span class="string">"Livestock Products"</span> },
+            <span class="key">"serviceName"</span>: <span class="string">"Egg Collection Service"</span>,
+            <span class="key">"produceCategory"</span>: <span class="string">"Eggs"</span>,
+            <span class="key">"acceptedGrades"</span>: [<span class="string">"Grade A"</span>, <span class="string">"Grade B"</span>],
+            <span class="key">"unitOfMeasure"</span>: <span class="string">"Tray (30 eggs)"</span>,
+            <span class="key">"minimumQuantity"</span>: <span class="number">5</span>,
+            <span class="key">"quantityAvailable"</span>: { <span class="key">"value"</span>: <span class="number">10</span>, <span class="key">"unit"</span>: <span class="string">"Trays"</span> },
+            <span class="key">"collectionMode"</span>: <span class="string">"FARM_GATE_PICKUP"</span>,
+            <span class="key">"paymentTimeline"</span>: <span class="string">"UPON_COLLECTION"</span>,
+            <span class="key">"tags"</span>: [<span class="string">"eggs"</span>, <span class="string">"poultry-products"</span>]
+          }
+        }]
+      }]
+    }
+  }
+}</pre>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== SCHEMA 4: ACIA ================================ -->
+<!-- ====================================================================== -->
+<h2 id="acia">4. AdvisoryContentItemAttributes</h2>
+
+<div class="schema-card">
+  <div class="schema-card-header">
+    <span class="schema-prefix">acia:</span>
+    <h3>AdvisoryContentItemAttributes</h3>
+  </div>
+  <div class="schema-meta">
+    <span>Container: <strong>itemAttributes</strong></span>
+    <span>Applies to: <strong>Advisory-Content</strong></span>
+  </div>
+  <p>Describes free advisory/training content. No order lifecycle &mdash; content URL is delivered directly in <code>on_discover</code>.</p>
+</div>
+
+<div class="note">
+  <strong>Advisory is discover-only.</strong> There is no select/init/confirm flow for advisory content. The <code>contentUrl</code> is delivered directly in the <code>on_discover</code> response, and no <code>offerAttributes</code> or <code>orderAttributes</code> are used.
+</div>
+
+<h4>Field Reference</h4>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>subCategory</code></td>
+      <td><code>object</code><br>{code, name}</td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Topic grouping within Advisory</td>
+      <td><code>{"code": "agricultural-advisory", "name": "Agricultural Advisory"}</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceName</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Content title</td>
+      <td><code>"Broiler Feeding Schedule - Week 1"</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceDescription</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Content description</td>
+      <td><code>"Optimal feeding schedule and quantities for week-1 broiler chicks"</code></td>
+    </tr>
+    <tr>
+      <td><code>contentType</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Media type. Values: <span class="badge badge-enum">TEXT</span> <span class="badge badge-enum">VIDEO</span> <span class="badge badge-enum">PDF</span> <span class="badge badge-enum">AUDIO</span> <span class="badge badge-enum">IMAGE</span> <span class="badge badge-enum">INFOGRAPHIC</span></td>
+      <td><code>"VIDEO"</code></td>
+    </tr>
+    <tr>
+      <td><code>contentMimeType</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>IANA MIME type</td>
+      <td><code>"video/mp4"</code></td>
+    </tr>
+    <tr>
+      <td><code>contentUrl</code></td>
+      <td><code>string</code><br>(uri)</td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Direct URL to the content</td>
+      <td><code>"https://platformcdn.kuza.one/global/content/video/feeding_schedule.mp4"</code></td>
+    </tr>
+    <tr>
+      <td><code>contentDuration</code></td>
+      <td><code>string</code><br>ISO 8601</td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Duration for video/audio content</td>
+      <td><code>"PT3M45S"</code></td>
+    </tr>
+    <tr>
+      <td><code>targetAudience</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Who the content is most relevant for</td>
+      <td><code>"Poultry farmers in first cycle"</code></td>
+    </tr>
+    <tr>
+      <td><code>availableLanguages</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>ISO 639-1 language codes</td>
+      <td><code>["en", "sw"]</code></td>
+    </tr>
+    <tr>
+      <td><code>tags</code></td>
+      <td><code>string[]</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Free-form tags</td>
+      <td><code>["feeding", "broiler", "week-1"]</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>OpenAPI 3.1 Definition</h4>
+<pre><span class="comment"># AdvisoryContentItemAttributes (acia:)</span>
+<span class="key">AdvisoryContentItemAttributes</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">required</span>:
+    - <span class="string">subCategory</span>
+    - <span class="string">serviceName</span>
+    - <span class="string">contentType</span>
+    - <span class="string">contentUrl</span>
+  <span class="key">properties</span>:
+    <span class="key">subCategory</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">code</span>, <span class="string">name</span>]
+      <span class="key">properties</span>:
+        <span class="key">code</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">examples</span>: [<span class="string">"agricultural-advisory"</span>, <span class="string">"financial-literacy"</span>, <span class="string">"health-nutrition"</span>]
+        <span class="key">name</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">serviceName</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">description</span>: <span class="string">Content title</span>
+    <span class="key">serviceDescription</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">contentType</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">TEXT</span>, <span class="enum-val">VIDEO</span>, <span class="enum-val">PDF</span>, <span class="enum-val">AUDIO</span>, <span class="enum-val">IMAGE</span>, <span class="enum-val">INFOGRAPHIC</span>]
+    <span class="key">contentMimeType</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">description</span>: <span class="string">IANA MIME type</span>
+    <span class="key">contentUrl</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">format</span>: <span class="string">uri</span>
+      <span class="key">description</span>: <span class="string">Direct URL to content</span>
+    <span class="key">contentDuration</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">format</span>: <span class="string">duration</span>
+      <span class="key">description</span>: <span class="string">ISO 8601 duration for video/audio</span>
+    <span class="key">targetAudience</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">availableLanguages</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">pattern</span>: <span class="string">"^[a-z]{2}$"</span>
+    <span class="key">tags</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span></pre>
+
+<h4>JSON Example &mdash; Beckn Message Fragment</h4>
+<pre>{
+  <span class="key">"context"</span>: {
+    <span class="key">"domain"</span>: <span class="string">"local-services"</span>,
+    <span class="key">"action"</span>: <span class="string">"on_discover"</span>,
+    <span class="key">"version"</span>: <span class="string">"2.0.0"</span>
+  },
+  <span class="key">"message"</span>: {
+    <span class="key">"catalog"</span>: {
+      <span class="key">"providers"</span>: [{
+        <span class="key">"id"</span>: <span class="string">"provider-uuid-kuza"</span>,
+        <span class="key">"descriptor"</span>: { <span class="key">"name"</span>: <span class="string">"Kuza Advisory Platform"</span> },
+        <span class="key">"items"</span>: [{
+          <span class="key">"id"</span>: <span class="string">"item-uuid-040"</span>,
+          <span class="key">"descriptor"</span>: { <span class="key">"name"</span>: <span class="string">"Broiler Feeding Schedule - Week 1"</span> },
+          <span class="key">"category_ids"</span>: [<span class="string">"Advisory-Content"</span>],
+          <span class="key">"itemAttributes"</span>: {
+            <span class="key">"subCategory"</span>: { <span class="key">"code"</span>: <span class="string">"agricultural-advisory"</span>, <span class="key">"name"</span>: <span class="string">"Agricultural Advisory"</span> },
+            <span class="key">"serviceName"</span>: <span class="string">"Broiler Feeding Schedule - Week 1"</span>,
+            <span class="key">"serviceDescription"</span>: <span class="string">"Optimal feeding schedule and quantities for week-1 broiler chicks"</span>,
+            <span class="key">"contentType"</span>: <span class="string">"VIDEO"</span>,
+            <span class="key">"contentMimeType"</span>: <span class="string">"video/mp4"</span>,
+            <span class="key">"contentUrl"</span>: <span class="string">"https://platformcdn.kuza.one/global/content/video/feeding_wk1.mp4"</span>,
+            <span class="key">"contentDuration"</span>: <span class="string">"PT3M45S"</span>,
+            <span class="key">"targetAudience"</span>: <span class="string">"Poultry farmers in first cycle"</span>,
+            <span class="key">"availableLanguages"</span>: [<span class="string">"en"</span>, <span class="string">"sw"</span>],
+            <span class="key">"tags"</span>: [<span class="string">"feeding"</span>, <span class="string">"broiler"</span>, <span class="string">"week-1"</span>]
+          }
+        }]
+      }]
+    }
+  }
+}</pre>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== SCHEMA 5: LSOA ================================ -->
+<!-- ====================================================================== -->
+<h2 id="lsoa">5. LocalServiceOfferAttributes</h2>
+
+<div class="schema-card">
+  <div class="schema-card-header">
+    <span class="schema-prefix">lsoa:</span>
+    <h3>LocalServiceOfferAttributes</h3>
+  </div>
+  <div class="schema-meta">
+    <span>Container: <strong>offerAttributes</strong></span>
+    <span>Applies to: <strong>Livelihood-Services, Household-Services, Market-Produce</strong></span>
+  </div>
+  <p>Pricing, payment methods, availability, and capacity for all paid flows. Not used for Advisory-Content.</p>
+</div>
+
+<h4>Field Reference</h4>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>priceAmount</code></td>
+      <td><code>number</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Base price</td>
+      <td><code>50</code></td>
+    </tr>
+    <tr>
+      <td><code>currency</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>ISO 4217 currency code</td>
+      <td><code>"KES"</code></td>
+    </tr>
+    <tr>
+      <td><code>priceUnit</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>What the price is per</td>
+      <td><code>"per bird"</code></td>
+    </tr>
+    <tr>
+      <td><code>pricingModel</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Pricing approach. Values: <span class="badge badge-enum">FIXED</span> <span class="badge badge-enum">PER_UNIT</span> <span class="badge badge-enum">PER_VISIT</span> <span class="badge badge-enum">NEGOTIABLE</span></td>
+      <td><code>"PER_UNIT"</code></td>
+    </tr>
+    <tr>
+      <td><code>acceptedPaymentMethods</code></td>
+      <td><code>enum[]</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>How the provider accepts payment. Values: <span class="badge badge-enum">CASH</span> <span class="badge badge-enum">MPESA</span></td>
+      <td><code>["CASH", "MPESA"]</code></td>
+    </tr>
+    <tr>
+      <td><code>capacity</code></td>
+      <td><code>object</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Provider capacity: {value, unit, period}</td>
+      <td><code>{"value": 500, "unit": "birds", "period": "per day"}</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceAvailability</code></td>
+      <td><code>object</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>When the provider is available: {availableDays, timeSlots}</td>
+      <td><code>{"availableDays": ["Mon","Tue","Wed","Thu","Fri"], "timeSlots": ["08:00-12:00","14:00-17:00"]}</code></td>
+    </tr>
+    <tr>
+      <td><code>cancellationPolicy</code></td>
+      <td><code>object</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Cancellation rules: {isCancellable, windowHours, reasons}</td>
+      <td><code>{"isCancellable": true, "windowHours": 24, "reasons": ["Weather","Emergency"]}</code></td>
+    </tr>
+    <tr>
+      <td><code>validFrom</code></td>
+      <td><code>string</code><br>(datetime)</td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Offer start date (ISO 8601)</td>
+      <td><code>"2026-04-01T00:00:00Z"</code></td>
+    </tr>
+    <tr>
+      <td><code>validTo</code></td>
+      <td><code>string</code><br>(datetime)</td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Offer expiry date (ISO 8601)</td>
+      <td><code>"2026-06-30T23:59:59Z"</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>OpenAPI 3.1 Definition</h4>
+<pre><span class="comment"># LocalServiceOfferAttributes (lsoa:)</span>
+<span class="key">LocalServiceOfferAttributes</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">required</span>:
+    - <span class="string">priceAmount</span>
+    - <span class="string">currency</span>
+    - <span class="string">pricingModel</span>
+    - <span class="string">acceptedPaymentMethods</span>
+  <span class="key">properties</span>:
+    <span class="key">priceAmount</span>:
+      <span class="key">type</span>: <span class="string">number</span>
+      <span class="key">description</span>: <span class="string">Base price</span>
+    <span class="key">currency</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">pattern</span>: <span class="string">"^[A-Z]{3}$"</span>
+      <span class="key">description</span>: <span class="string">ISO 4217 currency code</span>
+    <span class="key">priceUnit</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">description</span>: <span class="string">What the price is per (e.g., "per bird", "per visit")</span>
+    <span class="key">pricingModel</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">FIXED</span>, <span class="enum-val">PER_UNIT</span>, <span class="enum-val">PER_VISIT</span>, <span class="enum-val">NEGOTIABLE</span>]
+    <span class="key">acceptedPaymentMethods</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">enum</span>: [<span class="enum-val">CASH</span>, <span class="enum-val">MPESA</span>]
+      <span class="key">minItems</span>: <span class="number">1</span>
+    <span class="key">capacity</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">value</span>:
+          <span class="key">type</span>: <span class="string">number</span>
+        <span class="key">unit</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">period</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">serviceAvailability</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">availableDays</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>:
+            <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">timeSlots</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>:
+            <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">cancellationPolicy</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">isCancellable</span>:
+          <span class="key">type</span>: <span class="string">boolean</span>
+        <span class="key">windowHours</span>:
+          <span class="key">type</span>: <span class="string">integer</span>
+        <span class="key">reasons</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>:
+            <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">validFrom</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">format</span>: <span class="string">date-time</span>
+    <span class="key">validTo</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">format</span>: <span class="string">date-time</span></pre>
+
+<h4>JSON Example &mdash; Beckn Message Fragment</h4>
+<pre>{
+  <span class="key">"offerAttributes"</span>: {
+    <span class="key">"priceAmount"</span>: <span class="number">50</span>,
+    <span class="key">"currency"</span>: <span class="string">"KES"</span>,
+    <span class="key">"priceUnit"</span>: <span class="string">"per bird"</span>,
+    <span class="key">"pricingModel"</span>: <span class="string">"PER_UNIT"</span>,
+    <span class="key">"acceptedPaymentMethods"</span>: [<span class="string">"CASH"</span>, <span class="string">"MPESA"</span>],
+    <span class="key">"capacity"</span>: { <span class="key">"value"</span>: <span class="number">500</span>, <span class="key">"unit"</span>: <span class="string">"birds"</span>, <span class="key">"period"</span>: <span class="string">"per day"</span> },
+    <span class="key">"serviceAvailability"</span>: {
+      <span class="key">"availableDays"</span>: [<span class="string">"Mon"</span>, <span class="string">"Tue"</span>, <span class="string">"Wed"</span>, <span class="string">"Thu"</span>, <span class="string">"Fri"</span>],
+      <span class="key">"timeSlots"</span>: [<span class="string">"08:00-12:00"</span>, <span class="string">"14:00-17:00"</span>]
+    },
+    <span class="key">"cancellationPolicy"</span>: {
+      <span class="key">"isCancellable"</span>: <span class="bool">true</span>,
+      <span class="key">"windowHours"</span>: <span class="number">24</span>,
+      <span class="key">"reasons"</span>: [<span class="string">"Weather"</span>, <span class="string">"Emergency"</span>]
+    },
+    <span class="key">"validFrom"</span>: <span class="string">"2026-04-01T00:00:00Z"</span>,
+    <span class="key">"validTo"</span>: <span class="string">"2026-06-30T23:59:59Z"</span>
+  }
+}</pre>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== SCHEMA 6: LSFA ================================ -->
+<!-- ====================================================================== -->
+<h2 id="lsfa">6. LocalServiceFulfillmentAttributes</h2>
+
+<div class="schema-card">
+  <div class="schema-card-header">
+    <span class="schema-prefix">lsfa:</span>
+    <h3>LocalServiceFulfillmentAttributes</h3>
+  </div>
+  <div class="schema-meta">
+    <span>Container: <strong>fulfillmentAttributes</strong></span>
+    <span>Applies to: <strong>All flows</strong> (including Advisory for location context)</span>
+  </div>
+  <p>Location, scheduling, delivery mode, and service status tracking. Used across all four category flows.</p>
+</div>
+
+<h4>Field Reference</h4>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>serviceArea</code></td>
+      <td><code>ServiceArea[]</code></td>
+      <td><span class="badge badge-conditional">Required (provider)</span></td>
+      <td>Provider's registered coverage areas</td>
+      <td><code>[{"countyCode": "022", "countyName": "Kiambu", "subCounties": [{"subCountyCode": "022-01", "subCountyName": "Thika Town"}]}]</code></td>
+    </tr>
+    <tr>
+      <td><code>farmerLocation</code></td>
+      <td><code>FarmerLocation</code></td>
+      <td><span class="badge badge-conditional">Required (farmer)</span></td>
+      <td>Farmer's location details</td>
+      <td><code>{"county": "Kiambu", "subCounty": "Thika Town", "ward": "Kamenu", "village": "Makongeni"}</code></td>
+    </tr>
+    <tr>
+      <td><code>scheduledDate</code></td>
+      <td><code>string</code><br>(date)</td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Farmer's preferred service date (ISO 8601)</td>
+      <td><code>"2026-04-15"</code></td>
+    </tr>
+    <tr>
+      <td><code>scheduledTimeSlot</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Preferred time of day</td>
+      <td><code>"Morning"</code></td>
+    </tr>
+    <tr>
+      <td><code>confirmedVisitTime</code></td>
+      <td><code>string</code><br>(datetime)</td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Provider's confirmed visit date/time</td>
+      <td><code>"2026-04-15T09:00:00+03:00"</code></td>
+    </tr>
+    <tr>
+      <td><code>actualServiceDate</code></td>
+      <td><code>string</code><br>(date)</td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>When service was actually provided</td>
+      <td><code>"2026-04-15"</code></td>
+    </tr>
+    <tr>
+      <td><code>deliveryMode</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>How the service is delivered. Values: <span class="badge badge-enum">ON_SITE</span> <span class="badge badge-enum">PROVIDER_LOCATION</span> <span class="badge badge-enum">COLLECTION_POINT</span> <span class="badge badge-enum">DIGITAL</span></td>
+      <td><code>"ON_SITE"</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceStatus</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-required">Required</span></td>
+      <td>Current status in lifecycle. Values: <span class="badge badge-enum">ORDER_PLACED</span> <span class="badge badge-enum">PROVIDER_ACCEPTED</span> <span class="badge badge-enum">PROVIDER_REJECTED</span> <span class="badge badge-enum">IN_PROGRESS</span> <span class="badge badge-enum">COMPLETED</span> <span class="badge badge-enum">FARMER_CONFIRMED</span> <span class="badge badge-enum">CANCELLED</span> <span class="badge badge-enum">CLOSED</span></td>
+      <td><code>"PROVIDER_ACCEPTED"</code></td>
+    </tr>
+    <tr>
+      <td><code>providerNotes</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Notes from the provider's visit</td>
+      <td><code>"Vaccinated 195 birds. 5 birds showed signs of illness, recommended isolation."</code></td>
+    </tr>
+    <tr>
+      <td><code>followUpRequired</code></td>
+      <td><code>boolean</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Provider flags if follow-up is needed</td>
+      <td><code>true</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>OpenAPI 3.1 Definition</h4>
+<pre><span class="comment"># LocalServiceFulfillmentAttributes (lsfa:)</span>
+<span class="key">LocalServiceFulfillmentAttributes</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">required</span>:
+    - <span class="string">deliveryMode</span>
+    - <span class="string">serviceStatus</span>
+  <span class="key">properties</span>:
+    <span class="key">serviceArea</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">description</span>: <span class="string">Provider's registered coverage areas (required for provider)</span>
+      <span class="key">items</span>:
+        <span class="key">$ref</span>: <span class="string">"#/components/schemas/ServiceArea"</span>
+    <span class="key">farmerLocation</span>:
+      <span class="key">$ref</span>: <span class="string">"#/components/schemas/FarmerLocation"</span>
+    <span class="key">scheduledDate</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">format</span>: <span class="string">date</span>
+      <span class="key">description</span>: <span class="string">Farmer's preferred service date</span>
+    <span class="key">scheduledTimeSlot</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">description</span>: <span class="string">Preferred time (e.g., "Morning", "Afternoon")</span>
+    <span class="key">confirmedVisitTime</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">format</span>: <span class="string">date-time</span>
+      <span class="key">description</span>: <span class="string">Provider's confirmed date/time</span>
+    <span class="key">actualServiceDate</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">format</span>: <span class="string">date</span>
+      <span class="key">description</span>: <span class="string">When service was actually provided</span>
+    <span class="key">deliveryMode</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">ON_SITE</span>, <span class="enum-val">PROVIDER_LOCATION</span>, <span class="enum-val">COLLECTION_POINT</span>, <span class="enum-val">DIGITAL</span>]
+    <span class="key">serviceStatus</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>:
+        - <span class="enum-val">ORDER_PLACED</span>
+        - <span class="enum-val">PROVIDER_ACCEPTED</span>
+        - <span class="enum-val">PROVIDER_REJECTED</span>
+        - <span class="enum-val">IN_PROGRESS</span>
+        - <span class="enum-val">COMPLETED</span>
+        - <span class="enum-val">FARMER_CONFIRMED</span>
+        - <span class="enum-val">CANCELLED</span>
+        - <span class="enum-val">CLOSED</span>
+    <span class="key">providerNotes</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">followUpRequired</span>:
+      <span class="key">type</span>: <span class="string">boolean</span></pre>
+
+<h4>JSON Example &mdash; Beckn Message Fragment</h4>
+<pre>{
+  <span class="key">"fulfillmentAttributes"</span>: {
+    <span class="key">"serviceArea"</span>: [{
+      <span class="key">"countyCode"</span>: <span class="string">"022"</span>,
+      <span class="key">"countyName"</span>: <span class="string">"Kiambu"</span>,
+      <span class="key">"subCounties"</span>: [{
+        <span class="key">"subCountyCode"</span>: <span class="string">"022-01"</span>,
+        <span class="key">"subCountyName"</span>: <span class="string">"Thika Town"</span>
+      }]
+    }],
+    <span class="key">"farmerLocation"</span>: {
+      <span class="key">"county"</span>: <span class="string">"Kiambu"</span>,
+      <span class="key">"subCounty"</span>: <span class="string">"Thika Town"</span>,
+      <span class="key">"ward"</span>: <span class="string">"Kamenu"</span>,
+      <span class="key">"village"</span>: <span class="string">"Makongeni"</span>,
+      <span class="key">"gpsCoordinates"</span>: { <span class="key">"latitude"</span>: <span class="number">-1.0396</span>, <span class="key">"longitude"</span>: <span class="number">37.0900</span> }
+    },
+    <span class="key">"scheduledDate"</span>: <span class="string">"2026-04-15"</span>,
+    <span class="key">"scheduledTimeSlot"</span>: <span class="string">"Morning"</span>,
+    <span class="key">"confirmedVisitTime"</span>: <span class="string">"2026-04-15T09:00:00+03:00"</span>,
+    <span class="key">"deliveryMode"</span>: <span class="string">"ON_SITE"</span>,
+    <span class="key">"serviceStatus"</span>: <span class="string">"PROVIDER_ACCEPTED"</span>,
+    <span class="key">"followUpRequired"</span>: <span class="bool">false</span>
+  }
+}</pre>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== SCHEMA 7: LSOR ================================ -->
+<!-- ====================================================================== -->
+<h2 id="lsor">7. LocalServiceOrderAttributes</h2>
+
+<div class="schema-card">
+  <div class="schema-card-header">
+    <span class="schema-prefix">lsor:</span>
+    <h3>LocalServiceOrderAttributes</h3>
+  </div>
+  <div class="schema-meta">
+    <span>Container: <strong>orderAttributes</strong></span>
+    <span>Applies to: <strong>Livelihood-Services, Household-Services, Market-Produce</strong></span>
+  </div>
+  <p>Post-transaction attributes for all paid flows. Both sides (farmer and provider) report payment status independently, enabling reconciliation without a shared payment gateway.</p>
+</div>
+
+<div class="note note-warning">
+  <strong>Dual-sided reporting.</strong> Payment is reported independently by both parties &mdash; the farmer reports via WhatsApp and the provider reports via the web app. There is no integrated payment gateway; reconciliation happens by comparing both reports.
+</div>
+
+<h4>Field Reference</h4>
+<table>
+  <thead>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th><th>Example</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>farmerPaymentMethod</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>How the farmer paid. Values: <span class="badge badge-enum">CASH</span> <span class="badge badge-enum">MPESA</span></td>
+      <td><code>"MPESA"</code></td>
+    </tr>
+    <tr>
+      <td><code>farmerPaymentStatus</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Farmer's self-reported payment status. Values: <span class="badge badge-enum">PAID</span> <span class="badge badge-enum">NOT_PAID</span></td>
+      <td><code>"PAID"</code></td>
+    </tr>
+    <tr>
+      <td><code>providerPaymentReceived</code></td>
+      <td><code>boolean</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Provider confirms receipt of payment</td>
+      <td><code>true</code></td>
+    </tr>
+    <tr>
+      <td><code>providerAmountReceived</code></td>
+      <td><code>number</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Amount the provider received</td>
+      <td><code>10000</code></td>
+    </tr>
+    <tr>
+      <td><code>paymentCurrency</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>ISO 4217 currency code</td>
+      <td><code>"KES"</code></td>
+    </tr>
+    <tr>
+      <td><code>serviceConfirmedByFarmer</code></td>
+      <td><code>boolean</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Farmer confirms the service was performed</td>
+      <td><code>true</code></td>
+    </tr>
+    <tr>
+      <td><code>providerFulfillmentStatus</code></td>
+      <td><code>enum</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Provider's self-reported fulfillment status. Values: <span class="badge badge-enum">COMPLETED</span> <span class="badge badge-enum">NOT_COMPLETED</span></td>
+      <td><code>"COMPLETED"</code></td>
+    </tr>
+    <tr>
+      <td><code>providerFeedback</code></td>
+      <td><code>Feedback</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Provider's feedback: {rating, selectedOption, additionalText}</td>
+      <td><code>{"rating": 4, "selectedOption": "Good experience", "additionalText": "Farmer was prepared"}</code></td>
+    </tr>
+    <tr>
+      <td><code>farmerFeedback</code></td>
+      <td><code>Feedback</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Farmer's feedback: {rating, selectedOption, additionalText}</td>
+      <td><code>{"rating": 5, "selectedOption": "Excellent service"}</code></td>
+    </tr>
+    <tr>
+      <td><code>followUpRequired</code></td>
+      <td><code>boolean</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>Provider flags if follow-up is needed</td>
+      <td><code>true</code></td>
+    </tr>
+    <tr>
+      <td><code>followUpNotes</code></td>
+      <td><code>string</code></td>
+      <td><span class="badge badge-optional">Optional</span></td>
+      <td>What follow-up is needed</td>
+      <td><code>"Booster vaccination needed in 2 weeks"</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>OpenAPI 3.1 Definition</h4>
+<pre><span class="comment"># LocalServiceOrderAttributes (lsor:)</span>
+<span class="key">LocalServiceOrderAttributes</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">properties</span>:
+    <span class="key">farmerPaymentMethod</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">CASH</span>, <span class="enum-val">MPESA</span>]
+      <span class="key">description</span>: <span class="string">Reported by farmer via WhatsApp</span>
+    <span class="key">farmerPaymentStatus</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">PAID</span>, <span class="enum-val">NOT_PAID</span>]
+    <span class="key">providerPaymentReceived</span>:
+      <span class="key">type</span>: <span class="string">boolean</span>
+      <span class="key">description</span>: <span class="string">Provider confirms payment receipt via App</span>
+    <span class="key">providerAmountReceived</span>:
+      <span class="key">type</span>: <span class="string">number</span>
+    <span class="key">paymentCurrency</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">pattern</span>: <span class="string">"^[A-Z]{3}$"</span>
+    <span class="key">serviceConfirmedByFarmer</span>:
+      <span class="key">type</span>: <span class="string">boolean</span>
+      <span class="key">description</span>: <span class="string">Farmer confirms service was done</span>
+    <span class="key">providerFulfillmentStatus</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">COMPLETED</span>, <span class="enum-val">NOT_COMPLETED</span>]
+    <span class="key">providerFeedback</span>:
+      <span class="key">$ref</span>: <span class="string">"#/components/schemas/Feedback"</span>
+    <span class="key">farmerFeedback</span>:
+      <span class="key">$ref</span>: <span class="string">"#/components/schemas/Feedback"</span>
+    <span class="key">followUpRequired</span>:
+      <span class="key">type</span>: <span class="string">boolean</span>
+    <span class="key">followUpNotes</span>:
+      <span class="key">type</span>: <span class="string">string</span></pre>
+
+<h4>JSON Example &mdash; Beckn Message Fragment</h4>
+<pre>{
+  <span class="key">"orderAttributes"</span>: {
+    <span class="key">"farmerPaymentMethod"</span>: <span class="string">"MPESA"</span>,
+    <span class="key">"farmerPaymentStatus"</span>: <span class="string">"PAID"</span>,
+    <span class="key">"providerPaymentReceived"</span>: <span class="bool">true</span>,
+    <span class="key">"providerAmountReceived"</span>: <span class="number">10000</span>,
+    <span class="key">"paymentCurrency"</span>: <span class="string">"KES"</span>,
+    <span class="key">"serviceConfirmedByFarmer"</span>: <span class="bool">true</span>,
+    <span class="key">"providerFulfillmentStatus"</span>: <span class="string">"COMPLETED"</span>,
+    <span class="key">"providerFeedback"</span>: {
+      <span class="key">"rating"</span>: <span class="number">4</span>,
+      <span class="key">"selectedOption"</span>: <span class="string">"Good experience"</span>,
+      <span class="key">"additionalText"</span>: <span class="string">"Farmer was well-prepared, birds accessible"</span>
+    },
+    <span class="key">"farmerFeedback"</span>: {
+      <span class="key">"rating"</span>: <span class="number">5</span>,
+      <span class="key">"selectedOption"</span>: <span class="string">"Excellent service"</span>
+    },
+    <span class="key">"followUpRequired"</span>: <span class="bool">true</span>,
+    <span class="key">"followUpNotes"</span>: <span class="string">"Booster vaccination needed in 2 weeks"</span>
+  }
+}</pre>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== SUB-SCHEMAS =================================== -->
+<!-- ====================================================================== -->
+<h2 id="sub-schemas">Sub-schemas</h2>
+
+<p>These shared types are referenced across multiple extension schemas.</p>
+
+<h3>ServiceArea</h3>
+<p>Represents a geographic coverage area used by providers to define where they operate.</p>
+
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>countyCode</code></td><td><code>string</code></td><td><span class="badge badge-required">Required</span></td><td>County identifier code</td></tr>
+    <tr><td><code>countyName</code></td><td><code>string</code></td><td><span class="badge badge-required">Required</span></td><td>County name</td></tr>
+    <tr><td><code>subCounties</code></td><td><code>object[]</code></td><td><span class="badge badge-optional">Optional</span></td><td>Array of {subCountyCode, subCountyName}</td></tr>
+  </tbody>
+</table>
+
+<pre><span class="comment"># ServiceArea sub-schema</span>
+<span class="key">ServiceArea</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">required</span>: [<span class="string">countyCode</span>, <span class="string">countyName</span>]
+  <span class="key">properties</span>:
+    <span class="key">countyCode</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">countyName</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">subCounties</span>:
+      <span class="key">type</span>: <span class="string">array</span>
+      <span class="key">items</span>:
+        <span class="key">type</span>: <span class="string">object</span>
+        <span class="key">required</span>: [<span class="string">subCountyCode</span>, <span class="string">subCountyName</span>]
+        <span class="key">properties</span>:
+          <span class="key">subCountyCode</span>:
+            <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">subCountyName</span>:
+            <span class="key">type</span>: <span class="string">string</span></pre>
+
+<h3>FarmerLocation</h3>
+<p>Represents the farmer's geographic location for service matching and fulfillment.</p>
+
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>county</code></td><td><code>string</code></td><td><span class="badge badge-required">Required</span></td><td>County name</td></tr>
+    <tr><td><code>subCounty</code></td><td><code>string</code></td><td><span class="badge badge-required">Required</span></td><td>Sub-county name</td></tr>
+    <tr><td><code>ward</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Ward name</td></tr>
+    <tr><td><code>village</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Village name</td></tr>
+    <tr><td><code>gpsCoordinates</code></td><td><code>object</code></td><td><span class="badge badge-optional">Optional</span></td><td>{latitude: number, longitude: number}</td></tr>
+  </tbody>
+</table>
+
+<pre><span class="comment"># FarmerLocation sub-schema</span>
+<span class="key">FarmerLocation</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">required</span>: [<span class="string">county</span>, <span class="string">subCounty</span>]
+  <span class="key">properties</span>:
+    <span class="key">county</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">subCounty</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">ward</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">village</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">gpsCoordinates</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">latitude</span>:
+          <span class="key">type</span>: <span class="string">number</span>
+        <span class="key">longitude</span>:
+          <span class="key">type</span>: <span class="string">number</span></pre>
+
+<h3>QuantitySpec</h3>
+<p>A generic quantity descriptor used across item attributes to specify amounts.</p>
+
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>value</code></td><td><code>number</code></td><td><span class="badge badge-optional">Optional</span></td><td>Numeric quantity</td></tr>
+    <tr><td><code>unit</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Unit of measure</td></tr>
+    <tr><td><code>description</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Human-readable description</td></tr>
+  </tbody>
+</table>
+
+<pre><span class="comment"># QuantitySpec sub-schema</span>
+<span class="key">QuantitySpec</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">properties</span>:
+    <span class="key">value</span>:
+      <span class="key">type</span>: <span class="string">number</span>
+    <span class="key">unit</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">description</span>:
+      <span class="key">type</span>: <span class="string">string</span></pre>
+
+<h3>Feedback</h3>
+<p>Feedback from either party (farmer or provider) after service completion.</p>
+
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>rating</code></td><td><code>integer</code></td><td><span class="badge badge-optional">Optional</span></td><td>Rating from 1 to 5</td></tr>
+    <tr><td><code>selectedOption</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Pre-defined feedback option</td></tr>
+    <tr><td><code>additionalText</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Free-text additional feedback</td></tr>
+  </tbody>
+</table>
+
+<pre><span class="comment"># Feedback sub-schema</span>
+<span class="key">Feedback</span>:
+  <span class="key">type</span>: <span class="string">object</span>
+  <span class="key">properties</span>:
+    <span class="key">rating</span>:
+      <span class="key">type</span>: <span class="string">integer</span>
+      <span class="key">minimum</span>: <span class="number">1</span>
+      <span class="key">maximum</span>: <span class="number">5</span>
+    <span class="key">selectedOption</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+    <span class="key">additionalText</span>:
+      <span class="key">type</span>: <span class="string">string</span></pre>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== LIFECYCLE ===================================== -->
+<!-- ====================================================================== -->
+<h2 id="lifecycle">Service Status Lifecycle</h2>
+
+<p>The <code>serviceStatus</code> field in <code>LocalServiceFulfillmentAttributes</code> tracks the order through the following state machine. Advisory content has no lifecycle &mdash; it is delivered immediately via <code>contentUrl</code> in <code>on_discover</code>.</p>
+
+<div class="diagram-container">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 420" width="820" height="420" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#5a6577"/>
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#c0392b"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="820" height="420" fill="#f8f9fb" rx="12"/>
+
+  <!-- Title -->
+  <text x="410" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#1e2a3a">Service Status Lifecycle (Paid Flows)</text>
+
+  <!-- ORDER_PLACED -->
+  <rect x="30" y="60" width="160" height="44" rx="8" fill="#1a56db" stroke="#0f3a8e" stroke-width="1.5"/>
+  <text x="110" y="86" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">ORDER_PLACED</text>
+
+  <!-- Arrow: ORDER_PLACED -> PROVIDER_ACCEPTED -->
+  <line x1="190" y1="82" x2="260" y2="82" stroke="#5a6577" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- PROVIDER_ACCEPTED -->
+  <rect x="270" y="60" width="180" height="44" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="1.5"/>
+  <text x="360" y="86" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">PROVIDER_ACCEPTED</text>
+
+  <!-- Arrow: PROVIDER_ACCEPTED -> IN_PROGRESS -->
+  <line x1="450" y1="82" x2="520" y2="82" stroke="#5a6577" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- IN_PROGRESS -->
+  <rect x="530" y="60" width="140" height="44" rx="8" fill="#f39c12" stroke="#d68910" stroke-width="1.5"/>
+  <text x="600" y="86" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">IN_PROGRESS</text>
+
+  <!-- Arrow: IN_PROGRESS -> COMPLETED (down) -->
+  <line x1="600" y1="104" x2="600" y2="150" stroke="#5a6577" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- COMPLETED -->
+  <rect x="530" y="160" width="140" height="44" rx="8" fill="#2980b9" stroke="#1f6ea1" stroke-width="1.5"/>
+  <text x="600" y="186" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">COMPLETED</text>
+
+  <!-- Arrow: COMPLETED -> FARMER_CONFIRMED (down) -->
+  <line x1="600" y1="204" x2="600" y2="250" stroke="#5a6577" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- FARMER_CONFIRMED -->
+  <rect x="510" y="260" width="180" height="44" rx="8" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5"/>
+  <text x="600" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">FARMER_CONFIRMED</text>
+
+  <!-- Arrow: FARMER_CONFIRMED -> CLOSED (down) -->
+  <line x1="600" y1="304" x2="600" y2="350" stroke="#5a6577" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+  <!-- CLOSED -->
+  <rect x="530" y="360" width="140" height="44" rx="8" fill="#5a6577" stroke="#3d4654" stroke-width="1.5"/>
+  <text x="600" y="386" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">CLOSED</text>
+
+  <!-- PROVIDER_REJECTED (branch from ORDER_PLACED) -->
+  <rect x="30" y="170" width="180" height="44" rx="8" fill="#c0392b" stroke="#922b21" stroke-width="1.5"/>
+  <text x="120" y="196" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">PROVIDER_REJECTED</text>
+
+  <!-- Arrow: ORDER_PLACED -> PROVIDER_REJECTED -->
+  <line x1="110" y1="104" x2="110" y2="160" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrowhead-red)"/>
+
+  <!-- Arrow: PROVIDER_REJECTED -> CLOSED -->
+  <path d="M 120 214 L 120 382 L 520 382" stroke="#c0392b" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-red)"/>
+
+  <!-- CANCELLED -->
+  <rect x="270" y="280" width="140" height="44" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="340" y="306" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">CANCELLED</text>
+
+  <!-- Arrow: CANCELLED -> CLOSED -->
+  <path d="M 410 302 L 460 302 L 460 382 L 520 382" stroke="#c0392b" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-red)"/>
+
+  <!-- Dashed line: any state before COMPLETED -> CANCELLED -->
+  <text x="340" y="258" text-anchor="middle" font-size="10" fill="#c0392b" font-style="italic">Any state before COMPLETED</text>
+  <line x1="340" y1="264" x2="340" y2="270" stroke="#c0392b" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowhead-red)"/>
+
+  <!-- Legend -->
+  <rect x="30" y="350" width="12" height="12" rx="2" fill="#5a6577"/>
+  <text x="48" y="361" font-size="10" fill="#5a6577">Normal flow</text>
+  <rect x="130" y="350" width="12" height="12" rx="2" fill="#c0392b"/>
+  <text x="148" y="361" font-size="10" fill="#c0392b">Rejection / Cancellation</text>
+</svg>
+</div>
+
+<p>State transition rules:</p>
+<table>
+  <thead><tr><th>From</th><th>To</th><th>Triggered By</th></tr></thead>
+  <tbody>
+    <tr><td><code>ORDER_PLACED</code></td><td><code>PROVIDER_ACCEPTED</code></td><td>Provider accepts the order via App</td></tr>
+    <tr><td><code>ORDER_PLACED</code></td><td><code>PROVIDER_REJECTED</code></td><td>Provider rejects the order via App</td></tr>
+    <tr><td><code>PROVIDER_ACCEPTED</code></td><td><code>IN_PROGRESS</code></td><td>Provider begins service delivery</td></tr>
+    <tr><td><code>IN_PROGRESS</code></td><td><code>COMPLETED</code></td><td>Provider marks service as done via App</td></tr>
+    <tr><td><code>COMPLETED</code></td><td><code>FARMER_CONFIRMED</code></td><td>Farmer confirms service was received via WhatsApp</td></tr>
+    <tr><td><code>FARMER_CONFIRMED</code></td><td><code>CLOSED</code></td><td>Both parties have reported; transaction finalized</td></tr>
+    <tr><td><code>PROVIDER_REJECTED</code></td><td><code>CLOSED</code></td><td>Automatic closure after rejection</td></tr>
+    <tr><td>Any state before <code>COMPLETED</code></td><td><code>CANCELLED</code></td><td>Either party cancels</td></tr>
+    <tr><td><code>CANCELLED</code></td><td><code>CLOSED</code></td><td>Automatic closure after cancellation</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <strong>Advisory-Content has no lifecycle.</strong> Content is delivered immediately via <code>contentUrl</code> in the <code>on_discover</code> response. No status tracking is needed.
+</div>
+
+
+<!-- ====================================================================== -->
+<!-- ====================== FULL OPENAPI ================================== -->
+<!-- ====================================================================== -->
+<h2 id="openapi-full">Full OpenAPI 3.1 Bundle</h2>
+
+<p>The complete schema definitions bundled as a single OpenAPI 3.1 components block, suitable for inclusion in a Beckn domain specification file.</p>
+
+<pre><span class="comment"># ============================================================</span>
+<span class="comment"># NFH-Kuza-Google Extension Schemas</span>
+<span class="comment"># Domain: local-services | Protocol: Beckn v2.0.0</span>
+<span class="comment"># ============================================================</span>
+
+<span class="key">openapi</span>: <span class="string">"3.1.0"</span>
+<span class="key">info</span>:
+  <span class="key">title</span>: <span class="string">NFH-Kuza-Google Extension Schemas</span>
+  <span class="key">version</span>: <span class="string">"1.0.0"</span>
+  <span class="key">description</span>: >
+    <span class="string">Domain extension schemas for the local-services domain
+    in the NFH-Kuza-Google rural service delivery pilot.</span>
+
+<span class="key">components</span>:
+  <span class="key">schemas</span>:
+
+    <span class="comment"># ---- Sub-schemas ----</span>
+
+    <span class="key">QuantitySpec</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">value</span>:
+          <span class="key">type</span>: <span class="string">number</span>
+        <span class="key">unit</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">description</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+
+    <span class="key">ServiceArea</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">countyCode</span>, <span class="string">countyName</span>]
+      <span class="key">properties</span>:
+        <span class="key">countyCode</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">countyName</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">subCounties</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>:
+            <span class="key">type</span>: <span class="string">object</span>
+            <span class="key">required</span>: [<span class="string">subCountyCode</span>, <span class="string">subCountyName</span>]
+            <span class="key">properties</span>:
+              <span class="key">subCountyCode</span>:
+                <span class="key">type</span>: <span class="string">string</span>
+              <span class="key">subCountyName</span>:
+                <span class="key">type</span>: <span class="string">string</span>
+
+    <span class="key">FarmerLocation</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">county</span>, <span class="string">subCounty</span>]
+      <span class="key">properties</span>:
+        <span class="key">county</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">subCounty</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">ward</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">village</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">gpsCoordinates</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">properties</span>:
+            <span class="key">latitude</span>:
+              <span class="key">type</span>: <span class="string">number</span>
+            <span class="key">longitude</span>:
+              <span class="key">type</span>: <span class="string">number</span>
+
+    <span class="key">Feedback</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">rating</span>:
+          <span class="key">type</span>: <span class="string">integer</span>
+          <span class="key">minimum</span>: <span class="number">1</span>
+          <span class="key">maximum</span>: <span class="number">5</span>
+        <span class="key">selectedOption</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+        <span class="key">additionalText</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+
+    <span class="comment"># ---- Item Attributes ----</span>
+
+    <span class="key">LivelihoodItemAttributes</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">subCategory</span>, <span class="string">serviceName</span>, <span class="string">serviceMode</span>]
+      <span class="key">properties</span>:
+        <span class="key">subCategory</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">required</span>: [<span class="string">code</span>, <span class="string">name</span>]
+          <span class="key">properties</span>:
+            <span class="key">code</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">name</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceName</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceDescription</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceMode</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">ON_SITE_VISIT</span>, <span class="enum-val">PROVIDER_LOCATION</span>, <span class="enum-val">INPUT_DELIVERY</span>]
+        <span class="key">quantityRequired</span>: { <span class="key">$ref</span>: <span class="string">"#/components/schemas/QuantitySpec"</span> }
+        <span class="key">estimatedDuration</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">format</span>: <span class="string">duration</span> }
+        <span class="key">inputDetails</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">properties</span>:
+            <span class="key">inputName</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">unit</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">quantityPerUnit</span>: { <span class="key">type</span>: <span class="string">number</span> }
+        <span class="key">sectorContext</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">properties</span>:
+            <span class="key">livestockType</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">breed</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">cropType</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">tradeType</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">availableLanguages</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">pattern</span>: <span class="string">"^[a-z]{2}$"</span> }
+        <span class="key">tags</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+
+    <span class="key">HouseholdItemAttributes</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">subCategory</span>, <span class="string">serviceName</span>, <span class="string">serviceMode</span>]
+      <span class="key">properties</span>:
+        <span class="key">subCategory</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">required</span>: [<span class="string">code</span>, <span class="string">name</span>]
+          <span class="key">properties</span>:
+            <span class="key">code</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">name</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceName</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceDescription</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceMode</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">SERVICE_DELIVERY</span>, <span class="enum-val">PRODUCT_DELIVERY</span>, <span class="enum-val">FACILITY_VISIT</span>, <span class="enum-val">DIGITAL</span>]
+        <span class="key">quantityRequired</span>: { <span class="key">$ref</span>: <span class="string">"#/components/schemas/QuantitySpec"</span> }
+        <span class="key">beneficiaryType</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">INDIVIDUAL</span>, <span class="enum-val">HOUSEHOLD</span>, <span class="enum-val">CHILD</span>, <span class="enum-val">ELDERLY</span>]
+        <span class="key">documentsRequired</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceFrequency</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">ONE_TIME</span>, <span class="enum-val">RECURRING</span>, <span class="enum-val">SEASONAL</span>]
+        <span class="key">availableLanguages</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">pattern</span>: <span class="string">"^[a-z]{2}$"</span> }
+        <span class="key">tags</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+
+    <span class="key">MarketProduceItemAttributes</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">subCategory</span>, <span class="string">serviceName</span>, <span class="string">produceCategory</span>, <span class="string">unitOfMeasure</span>, <span class="string">collectionMode</span>]
+      <span class="key">properties</span>:
+        <span class="key">subCategory</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">required</span>: [<span class="string">code</span>, <span class="string">name</span>]
+          <span class="key">properties</span>:
+            <span class="key">code</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">name</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceName</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceDescription</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">produceCategory</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">acceptedGrades</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">unitOfMeasure</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">minimumQuantity</span>: { <span class="key">type</span>: <span class="string">number</span> }
+        <span class="key">quantityAvailable</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">properties</span>:
+            <span class="key">value</span>: { <span class="key">type</span>: <span class="string">number</span> }
+            <span class="key">unit</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">collectionMode</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">FARM_GATE_PICKUP</span>, <span class="enum-val">COLLECTION_POINT</span>, <span class="enum-val">FARMER_DELIVERS</span>]
+        <span class="key">paymentTimeline</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">IMMEDIATE</span>, <span class="enum-val">UPON_COLLECTION</span>, <span class="enum-val">AFTER_SALE</span>]
+        <span class="key">availableLanguages</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">pattern</span>: <span class="string">"^[a-z]{2}$"</span> }
+        <span class="key">tags</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+
+    <span class="key">AdvisoryContentItemAttributes</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">subCategory</span>, <span class="string">serviceName</span>, <span class="string">contentType</span>, <span class="string">contentUrl</span>]
+      <span class="key">properties</span>:
+        <span class="key">subCategory</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">required</span>: [<span class="string">code</span>, <span class="string">name</span>]
+          <span class="key">properties</span>:
+            <span class="key">code</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">name</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceName</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceDescription</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">contentType</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">TEXT</span>, <span class="enum-val">VIDEO</span>, <span class="enum-val">PDF</span>, <span class="enum-val">AUDIO</span>, <span class="enum-val">IMAGE</span>, <span class="enum-val">INFOGRAPHIC</span>]
+        <span class="key">contentMimeType</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">contentUrl</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">format</span>: <span class="string">uri</span> }
+        <span class="key">contentDuration</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">format</span>: <span class="string">duration</span> }
+        <span class="key">targetAudience</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">availableLanguages</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">pattern</span>: <span class="string">"^[a-z]{2}$"</span> }
+        <span class="key">tags</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+
+    <span class="comment"># ---- Offer Attributes ----</span>
+
+    <span class="key">LocalServiceOfferAttributes</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">priceAmount</span>, <span class="string">currency</span>, <span class="string">pricingModel</span>, <span class="string">acceptedPaymentMethods</span>]
+      <span class="key">properties</span>:
+        <span class="key">priceAmount</span>: { <span class="key">type</span>: <span class="string">number</span> }
+        <span class="key">currency</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">pattern</span>: <span class="string">"^[A-Z]{3}$"</span> }
+        <span class="key">priceUnit</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">pricingModel</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">FIXED</span>, <span class="enum-val">PER_UNIT</span>, <span class="enum-val">PER_VISIT</span>, <span class="enum-val">NEGOTIABLE</span>]
+        <span class="key">acceptedPaymentMethods</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">enum</span>: [<span class="enum-val">CASH</span>, <span class="enum-val">MPESA</span>] }
+          <span class="key">minItems</span>: <span class="number">1</span>
+        <span class="key">capacity</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">properties</span>:
+            <span class="key">value</span>: { <span class="key">type</span>: <span class="string">number</span> }
+            <span class="key">unit</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">period</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">serviceAvailability</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">properties</span>:
+            <span class="key">availableDays</span>:
+              <span class="key">type</span>: <span class="string">array</span>
+              <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+            <span class="key">timeSlots</span>:
+              <span class="key">type</span>: <span class="string">array</span>
+              <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">cancellationPolicy</span>:
+          <span class="key">type</span>: <span class="string">object</span>
+          <span class="key">properties</span>:
+            <span class="key">isCancellable</span>: { <span class="key">type</span>: <span class="string">boolean</span> }
+            <span class="key">windowHours</span>: { <span class="key">type</span>: <span class="string">integer</span> }
+            <span class="key">reasons</span>:
+              <span class="key">type</span>: <span class="string">array</span>
+              <span class="key">items</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">validFrom</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">format</span>: <span class="string">date-time</span> }
+        <span class="key">validTo</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">format</span>: <span class="string">date-time</span> }
+
+    <span class="comment"># ---- Fulfillment Attributes ----</span>
+
+    <span class="key">LocalServiceFulfillmentAttributes</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">required</span>: [<span class="string">deliveryMode</span>, <span class="string">serviceStatus</span>]
+      <span class="key">properties</span>:
+        <span class="key">serviceArea</span>:
+          <span class="key">type</span>: <span class="string">array</span>
+          <span class="key">items</span>: { <span class="key">$ref</span>: <span class="string">"#/components/schemas/ServiceArea"</span> }
+        <span class="key">farmerLocation</span>:
+          <span class="key">$ref</span>: <span class="string">"#/components/schemas/FarmerLocation"</span>
+        <span class="key">scheduledDate</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">format</span>: <span class="string">date</span> }
+        <span class="key">scheduledTimeSlot</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">confirmedVisitTime</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">format</span>: <span class="string">date-time</span> }
+        <span class="key">actualServiceDate</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">format</span>: <span class="string">date</span> }
+        <span class="key">deliveryMode</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">ON_SITE</span>, <span class="enum-val">PROVIDER_LOCATION</span>, <span class="enum-val">COLLECTION_POINT</span>, <span class="enum-val">DIGITAL</span>]
+        <span class="key">serviceStatus</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>:
+            - <span class="enum-val">ORDER_PLACED</span>
+            - <span class="enum-val">PROVIDER_ACCEPTED</span>
+            - <span class="enum-val">PROVIDER_REJECTED</span>
+            - <span class="enum-val">IN_PROGRESS</span>
+            - <span class="enum-val">COMPLETED</span>
+            - <span class="enum-val">FARMER_CONFIRMED</span>
+            - <span class="enum-val">CANCELLED</span>
+            - <span class="enum-val">CLOSED</span>
+        <span class="key">providerNotes</span>: { <span class="key">type</span>: <span class="string">string</span> }
+        <span class="key">followUpRequired</span>: { <span class="key">type</span>: <span class="string">boolean</span> }
+
+    <span class="comment"># ---- Order Attributes ----</span>
+
+    <span class="key">LocalServiceOrderAttributes</span>:
+      <span class="key">type</span>: <span class="string">object</span>
+      <span class="key">properties</span>:
+        <span class="key">farmerPaymentMethod</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">CASH</span>, <span class="enum-val">MPESA</span>]
+        <span class="key">farmerPaymentStatus</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">PAID</span>, <span class="enum-val">NOT_PAID</span>]
+        <span class="key">providerPaymentReceived</span>: { <span class="key">type</span>: <span class="string">boolean</span> }
+        <span class="key">providerAmountReceived</span>: { <span class="key">type</span>: <span class="string">number</span> }
+        <span class="key">paymentCurrency</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">pattern</span>: <span class="string">"^[A-Z]{3}$"</span> }
+        <span class="key">serviceConfirmedByFarmer</span>: { <span class="key">type</span>: <span class="string">boolean</span> }
+        <span class="key">providerFulfillmentStatus</span>:
+          <span class="key">type</span>: <span class="string">string</span>
+          <span class="key">enum</span>: [<span class="enum-val">COMPLETED</span>, <span class="enum-val">NOT_COMPLETED</span>]
+        <span class="key">providerFeedback</span>: { <span class="key">$ref</span>: <span class="string">"#/components/schemas/Feedback"</span> }
+        <span class="key">farmerFeedback</span>: { <span class="key">$ref</span>: <span class="string">"#/components/schemas/Feedback"</span> }
+        <span class="key">followUpRequired</span>: { <span class="key">type</span>: <span class="string">boolean</span> }
+        <span class="key">followUpNotes</span>: { <span class="key">type</span>: <span class="string">string</span> }</pre>
+
+<p style="margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--color-border); font-size: 12px; color: var(--color-text-secondary);">
+  NFH-Kuza-Google Extension Schemas v1.0.0 &mdash; Domain: <code>local-services</code> &mdash; Protocol: Beckn v2.0.0 &mdash; Generated 2026-04-10
+</p>
+
+</main>
+</div>
+
+</body>
+</html>
