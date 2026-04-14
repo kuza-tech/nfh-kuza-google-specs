@@ -352,6 +352,7 @@
       <a href="#flow-c" class="sub">4.3 Service Completion</a>
       <a href="#flow-d" class="sub">4.4 Advisory Content</a>
       <a href="#flow-e" class="sub">4.5 Market Produce</a>
+      <a href="#beckn-endpoint-mapping" class="sub">4.6 Complete Beckn Endpoint Mapping</a>
       <a href="#ownership">5. Component Ownership</a>
       <a href="#database-schema">6. Database Schema</a>
       <a href="#deployment">7. Deployment Topology</a>
@@ -736,9 +737,8 @@
     <-- BPP --> ONIX-BPP --> [Beckn Network] --> ONIX-BAP --> BAP Client
   <-- beckn_marketplace_handler.php --> WhatsApp (list of providers with prices)
 
-Farmer selects provider --> select --> on_select (quote)
-Farmer confirms        --> init   --> on_init  (payment terms)
-Farmer books           --> confirm --> on_confirm (order created)</code></pre>
+(continues through select / init / confirm / status / update / cancel / rate / support &mdash;
+ see Section 4.6 for the complete Beckn endpoint mapping covering the full order lifecycle.)</code></pre>
     </div>
 
     <div class="flow-block" id="flow-b">
@@ -787,7 +787,275 @@ Advisory is free, no order lifecycle. Content generated and delivered immediatel
 - discover returns aggregators/buyers with buying prices
 - Aggregator collects produce from farmer
 - Aggregator pays farmer (not farmer pays provider)
-- Both parties confirm and provide feedback</code></pre>
+- Both parties confirm and provide feedback
+
+(continues through the same full Beckn lifecycle &mdash;
+ see Section 4.6 for the complete endpoint mapping including cancellation &amp; feedback.)</code></pre>
+    </div>
+
+    <!-- 4.6 Complete Beckn Endpoint Mapping -->
+    <h3 id="beckn-endpoint-mapping">4.6 Complete Beckn Endpoint Mapping</h3>
+    <p>This section maps every user-facing step in each flow to the corresponding Beckn v2 protocol endpoint, covering the <strong>full order lifecycle</strong> &mdash; discovery, selection, initialization, confirmation, fulfilment status, in-flight updates, cancellation, rating/feedback, and support.</p>
+
+    <p><strong>Beckn endpoints reference:</strong></p>
+    <ul>
+      <li><code>discover</code> / <code>on_discover</code> &mdash; find services/providers in the network</li>
+      <li><code>select</code> / <code>on_select</code> &mdash; request a priced quote for a specific item</li>
+      <li><code>init</code> / <code>on_init</code> &mdash; submit billing &amp; fulfilment details, receive draft order</li>
+      <li><code>confirm</code> / <code>on_confirm</code> &mdash; create the binding order</li>
+      <li><code>status</code> / <code>on_status</code> &mdash; query or push the current state of the contract</li>
+      <li><code>update</code> / <code>on_update</code> &mdash; mutate an existing contract (e.g. reschedule, report payment, add notes)</li>
+      <li><code>cancel</code> / <code>on_cancel</code> &mdash; cancel an order (before or after provider acceptance)</li>
+      <li><code>rate</code> / <code>on_rate</code> &mdash; submit ratings / feedback on provider or farmer</li>
+      <li><code>support</code> / <code>on_support</code> &mdash; request customer support details</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <strong>Conventions used in the tables below:</strong>
+      <ul>
+        <li><strong>BAP &rarr; BPP</strong> means the call originates at the BAP (farmer side) and is routed through ONIX / Beckn Network to the BPP (provider side). The corresponding <code>on_*</code> callback travels in the opposite direction.</li>
+        <li><strong>status</strong> calls can be <em>pull</em> (BAP &rarr; BPP to query) or <em>push</em> (BPP &rarr; BAP as a notification). Both are used.</li>
+        <li>Status values referenced come from <code>LocalServiceFulfillmentAttributes.serviceStatus</code>: <code>ORDER_PLACED</code>, <code>PROVIDER_ACCEPTED</code>, <code>PROVIDER_REJECTED</code>, <code>IN_PROGRESS</code>, <code>COMPLETED</code>, <code>FARMER_CONFIRMED</code>, <code>CANCELLED</code>, <code>CLOSED</code>.</li>
+      </ul>
+    </div>
+
+    <!-- ════════ LIVELIHOOD ════════ -->
+    <h4 id="mapping-livelihood">4.6.1 Livelihood Services &mdash; Complete Lifecycle</h4>
+    <p><em>Example: Poultry vaccination, feed supply, brooding, incubation, trades &amp; skills.</em></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>User-Facing Step</th>
+          <th>Beckn Call</th>
+          <th>Direction</th>
+          <th>Payload Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="2"><strong>Discovery</strong></td>
+            <td>Farmer picks category, sub-category, service, quantity, location, preferred date</td>
+            <td><code>discover</code></td><td>BAP &rarr; BPP</td>
+            <td>Intent: category=Livelihood-Services, subCategory, quantityRequired, farmerLocation, scheduledDate</td></tr>
+        <tr><td>System returns providers matching service area + service</td>
+            <td><code>on_discover</code></td><td>BPP &rarr; BAP</td>
+            <td>Catalog with providers, items (LivelihoodItemAttributes), offers (LocalServiceOfferAttributes) filtered by service area</td></tr>
+
+        <tr><td rowspan="2"><strong>Selection</strong></td>
+            <td>Farmer selects one provider from the list</td>
+            <td><code>select</code></td><td>BAP &rarr; BPP</td>
+            <td>providerId, itemId, offerId, quantityRequired</td></tr>
+        <tr><td>BPP returns final quote + cancellation policy</td>
+            <td><code>on_select</code></td><td>BPP &rarr; BAP</td>
+            <td>Final priceAmount (unit price &times; quantity), cancellationPolicy, confirmed offer terms</td></tr>
+
+        <tr><td rowspan="2"><strong>Initialization</strong></td>
+            <td>Farmer provides contact details (auto from WhatsApp profile) and scheduled date</td>
+            <td><code>init</code></td><td>BAP &rarr; BPP</td>
+            <td>farmer contact, farmerLocation, scheduledDate, billing reference</td></tr>
+        <tr><td>BPP returns draft order with payment terms</td>
+            <td><code>on_init</code></td><td>BPP &rarr; BAP</td>
+            <td>Draft order, payment terms (acceptedPaymentMethods: CASH/MPESA), total</td></tr>
+
+        <tr><td rowspan="2"><strong>Confirmation</strong></td>
+            <td>Farmer taps [Confirm] on WhatsApp summary</td>
+            <td><code>confirm</code></td><td>BAP &rarr; BPP</td>
+            <td>Confirmation with consent flag</td></tr>
+        <tr><td>Order created, provider notified</td>
+            <td><code>on_confirm</code></td><td>BPP &rarr; BAP</td>
+            <td>orderId, provider details, serviceStatus: ORDER_PLACED</td></tr>
+
+        <tr><td rowspan="4"><strong>Provider Response</strong></td>
+            <td>Provider taps [Accept] in WhatsApp notification</td>
+            <td><code>status</code> (push)</td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: PROVIDER_ACCEPTED, confirmedVisitTime</td></tr>
+        <tr><td>Farmer receives "Provider accepted. Visit on &lt;date&gt;. Contact: &lt;phone&gt;"</td>
+            <td><em>(push notification, no new call)</em></td><td>&mdash;</td>
+            <td>Farmer notified on WhatsApp</td></tr>
+        <tr><td>Provider taps [Reject] instead</td>
+            <td><code>status</code> (push)</td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: PROVIDER_REJECTED &rarr; CLOSED; farmer re-presented with alternative providers</td></tr>
+        <tr><td>Farmer checks order status manually</td>
+            <td><code>status</code> (pull)</td><td>BAP &rarr; BPP</td>
+            <td>Query by orderId; returns <code>on_status</code> with current state</td></tr>
+
+        <tr><td rowspan="2"><strong>Mid-flight Changes</strong></td>
+            <td>Provider or farmer changes date, quantity, time slot</td>
+            <td><code>update</code></td><td>BAP &harr; BPP (either side)</td>
+            <td>Updated scheduledDate / quantityRequired / confirmedVisitTime</td></tr>
+        <tr><td>Other side confirms the change</td>
+            <td><code>on_update</code></td><td>Opposite direction</td>
+            <td>Revised order</td></tr>
+
+        <tr><td rowspan="2"><strong>Service Execution</strong></td>
+            <td>Provider marks service in progress (via Kuza Web App)</td>
+            <td><code>status</code> (push)</td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: IN_PROGRESS</td></tr>
+        <tr><td>Provider completes service: enters actualServiceDate, payment method, amount received, notes, follow-up flag</td>
+            <td><code>update</code> + <code>status</code></td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: COMPLETED; providerAmountReceived, providerPaymentReceived: true, providerNotes, followUpRequired; on_update then on_status</td></tr>
+
+        <tr><td rowspan="3"><strong>Farmer Confirmation</strong></td>
+            <td>Farmer receives "Was the service completed?" [Yes] [No]</td>
+            <td><em>(WhatsApp; no Beckn call yet)</em></td><td>&mdash;</td><td>&mdash;</td></tr>
+        <tr><td>Farmer taps [Yes] &rarr; "How did you pay?" [Cash] [M-Pesa]</td>
+            <td><code>update</code></td><td>BAP &rarr; BPP</td>
+            <td>serviceConfirmedByFarmer: true, farmerPaymentMethod, farmerPaymentStatus: PAID</td></tr>
+        <tr><td>System moves to FARMER_CONFIRMED &rarr; CLOSED</td>
+            <td><code>on_update</code> + <code>status</code></td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: FARMER_CONFIRMED &rarr; CLOSED</td></tr>
+
+        <tr><td rowspan="4"><strong>Cancellation</strong></td>
+            <td>Farmer cancels before PROVIDER_ACCEPTED (always free)</td>
+            <td><code>cancel</code></td><td>BAP &rarr; BPP</td>
+            <td>cancellationReason, orderId</td></tr>
+        <tr><td>Farmer cancels after PROVIDER_ACCEPTED (within cancellation window)</td>
+            <td><code>cancel</code></td><td>BAP &rarr; BPP</td>
+            <td>cancellationReason; BPP applies cancellationPolicy (refundable flag, window hours)</td></tr>
+        <tr><td>Provider cancels (e.g., cannot service)</td>
+            <td><code>cancel</code></td><td>BPP &rarr; BAP</td>
+            <td>cancellationReason; farmer re-presented with alternatives</td></tr>
+        <tr><td>Counterparty acknowledges</td>
+            <td><code>on_cancel</code></td><td>Opposite direction</td>
+            <td>serviceStatus: CANCELLED &rarr; CLOSED; refund details if applicable</td></tr>
+
+        <tr><td rowspan="3"><strong>Feedback / Rating</strong></td>
+            <td>Farmer rates provider (1-5) + selects feedback option + optional text</td>
+            <td><code>rate</code></td><td>BAP &rarr; BPP</td>
+            <td>target: providerId, rating, selectedOption, additionalText (farmerFeedback)</td></tr>
+        <tr><td>Provider rates farmer (cooperation, timeliness, payment)</td>
+            <td><code>rate</code></td><td>BPP &rarr; BAP</td>
+            <td>target: farmerId, rating, selectedOption, additionalText (providerFeedback)</td></tr>
+        <tr><td>Acknowledgement</td>
+            <td><code>on_rate</code></td><td>Opposite direction</td>
+            <td>Feedback recorded confirmation</td></tr>
+
+        <tr><td rowspan="2"><strong>Support</strong></td>
+            <td>Farmer requests provider contact / help</td>
+            <td><code>support</code></td><td>BAP &rarr; BPP</td>
+            <td>ref: orderId</td></tr>
+        <tr><td>BPP returns contact info</td>
+            <td><code>on_support</code></td><td>BPP &rarr; BAP</td>
+            <td>contactInfo: phone / email / WhatsApp</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ════════ HOUSEHOLD ════════ -->
+    <h4 id="mapping-household">4.6.2 Household Services &mdash; Complete Lifecycle</h4>
+    <p><em>Example: School fee payment, hospital checkup, insurance enrolment, consumer goods delivery.</em></p>
+    <p>Structurally <strong>identical</strong> to Livelihood mapping (4.6.1). The Beckn endpoint sequence and semantics are the same. Category-specific differences are in the payload fields of <code>on_discover</code> / <code>on_select</code>:</p>
+    <ul>
+      <li><code>HouseholdItemAttributes</code> replaces <code>LivelihoodItemAttributes</code></li>
+      <li><code>subCategory</code> values: Education, Health, Insurance, Consumer Goods</li>
+      <li><code>serviceMode</code> enum: SERVICE_DELIVERY / PRODUCT_DELIVERY / FACILITY_VISIT / DIGITAL</li>
+      <li><code>beneficiaryType</code> (INDIVIDUAL / HOUSEHOLD / CHILD / ELDERLY) and <code>documentsRequired</code> may be populated</li>
+      <li>Some services (e.g., school fee payment) may have <code>scheduledDate</code> as the payment deadline rather than a visit date</li>
+    </ul>
+    <p>All lifecycle phases &mdash; discovery, selection, init, confirm, status, update, cancel, rate, support &mdash; apply the same way. The full Livelihood table above applies to Household with the above payload differences.</p>
+
+    <!-- ════════ MARKET PRODUCE ════════ -->
+    <h4 id="mapping-market">4.6.3 Market Produce &mdash; Complete Lifecycle (Reversed Economics)</h4>
+    <p><em>Example: Farmer sells eggs, milk, farm produce to an aggregator / buyer. Money flows provider &rarr; farmer.</em></p>
+    <p>The Beckn endpoint sequence is the <strong>same as Livelihood</strong>. The semantic reversal is in the payload content, not in the protocol flow. Highlights:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Beckn Call</th>
+          <th>Semantic Reversal (vs Livelihood)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Discovery</td><td><code>discover</code> / <code>on_discover</code></td>
+            <td>Farmer advertises produce (<code>quantityAvailable</code>, <code>produceCategory</code>); BPP returns aggregators/buyers with <code>buying</code> prices and <code>collectionMode</code> (FARM_GATE_PICKUP / COLLECTION_POINT / FARMER_DELIVERS)</td></tr>
+        <tr><td>Selection</td><td><code>select</code> / <code>on_select</code></td>
+            <td>Quote is the <strong>buying price per unit</strong> aggregator offers for farmer's produce &times; quantity</td></tr>
+        <tr><td>Init / Confirm</td><td><code>init</code>, <code>confirm</code> (and <code>on_*</code>)</td>
+            <td>Identical protocol, order created to pick up produce at farmer's location / collection point</td></tr>
+        <tr><td>Provider acceptance</td><td><code>status</code> (push)</td>
+            <td>Aggregator accepts the collection request; serviceStatus: PROVIDER_ACCEPTED</td></tr>
+        <tr><td>Fulfilment</td><td><code>status</code> / <code>update</code></td>
+            <td>Aggregator collects produce, grades it (<code>acceptedGrades</code>), pays farmer; populates <code>providerPaymentReceived</code> to indicate <em>aggregator paid farmer</em> (NOT farmer paid provider). <code>amountReceived</code> = amount paid to farmer.</td></tr>
+        <tr><td>Farmer confirmation</td><td><code>update</code></td>
+            <td>Farmer confirms produce was collected and reports method received (Cash / M-Pesa); <code>farmerPaymentStatus: PAID</code> = farmer confirms they received payment</td></tr>
+        <tr><td>Cancellation</td><td><code>cancel</code> / <code>on_cancel</code></td>
+            <td>Either side can cancel before collection. After partial collection, use <code>update</code> to adjust quantity actually collected rather than full cancel.</td></tr>
+        <tr><td>Rate</td><td><code>rate</code> / <code>on_rate</code></td>
+            <td>Farmer rates aggregator's fairness (grading, price honoured, payment promptness); aggregator rates produce quality &amp; farmer reliability</td></tr>
+        <tr><td>Support</td><td><code>support</code> / <code>on_support</code></td>
+            <td>Same contract as Livelihood</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ════════ ADVISORY ════════ -->
+    <h4 id="mapping-advisory">4.6.4 Advisory Content &mdash; Discover-Only Lifecycle</h4>
+    <p><em>Example: Farmer requests advisory on poultry care, financial literacy, health &amp; nutrition.</em></p>
+    <p>Advisory is <strong>free, has no order, no payment, no scheduling</strong>. Beckn endpoints used are limited to discovery and optional feedback.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>User-Facing Step</th>
+          <th>Beckn Call</th>
+          <th>Direction</th>
+          <th>Payload Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="3"><strong>Discovery with AI Generation</strong></td>
+            <td>Farmer selects Advisory &rarr; domain &rarr; category &rarr; sub-category</td>
+            <td><code>discover</code></td><td>BAP &rarr; BPP</td>
+            <td>Intent: category=Advisory-Content, subCategory (topic), farmerContext (location, enterprise, language)</td></tr>
+        <tr><td>BPP calls Google AI with the request attributes to generate advisory content</td>
+            <td><em>(BPP-internal; not a Beckn call)</em></td><td>BPP &harr; Google AI</td>
+            <td>AI-generated content based on domain / category / sub-category / farmer context</td></tr>
+        <tr><td>AI-generated advisory delivered to farmer on WhatsApp</td>
+            <td><code>on_discover</code></td><td>BPP &rarr; BAP</td>
+            <td>Catalog with AdvisoryContentItemAttributes: contentType, contentUrl / inline text, contentDuration, targetAudience</td></tr>
+
+        <tr><td rowspan="2"><strong>Feedback</strong> (optional)</td>
+            <td>Farmer answers "Was this helpful?" [Yes] [No] or rates content</td>
+            <td><code>rate</code></td><td>BAP &rarr; BPP</td>
+            <td>target: contentId, rating (binary helpful/not or 1-5), optional additionalText</td></tr>
+        <tr><td>Acknowledgement</td>
+            <td><code>on_rate</code></td><td>BPP &rarr; BAP</td>
+            <td>Feedback recorded; may trigger content improvement feedback loop</td></tr>
+
+        <tr><td><strong>Support</strong> (rare)</td>
+            <td>Farmer asks for more info / clarification on content</td>
+            <td><code>support</code> / <code>on_support</code></td><td>BAP &harr; BPP</td>
+            <td>Contact info for advisory provider / content author (if applicable); typically not used in pilot</td></tr>
+
+        <tr><td><strong>Not applicable</strong></td>
+            <td colspan="4"><code>select</code>, <code>init</code>, <code>confirm</code>, <code>status</code>, <code>update</code>, <code>cancel</code> &mdash; advisory has no order, so these endpoints are not used.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-info">
+      <strong>Summary of endpoint coverage per flow:</strong>
+      <table style="margin-top: 0.75rem;">
+        <thead>
+          <tr>
+            <th>Flow</th>
+            <th>discover</th><th>select</th><th>init</th><th>confirm</th>
+            <th>status</th><th>update</th><th>cancel</th><th>rate</th><th>support</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Livelihood</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td></tr>
+          <tr><td>Household</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td></tr>
+          <tr><td>Market Produce</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td></tr>
+          <tr><td>Advisory</td>
+              <td>&check;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+              <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&check;</td><td>(rare)</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- 5. Component Ownership -->
