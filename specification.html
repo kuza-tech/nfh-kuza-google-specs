@@ -180,7 +180,7 @@
 <div class="callout callout-info">
   <p class="callout-label">Partners</p>
   <p><strong>Kuza</strong> &mdash; Platform technology, farmer &amp; provider networks, domain expertise.<br>
-  <strong>Google</strong> &mdash; Three contributions: (1) Cloud infrastructure (GCP / GCC) for hosting the Kuza stack, (2) Content APIs serving curated domain content (agri, health, market, finance) through the chatbot, (3) AI interfaces (location normalisation, content tailoring &amp; generation).<br>
+  <strong>Google</strong> &mdash; Three contributions: (1) Cloud infrastructure (GCP) for hosting the Kuza stack, (2) Content APIs serving curated domain content (agri, health, market, finance) through the chatbot, (3) AI interfaces (location normalisation, content tailoring &amp; generation).<br>
   <strong>Beckn</strong> &mdash; Open network protocol, DeDi Registry, ONIX adapters, Catalog &amp; Discovery Services.</p>
 </div>
 
@@ -1067,7 +1067,7 @@ Any state before COMPLETED  ──→  CANCELLED  ──→  CLOSED
 <ul>
   <li><strong>BAP</strong> registered with DeDi Registry (identity + public key + callback URI)</li>
   <li><strong>BPP</strong> registered with DeDi Registry</li>
-  <li><strong>ONIX adapters</strong> deployed on GCC (Docker containers)</li>
+  <li><strong>ONIX adapters</strong> deployed on GCP (Docker containers)</li>
   <li>Catalog published to <strong>Beckn Catalog Service</strong></li>
   <li>Discovery routed through <strong>Beckn Discovery Service</strong></li>
   <li>Transaction messages (<code>select</code> / <code>init</code> / <code>confirm</code> / <code>status</code>) routed directly BAP &harr; BPP via DeDi Registry</li>
@@ -1076,7 +1076,7 @@ Any state before COMPLETED  ──→  CANCELLED  ──→  CLOSED
 <h3 id="s11-3">11.3 Google Cloud Services</h3>
 <p>Google contributes across three distinct service tiers. Each is consumed at a different point in the pipeline.</p>
 
-<h4>11.3.1 Google Cloud Platform (GCP / GCC) &mdash; Hosting Infrastructure</h4>
+<h4>11.3.1 Google Cloud Platform (GCP) &mdash; Hosting Infrastructure</h4>
 <ul>
   <li>Hosts the entire Kuza-built stack: WhatsApp Handler, BAP, BPP, Kuza Web App, ONIX adapters, MySQL database</li>
   <li>Provides networking, TLS termination, load balancing, public endpoints for BAP / BPP callbacks</li>

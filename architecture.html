@@ -501,9 +501,9 @@
         <rect x="755" y="635" width="245" height="90" rx="12" fill="none" stroke="#EA580C" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.5"/>
         <text x="877" y="650" text-anchor="middle" font-size="10" font-weight="700" fill="#C2410C">Google Cloud Services</text>
 
-        <!-- 7.1 GCP / GCC infrastructure (background hosting layer) -->
+        <!-- 7.1 GCP infrastructure (background hosting layer) -->
         <rect x="765" y="658" width="225" height="20" rx="6" fill="#FFF7ED" stroke="#EA580C" stroke-width="1"/>
-        <text x="877" y="672" text-anchor="middle" font-size="9" font-weight="600" fill="#C2410C">GCP / GCC &mdash; Hosting Infrastructure</text>
+        <text x="877" y="672" text-anchor="middle" font-size="9" font-weight="600" fill="#C2410C">GCP &mdash; Hosting Infrastructure</text>
 
         <!-- 7.2 Content APIs -->
         <rect x="765" y="682" width="108" height="38" rx="6" fill="#FED7AA" stroke="#EA580C" stroke-width="1.5" filter="url(#shadow)"/>
@@ -577,9 +577,9 @@
         <text x="355" y="420" font-size="9" fill="#059669">beckn</text>
         <text x="612" y="420" font-size="9" fill="#059669">beckn</text>
 
-        <!-- GCC hosting boundary -->
+        <!-- GCP hosting boundary -->
         <rect x="60" y="130" width="950" height="605" rx="16" fill="none" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="8,5" opacity="0.3"/>
-        <text x="75" y="725" font-size="11" fill="#93C5FD" font-weight="600">Hosted on GCP / GCC (Google Cloud)</text>
+        <text x="75" y="725" font-size="11" fill="#93C5FD" font-weight="600">Hosted on GCP (Google Cloud)</text>
 
         <!-- External label for Beckn Fabric -->
         <text x="880" y="610" font-size="9" fill="#059669" font-weight="600">External</text>
@@ -645,7 +645,7 @@
       <li>Sends protocol messages through the ONIX-BAP adapter</li>
       <li>Receives async callbacks (<code>on_discover</code>, <code>on_select</code>, <code>on_init</code>, <code>on_confirm</code>, <code>on_status</code>, <code>on_cancel</code>, <code>on_rate</code>)</li>
       <li>Pushes results back to WhatsApp Handler for farmer delivery</li>
-      <li>Hosted by Kuza on GCC</li>
+      <li>Hosted by Kuza on GCP</li>
     </ul>
 
     <h3 id="layer-4">3.4 Layer 4: BPP (Beckn Provider Platform)</h3>
@@ -659,7 +659,7 @@
       <li>Manages order lifecycle on the provider side (create, accept, update status, complete)</li>
       <li>Sends async Beckn responses back through ONIX-BPP adapter</li>
       <li>Serves the <strong>Kuza Web App</strong> (provider interface) for catalog and order management</li>
-      <li>Hosted by Kuza on GCC</li>
+      <li>Hosted by Kuza on GCP</li>
     </ul>
 
     <h3 id="layer-5">3.5 Layer 5: Beckn Network Infrastructure</h3>
@@ -672,7 +672,7 @@
       <li>Plugin-based Go servers running the <code>fidedocker/onix-adapter</code> Docker image</li>
       <li>Two instances: ONIX-BAP (farmer side) and ONIX-BPP (provider side)</li>
       <li>Handle message signing, signature validation, schema validation, and network routing</li>
-      <li>Hosted on GCC as Docker containers</li>
+      <li>Hosted on GCP as Docker containers</li>
     </ul>
 
     <h4>DeDi Registry</h4>
@@ -698,7 +698,7 @@
 
     <h3 id="layer-6">3.6 Layer 6: Kuza Platform (Data Store)</h3>
     <p>
-      MySQL 8 on GCC serves as the single source of truth. The Beckn network is stateless &mdash; all
+      MySQL 8 on GCP serves as the single source of truth. The Beckn network is stateless &mdash; all
       persistent data lives here.
     </p>
 
@@ -730,7 +730,7 @@
     <h3 id="layer-7">3.7 Layer 7: Google Cloud Services</h3>
     <p>Google contributes to the platform across <strong>three distinct service tiers</strong>: cloud infrastructure for hosting, content APIs for serving curated domain content, and AI interfaces for intelligent processing. Each is consumed at a different point in the pipeline.</p>
 
-    <h4>3.7.1 Google Cloud Platform (GCP / GCC) &mdash; Hosting Infrastructure</h4>
+    <h4>3.7.1 Google Cloud Platform (GCP) &mdash; Hosting Infrastructure</h4>
     <p>The entire Kuza-built stack is deployed on GCP. This is the foundational layer on which everything Kuza builds runs.</p>
     <ul>
       <li><strong>Compute:</strong> hosts the WhatsApp Handler, BAP application, BPP application, Kuza Web App, ONIX adapters (Docker)</li>
@@ -1120,26 +1120,26 @@ Advisory is free, no order lifecycle. Content delivered immediately via on_disco
         <tr><th>Component</th><th>Built By</th><th>Hosted On</th></tr>
       </thead>
       <tbody>
-        <tr><td>WhatsApp Handler (<code>beckn_marketplace_handler.php</code>)</td><td>Kuza</td><td>GCC</td></tr>
-        <tr><td>BAP application logic</td><td>Kuza</td><td>GCC</td></tr>
-        <tr><td>BPP application logic</td><td>Kuza</td><td>GCC</td></tr>
-        <tr><td>Kuza Web App (provider interface)</td><td>Kuza</td><td>GCC</td></tr>
-        <tr><td>Provider WhatsApp notifications</td><td>Kuza</td><td>GCC</td></tr>
-        <tr><td>ONIX Adapters (BAP + BPP)</td><td>Beckn (open source, Go)</td><td>GCC (Docker)</td></tr>
+        <tr><td>WhatsApp Handler (<code>beckn_marketplace_handler.php</code>)</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>BAP application logic</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>BPP application logic</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>Kuza Web App (provider interface)</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>Provider WhatsApp notifications</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>ONIX Adapters (BAP + BPP)</td><td>Beckn (open source, Go)</td><td>GCP (Docker)</td></tr>
         <tr><td>DeDi Registry</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
         <tr><td>Catalog Service</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
         <tr><td>Discovery Service</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
-        <tr><td>Google Cloud Platform (GCP / GCC) &mdash; hosting infrastructure</td><td>Google</td><td>GCC</td></tr>
-        <tr><td>Google Content APIs (curated content for agri / health / market / finance)</td><td>Google</td><td>GCC</td></tr>
-        <tr><td>Google AI Interfaces (location normalization, content tailoring, future intent extraction)</td><td>Google</td><td>GCC</td></tr>
-        <tr><td>MySQL database</td><td>Kuza</td><td>GCC</td></tr>
+        <tr><td>Google Cloud Platform (GCP) &mdash; hosting infrastructure</td><td>Google</td><td>GCP</td></tr>
+        <tr><td>Google Content APIs (curated content for agri / health / market / finance)</td><td>Google</td><td>GCP</td></tr>
+        <tr><td>Google AI Interfaces (location normalization, content tailoring, future intent extraction)</td><td>Google</td><td>GCP</td></tr>
+        <tr><td>MySQL database</td><td>Kuza</td><td>GCP</td></tr>
       </tbody>
     </table>
 
     <!-- 6. Database Schema -->
     <h2 id="database-schema">6. Database Schema</h2>
     <p>
-      The following schema additions are required on MySQL 8 (GCC). These tables live alongside existing
+      The following schema additions are required on MySQL 8 (GCP). These tables live alongside existing
       Kuza Platform tables and reference the existing <code>user</code> table via foreign keys.
     </p>
 
@@ -1199,11 +1199,11 @@ INDEX idx_phone_session (phone_number, session_id)</code></pre>
     <!-- 7. Deployment -->
     <h2 id="deployment">7. Deployment Topology</h2>
     <p>
-      All Kuza-built components are deployed on Google Cloud Compute (GCC). Beckn Fabric services
+      All Kuza-built components are deployed on Google Cloud Platform (GCP). Beckn Fabric services
       are externally hosted and accessed over HTTPS.
     </p>
 
-    <h3>GCC Instance Layout</h3>
+    <h3>GCP Instance Layout</h3>
     <table>
       <thead>
         <tr><th>Component</th><th>Runtime</th><th>Port</th><th>Notes</th></tr>
@@ -1235,7 +1235,7 @@ INDEX idx_phone_session (phone_number, session_id)</code></pre>
     <div class="callout success">
       <div class="callout-title">Deployment Note</div>
       <p>
-        ONIX adapters run as Docker containers on the same GCC instance. They require outbound HTTPS access to
+        ONIX adapters run as Docker containers on the same GCP instance. They require outbound HTTPS access to
         Beckn Fabric endpoints and inbound access from the BAP/BPP application logic on localhost.
       </p>
     </div>
