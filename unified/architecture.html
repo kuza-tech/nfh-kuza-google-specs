@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFH-Kuza-Google — Unified Domain-Agnostic Architecture</title>
+  <style>
+    :root {
+      --blue-kuza: #2563EB;
+      --blue-kuza-light: #DBEAFE;
+      --blue-kuza-dark: #1E40AF;
+      --green-beckn: #059669;
+      --green-beckn-light: #D1FAE5;
+      --green-beckn-dark: #047857;
+      --orange-google: #EA580C;
+      --orange-google-light: #FED7AA;
+      --orange-google-dark: #C2410C;
+      --gray-wa: #6B7280;
+      --gray-wa-light: #F3F4F6;
+      --gray-wa-dark: #374151;
+      --purple-analytics: #7C3AED;
+      --purple-analytics-light: #EDE9FE;
+      --purple-analytics-dark: #5B21B6;
+      --bg: #FFFFFF;
+      --bg-alt: #F9FAFB;
+      --text: #111827;
+      --text-secondary: #4B5563;
+      --border: #E5E7EB;
+      --sidebar-bg: #F8FAFC;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+      background: var(--bg);
+    }
+
+    /* Header */
+    .doc-header {
+      background: linear-gradient(135deg, var(--blue-kuza-dark) 0%, var(--blue-kuza) 50%, #3B82F6 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .doc-header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    .doc-header .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+    .doc-header .meta {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 0.875rem;
+      opacity: 0.85;
+    }
+    .doc-header .meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Sidebar / TOC */
+    .sidebar {
+      width: 280px;
+      min-width: 280px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      padding: 0 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .sidebar nav a {
+      display: block;
+      padding: 0.4rem 1.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      color: var(--blue-kuza);
+      background: var(--blue-kuza-light);
+      border-left-color: var(--blue-kuza);
+    }
+    .sidebar nav a.sub {
+      padding-left: 2.5rem;
+      font-size: 0.8125rem;
+    }
+
+    /* Main content */
+    .content {
+      flex: 1;
+      padding: 2.5rem 3rem;
+      max-width: 900px;
+      min-width: 0;
+    }
+
+    .content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+    .content h2:first-of-type { margin-top: 0; }
+
+    .content h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 1.75rem 0 0.75rem;
+    }
+
+    .content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    .content p {
+      margin-bottom: 1rem;
+      color: var(--text-secondary);
+    }
+
+    .content ul, .content ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+    .content li {
+      margin-bottom: 0.35rem;
+      color: var(--text-secondary);
+    }
+    .content li strong {
+      color: var(--text);
+    }
+
+    /* Code blocks */
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+      font-size: 0.85em;
+      background: #F1F5F9;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: #0F172A;
+    }
+    pre {
+      background: #0F172A;
+      color: #E2E8F0;
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      font-size: 0.825rem;
+      line-height: 1.6;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: var(--bg-alt);
+      border-bottom: 2px solid var(--border);
+      font-weight: 600;
+      color: var(--text);
+    }
+    td {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    tr:hover td {
+      background: #FAFBFC;
+    }
+
+    /* Callout boxes */
+    .callout {
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid;
+    }
+    .callout.info {
+      background: var(--blue-kuza-light);
+      border-color: var(--blue-kuza);
+    }
+    .callout.info .callout-title { color: var(--blue-kuza-dark); }
+    .callout.warning {
+      background: #FEF3C7;
+      border-color: #F59E0B;
+    }
+    .callout.warning .callout-title { color: #92400E; }
+    .callout.success {
+      background: var(--green-beckn-light);
+      border-color: var(--green-beckn);
+    }
+    .callout.success .callout-title { color: var(--green-beckn-dark); }
+    .callout-title {
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+    .callout p {
+      font-size: 0.875rem;
+      margin-bottom: 0;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+    }
+    .legend-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    /* Flow diagram text blocks */
+    .flow-block {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .flow-block h4 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+    .flow-block pre {
+      margin-bottom: 0;
+      font-size: 0.8rem;
+    }
+
+    /* SVG diagram container */
+    .diagram-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 1.5rem 0 2rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #FAFBFC;
+      padding: 1rem;
+    }
+    .diagram-container svg {
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .content { padding: 1.5rem; }
+      .doc-header h1 { font-size: 1.5rem; }
+      .doc-header .meta { flex-direction: column; gap: 0.5rem; }
+    }
+
+    /* Print */
+    @media print {
+      .sidebar { display: none; }
+      .doc-header { padding: 1.5rem; }
+      .content { max-width: 100%; padding: 1rem; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="doc-header">
+  <h1>NFH-Kuza-Google &mdash; Unified Domain-Agnostic Architecture</h1>
+  <div class="subtitle">Single platform for Local Services (Agri/Rural) + Health Services (TIBU) + future domains</div>
+  <div class="meta">
+    <span>Domains: <strong>local-services</strong> + <strong>health-services</strong></span>
+    <span>Version: 2.0</span>
+    <span>Date: April 2026</span>
+    <span>Status: Draft</span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar / Table of Contents -->
+  <aside class="sidebar">
+    <h3>Table of Contents</h3>
+    <nav>
+      <a href="#overview">1. Project Overview</a>
+      <a href="#flow-engine">1.5 Unified Flow Engine</a>
+      <a href="#architecture-diagram">2. Architecture Diagram</a>
+      <a href="#layers">3. Architecture Layers</a>
+      <a href="#layer-1" class="sub">3.1 Frontend Channels</a>
+      <a href="#layer-2" class="sub">3.2 Channel Handlers</a>
+      <a href="#layer-flow-engine" class="sub">3.3 Flow Engine</a>
+      <a href="#layer-3" class="sub">3.4 BAP</a>
+      <a href="#layer-4" class="sub">3.5 BPP</a>
+      <a href="#layer-5" class="sub">3.6 Beckn Network</a>
+      <a href="#layer-6" class="sub">3.7 Kuza Platform</a>
+      <a href="#layer-7" class="sub">3.8 Google Cloud Services</a>
+      <a href="#layer-analytics" class="sub">3.9 Analytics &amp; Intelligence</a>
+      <a href="#data-flows">4. Key Data Flows</a>
+      <a href="#flow-a" class="sub">4.1 Service Discovery &amp; Booking</a>
+      <a href="#flow-b" class="sub">4.2 Provider Order Acceptance</a>
+      <a href="#flow-c" class="sub">4.3 Service Completion</a>
+      <a href="#flow-d" class="sub">4.4 Advisory Content</a>
+      <a href="#flow-e" class="sub">4.5 Market Produce</a>
+      <a href="#beckn-endpoint-mapping" class="sub">4.6 Complete Beckn Endpoint Mapping</a>
+      <a href="#domain-flows" class="sub">4.7 Domain-Specific Flow Examples</a>
+      <a href="#ownership">5. Component Ownership</a>
+      <a href="#database-schema">6. Database Schema</a>
+      <a href="#deployment">7. Deployment Topology</a>
+      <a href="#domain-split">8. Domain-Shared vs Domain-Specific</a>
+      <a href="#principles">9. Architectural Principles</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+
+    <!-- 1. Overview -->
+    <h2 id="overview">1. Project Overview</h2>
+    <p>
+      NFH-Kuza-Google is a <strong>unified service orchestration platform</strong> that connects <em>seekers</em>
+      (farmers, patients, households) with <em>providers</em> (agripreneurs, clinicians, facilities, aggregators)
+      across multiple domains through WhatsApp, a lightweight web application, and low-connectivity channels
+      (SMS/USSD, Mobile Lite). The platform is built on the <strong>Beckn open network protocol</strong>,
+      enabling decentralized discovery and fulfillment of services.
+    </p>
+    <p>The same underlying flow engine, architecture, technology stack, and data infrastructure serve two live domains today, with a design that admits additional domains without structural change:</p>
+    <ul>
+      <li><strong>Local Services / Agri</strong> (Beckn domain code: <code>local-services</code>) &mdash; Livelihood, Household, Market, and Advisory flows for rural households.</li>
+      <li><strong>Health Services / TIBU</strong> (Beckn domain code: <code>health-services</code>) &mdash; TB screening, treatment, supervision, and post-TB care for Kenya's National TB Programme.</li>
+    </ul>
+    <div class="callout info">
+      <div class="callout-title">Design Principle</div>
+      <p>
+        100% of seeker interaction occurs through channel-agnostic messaging (primarily WhatsApp) &mdash; no app installation
+        required. Providers use a lightweight Ionic Angular web app opened via WhatsApp button links, with an optional
+        Mobile Lite interface for field workers (CHVs, CHPs, extension officers) in low-bandwidth conditions.
+      </p>
+    </div>
+
+    <h3>Service Domains &mdash; Agri (local-services)</h3>
+    <ul>
+      <li><strong>Livelihood Services</strong> &mdash; agricultural inputs, equipment rental, veterinary services, soil testing, etc.</li>
+      <li><strong>Household Services</strong> &mdash; plumbing, electrical, cleaning, construction, etc.</li>
+      <li><strong>Market Produce</strong> &mdash; connecting farmers with aggregators and buyers (reversed economics: buyer pays seeker)</li>
+      <li><strong>Advisory</strong> &mdash; agricultural content and guidance delivered as media (no order lifecycle)</li>
+    </ul>
+
+    <h3>Service Domains &mdash; Health (health-services)</h3>
+    <ul>
+      <li><strong>Screening &amp; Referral</strong> &mdash; symptom triage, referral to nearest facility with the right capability (e.g., GeneXpert, X-ray)</li>
+      <li><strong>Treatment Adherence</strong> &mdash; medication reminders, directly-observed therapy (DOT), supervision by CHP/CHV</li>
+      <li><strong>Lab &amp; Diagnostics</strong> &mdash; sputum collection, GeneXpert, culture &amp; DST bookings</li>
+      <li><strong>Post-TB Care &amp; Advisory</strong> &mdash; PTLD monitoring, nutrition, TB-awareness education</li>
+    </ul>
+
+    <!-- 1.5 Unified Flow Engine -->
+    <h2 id="flow-engine">1.5 Unified Flow Engine</h2>
+    <p>
+      The central abstraction of the platform is a <strong>domain-agnostic 7-step Flow Engine</strong>. Every transactional
+      interaction &mdash; whether agri or health &mdash; is modelled as the same sequence of states. This is what makes the
+      architecture truly unified: verticals differ in schema and vocabulary, but the engine that orchestrates them is identical.
+    </p>
+
+    <div class="callout info">
+      <div class="callout-title">The 7 Steps</div>
+      <p><strong>Need &rarr; Search &rarr; Select &rarr; Confirm &rarr; Deliver &rarr; Record &rarr; Outcome</strong></p>
+    </div>
+
+    <ul>
+      <li><strong>Need</strong> &mdash; a seeker has a need (farmer needs vaccination; patient has persistent cough). User trigger; no Beckn call.</li>
+      <li><strong>Search</strong> &mdash; identify who can help, matching capability + location. Beckn: <code>discover</code> / <code>on_discover</code>.</li>
+      <li><strong>Select</strong> &mdash; match to best provider, including quote / booking. Beckn: <code>select</code> / <code>on_select</code> + <code>init</code> / <code>on_init</code>.</li>
+      <li><strong>Confirm</strong> &mdash; both sides agree, binding contract created. Beckn: <code>confirm</code> / <code>on_confirm</code>.</li>
+      <li><strong>Deliver</strong> &mdash; service rendered (vaccination given; sputum collected). Beckn: <code>status</code> updates (<code>PROVIDER_ACCEPTED</code>, <code>IN_PROGRESS</code>, <code>COMPLETED</code>).</li>
+      <li><strong>Record</strong> &mdash; data captured (visit notes, clinical record, payment record). Beckn: <code>update</code> + <code>status</code>.</li>
+      <li><strong>Outcome</strong> &mdash; tracked to result (farmer feedback, treatment success, cure confirmed). Beckn: <code>rate</code> / <code>on_rate</code> plus custom outcome events (e.g., <code>HEALTH_OUTCOME_RECORDED</code>). Can be immediate or longitudinal.</li>
+    </ul>
+
+    <h3>Generalized Actor Model</h3>
+    <p>Specific titles (farmer, patient, agripreneur, clinician) are expressions of four abstract roles. A single individual may play multiple roles across different flows &mdash; a CHP is a <em>Provider</em> for screening but a <em>Seeker</em> for supervision.</p>
+    <ul>
+      <li><strong>Seeker</strong> &mdash; any individual or household needing service (farmer, patient, household, CHV, CHP).</li>
+      <li><strong>Provider</strong> &mdash; anyone delivering service (agripreneur, vet, clinician, lab, agro-vet, training facility).</li>
+      <li><strong>Coordinator</strong> &mdash; supervisors / oversight (SCTLC, CTLC, extension officer, area manager).</li>
+      <li><strong>Validator</strong> &mdash; lab, audit, quality assurance.</li>
+      <li><strong>Sponsor</strong> &mdash; funders, partners, government, NGOs.</li>
+    </ul>
+
+    <h3>Domain &amp; Vertical Hierarchy</h3>
+    <pre><code>Platform (Kuza Flow Engine)
+  └── Domain (e.g., local-services, health-services)
+        └── Vertical (e.g., poultry, crops, TB, HIV, malaria)
+              └── Flow Template (e.g., vaccination-booking, screening-referral)</code></pre>
+    <p>Each Beckn domain code maps to one platform Domain. Verticals are sub-classifications within a domain. Flow templates are reusable parameterised patterns instantiated by the Flow Engine.</p>
+
+    <h3>Capability-Based Matching</h3>
+    <p>Providers are matched by <strong>service area + structured capability tags</strong>, not category alone:</p>
+    <ul>
+      <li><strong>Agri</strong>: <code>services_offered</code> (vaccination, brooding, AI, soil testing, etc.)</li>
+      <li><strong>Health</strong>: <code>capabilities</code> (GeneXpert, X-ray, spirometry, DRTB-certified clinician)</li>
+    </ul>
+    <p>Both stored as structured tags on the Provider profile, queried in <code>discover</code>.</p>
+
+    <h3>Outcome Recording</h3>
+    <p>Beyond service status <code>COMPLETED</code>, the engine captures an explicit <strong>Outcome</strong> phase:</p>
+    <ul>
+      <li><strong>Agri outcomes</strong>: harvest yield (later season), income earned, repeat business, farmer feedback.</li>
+      <li><strong>Health outcomes</strong>: cure confirmed, treatment success, prevented mortality, PTLD detected.</li>
+      <li>Outcomes can be captured <em>immediately</em> (feedback at close) or <em>longitudinally</em> (months later), feeding back into the Analytics layer for ML training.</li>
+    </ul>
+
+    <!-- 2. Architecture Diagram -->
+    <h2 id="architecture-diagram">2. Architecture Diagram</h2>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:#2563EB;"></div> Kuza-built components</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#059669;"></div> Beckn infrastructure</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#EA580C;"></div> Google services</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#6B7280;"></div> Channels / external</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#7C3AED;"></div> Analytics &amp; Intelligence</div>
+    </div>
+    <div class="diagram-container">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 920" width="1020" height="920" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+        <defs>
+          <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#2563EB">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#059669">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <marker id="arrow-gray" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#6B7280">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <marker id="arrow-orange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#EA580C">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <marker id="arrow-purple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" fill="#7C3AED">
+            <polygon points="0 0, 8 3, 0 6"/>
+          </marker>
+          <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+          </filter>
+        </defs>
+
+        <!-- Layer labels -->
+        <text x="12" y="52" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L1 CHANNELS</text>
+        <text x="12" y="172" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L2 HANDLER</text>
+        <text x="12" y="244" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L3 FLOW ENG</text>
+        <text x="12" y="305" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L4/5 BAP/BPP</text>
+        <text x="12" y="432" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L6 BECKN</text>
+        <text x="12" y="572" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L6 FABRIC</text>
+        <text x="12" y="682" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L7 DATA</text>
+        <text x="12" y="762" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L8 GOOGLE</text>
+        <text x="12" y="805" font-size="10" fill="#9CA3AF" font-weight="600" text-anchor="start">L9 ANALYTICS</text>
+
+        <!-- ============ LAYER 1: Frontend Channels (multi-channel) ============ -->
+        <!-- WhatsApp (Seeker) -->
+        <rect x="30" y="25" width="160" height="65" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2" filter="url(#shadow)"/>
+        <text x="110" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">WhatsApp</text>
+        <text x="110" y="70" text-anchor="middle" font-size="10" fill="#6B7280">Seeker-Facing</text>
+        <text x="110" y="83" text-anchor="middle" font-size="9" fill="#6B7280">(farmer / patient)</text>
+
+        <!-- SMS / USSD (low connectivity) -->
+        <rect x="200" y="25" width="140" height="65" rx="10" fill="#F3F4F6" stroke="#6B7280" stroke-width="2" filter="url(#shadow)"/>
+        <text x="270" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">SMS / USSD</text>
+        <text x="270" y="70" text-anchor="middle" font-size="10" fill="#6B7280">Low-connectivity</text>
+        <text x="270" y="83" text-anchor="middle" font-size="9" fill="#6B7280">fallback</text>
+
+        <!-- Mobile Lite (Field workers) -->
+        <rect x="500" y="25" width="140" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="570" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Mobile Lite</text>
+        <text x="570" y="70" text-anchor="middle" font-size="10" fill="#2563EB">Field workers</text>
+        <text x="570" y="83" text-anchor="middle" font-size="9" fill="#2563EB">(CHV / CHP / EO)</text>
+
+        <!-- Kuza Web App (Provider) -->
+        <rect x="670" y="25" width="220" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="780" y="52" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Kuza Web App</text>
+        <text x="780" y="70" text-anchor="middle" font-size="10" fill="#2563EB">Provider-Facing</text>
+        <text x="780" y="83" text-anchor="middle" font-size="9" fill="#2563EB">(Ionic Angular)</text>
+
+        <!-- ============ LAYER 2: WhatsApp Handler ============ -->
+        <!-- webhook.php + beckn handler -->
+        <rect x="110" y="140" width="310" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="265" y="167" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">WhatsApp Handler</text>
+        <text x="265" y="185" text-anchor="middle" font-size="10" fill="#2563EB">webhook.php &rarr; beckn_marketplace_handler.php</text>
+
+        <!-- Provider Notifications -->
+        <rect x="580" y="140" width="240" height="65" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="700" y="167" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Provider Notifications</text>
+        <text x="700" y="185" text-anchor="middle" font-size="10" fill="#2563EB">Messaging Queue / Cron</text>
+
+        <!-- ============ LAYER 3 (NEW): Flow Engine ============ -->
+        <rect x="110" y="222" width="780" height="38" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" stroke-dasharray="2,2" filter="url(#shadow)"/>
+        <text x="500" y="240" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">Flow Engine (7-step: Need &rarr; Search &rarr; Select &rarr; Confirm &rarr; Deliver &rarr; Record &rarr; Outcome)</text>
+        <text x="500" y="254" text-anchor="middle" font-size="10" fill="#2563EB">Domain-agnostic state machine &mdash; loads flow templates per domain / vertical; routes to BAP/BPP</text>
+
+        <!-- ============ LAYER 3/4: BAP and BPP ============ -->
+        <!-- BAP -->
+        <rect x="110" y="275" width="270" height="60" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="245" y="300" text-anchor="middle" font-size="14" font-weight="700" fill="#1E40AF">BAP</text>
+        <text x="245" y="318" text-anchor="middle" font-size="11" fill="#2563EB">Beckn Application Platform (Seeker-side)</text>
+
+        <!-- BPP -->
+        <rect x="600" y="275" width="270" height="60" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="735" y="300" text-anchor="middle" font-size="14" font-weight="700" fill="#1E40AF">BPP</text>
+        <text x="735" y="318" text-anchor="middle" font-size="11" fill="#2563EB">Beckn Provider Platform (Provider-side)</text>
+
+        <!-- ============ LAYER 5: ONIX Adapters + Beckn Network ============ -->
+        <!-- ONIX-BAP -->
+        <rect x="130" y="400" width="200" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="230" y="424" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">ONIX-BAP</text>
+        <text x="230" y="442" text-anchor="middle" font-size="10" fill="#059669">Adapter (Go / Docker)</text>
+
+        <!-- Beckn Network cloud -->
+        <rect x="400" y="395" width="190" height="65" rx="32" fill="#D1FAE5" stroke="#059669" stroke-width="2" stroke-dasharray="6,3" filter="url(#shadow)"/>
+        <text x="495" y="425" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">Beckn Network</text>
+        <text x="495" y="443" text-anchor="middle" font-size="10" fill="#059669">Protocol Routing</text>
+
+        <!-- ONIX-BPP -->
+        <rect x="650" y="400" width="200" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="750" y="424" text-anchor="middle" font-size="13" font-weight="700" fill="#047857">ONIX-BPP</text>
+        <text x="750" y="442" text-anchor="middle" font-size="10" fill="#059669">Adapter (Go / Docker)</text>
+
+        <!-- ============ LAYER 5b: Beckn Fabric Services ============ -->
+        <!-- DeDi Registry -->
+        <rect x="110" y="530" width="210" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="215" y="554" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">DeDi Registry</text>
+        <text x="215" y="571" text-anchor="middle" font-size="10" fill="#059669">Identity &amp; Public Keys</text>
+
+        <!-- Catalog Service -->
+        <rect x="385" y="530" width="210" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="490" y="554" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">Catalog Service</text>
+        <text x="490" y="571" text-anchor="middle" font-size="10" fill="#059669">Provider Catalogs</text>
+
+        <!-- Discovery Service -->
+        <rect x="660" y="530" width="210" height="55" rx="10" fill="#D1FAE5" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
+        <text x="765" y="554" text-anchor="middle" font-size="12" font-weight="700" fill="#047857">Discovery Service</text>
+        <text x="765" y="571" text-anchor="middle" font-size="10" fill="#059669">Search &amp; Matching</text>
+
+        <!-- Beckn Fabric label -->
+        <rect x="100" y="515" width="780" height="80" rx="12" fill="none" stroke="#059669" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+        <text x="490" y="608" text-anchor="middle" font-size="10" fill="#059669" font-style="italic">Beckn Fabric (fabric.nfh.global) &mdash; externally hosted</text>
+
+        <!-- ============ LAYER 6: Kuza Platform ============ -->
+        <rect x="110" y="650" width="620" height="60" rx="10" fill="#DBEAFE" stroke="#2563EB" stroke-width="2" filter="url(#shadow)"/>
+        <text x="420" y="676" text-anchor="middle" font-size="14" font-weight="700" fill="#1E40AF">Kuza Platform (MySQL 8)</text>
+        <text x="420" y="694" text-anchor="middle" font-size="11" fill="#2563EB">Users, Providers, Catalogs, Orders, Payments, Conversations</text>
+
+        <!-- ============ LAYER 7: Google Cloud Services (3 tiers) ============ -->
+        <!-- Outer grouping rectangle -->
+        <rect x="755" y="635" width="245" height="90" rx="12" fill="none" stroke="#EA580C" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.5"/>
+        <text x="877" y="650" text-anchor="middle" font-size="10" font-weight="700" fill="#C2410C">Google Cloud Services</text>
+
+        <!-- 7.1 GCP infrastructure (background hosting layer) -->
+        <rect x="765" y="658" width="225" height="20" rx="6" fill="#FFF7ED" stroke="#EA580C" stroke-width="1"/>
+        <text x="877" y="672" text-anchor="middle" font-size="9" font-weight="600" fill="#C2410C">GCP &mdash; Hosting Infrastructure</text>
+
+        <!-- 7.2 Content APIs -->
+        <rect x="765" y="682" width="108" height="38" rx="6" fill="#FED7AA" stroke="#EA580C" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="819" y="697" text-anchor="middle" font-size="9.5" font-weight="700" fill="#C2410C">Content APIs</text>
+        <text x="819" y="710" text-anchor="middle" font-size="8" fill="#9A3412">agri / health / market</text>
+
+        <!-- 7.3 AI Interfaces -->
+        <rect x="881" y="682" width="108" height="38" rx="6" fill="#FED7AA" stroke="#EA580C" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="935" y="697" text-anchor="middle" font-size="9.5" font-weight="700" fill="#C2410C">AI Interfaces</text>
+        <text x="935" y="710" text-anchor="middle" font-size="8" fill="#9A3412">location norm. / gen.</text>
+
+        <!-- ============ ARROWS / DATA FLOWS ============ -->
+        <!-- WhatsApp -> Handler -->
+        <line x1="130" y1="90" x2="180" y2="140" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow-gray)"/>
+        <line x1="200" y1="140" x2="150" y2="90" stroke="#6B7280" stroke-width="2" marker-end="url(#arrow-gray)" stroke-dasharray="5,3"/>
+        <!-- SMS/USSD -> Handler -->
+        <line x1="270" y1="90" x2="260" y2="140" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrow-gray)" stroke-dasharray="3,3" opacity="0.7"/>
+        <!-- Mobile Lite -> Handler -->
+        <line x1="570" y1="90" x2="360" y2="140" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arrow-blue)" stroke-dasharray="3,3" opacity="0.7"/>
+
+        <!-- Handler -> Flow Engine -->
+        <line x1="245" y1="205" x2="245" y2="222" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+        <!-- Flow Engine -> BAP -->
+        <line x1="245" y1="260" x2="245" y2="275" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+        <line x1="265" y1="275" x2="265" y2="260" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)" stroke-dasharray="5,3"/>
+        <!-- Flow Engine -> BPP (right side) -->
+        <line x1="735" y1="260" x2="735" y2="275" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)" stroke-dasharray="3,3" opacity="0.6"/>
+
+        <!-- BAP -> ONIX-BAP -->
+        <line x1="230" y1="335" x2="230" y2="400" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+        <!-- ONIX-BAP <-> Beckn Network -->
+        <line x1="330" y1="427" x2="400" y2="427" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+        <line x1="400" y1="435" x2="330" y2="435" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)" stroke-dasharray="5,3"/>
+
+        <!-- Beckn Network <-> ONIX-BPP -->
+        <line x1="590" y1="427" x2="650" y2="427" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+        <line x1="650" y1="435" x2="590" y2="435" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)" stroke-dasharray="5,3"/>
+
+        <!-- ONIX-BPP -> BPP -->
+        <line x1="750" y1="400" x2="750" y2="335" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+        <!-- BPP <-> Kuza Web App -->
+        <line x1="790" y1="275" x2="790" y2="90" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+        <line x1="770" y1="90" x2="770" y2="275" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)" stroke-dasharray="5,3"/>
+
+        <!-- BPP <-> Provider Notifications -->
+        <line x1="700" y1="275" x2="700" y2="205" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+        <!-- Provider Notifications -> WhatsApp (curved path to farmer) -->
+        <path d="M 580 172 L 480 172 Q 460 172 460 152 L 460 57 L 350 57" stroke="#6B7280" stroke-width="1.5" fill="none" marker-end="url(#arrow-gray)" stroke-dasharray="5,3"/>
+        <text x="468" y="120" font-size="9" fill="#6B7280" transform="rotate(-90, 468, 120)">outbound msg</text>
+
+        <!-- BAP -> Kuza Platform (data store) -->
+        <path d="M 200 335 L 200 650" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)" stroke-dasharray="5,3" opacity="0.5"/>
+
+        <!-- BPP -> Kuza Platform (data store) -->
+        <path d="M 680 335 L 680 650" stroke="#2563EB" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)" stroke-dasharray="5,3" opacity="0.5"/>
+
+        <!-- Handler -> Google AI Interfaces (location normalization) -->
+        <path d="M 420 185 Q 650 280 935 682" stroke="#EA580C" stroke-width="1.5" fill="none" marker-end="url(#arrow-orange)" stroke-dasharray="5,3" opacity="0.6"/>
+        <text x="590" y="300" font-size="9" fill="#EA580C" opacity="0.8">location normalization</text>
+
+        <!-- BPP -> Google Content APIs (advisory content) -->
+        <path d="M 760 310 Q 800 460 819 682" stroke="#EA580C" stroke-width="1.8" fill="none" marker-end="url(#arrow-orange)" stroke-dasharray="5,3" opacity="0.6"/>
+        <text x="800" y="480" font-size="9" fill="#EA580C" opacity="0.85" transform="rotate(80, 800, 480)">curated content</text>
+
+        <!-- BPP -> Google AI Interfaces (advisory tailoring) -->
+        <path d="M 790 310 Q 880 480 935 682" stroke="#EA580C" stroke-width="1.5" fill="none" marker-end="url(#arrow-orange)" stroke-dasharray="5,3" opacity="0.55"/>
+        <text x="900" y="500" font-size="9" fill="#EA580C" opacity="0.8" transform="rotate(78, 900, 500)">AI tailoring</text>
+
+        <!-- ONIX adapters -> Beckn Fabric services (vertical dashed) -->
+        <line x1="215" y1="455" x2="215" y2="530" stroke="#059669" stroke-width="1" stroke-dasharray="4,3" opacity="0.5" marker-end="url(#arrow-green)"/>
+        <line x1="765" y1="455" x2="765" y2="530" stroke="#059669" stroke-width="1" stroke-dasharray="4,3" opacity="0.5" marker-end="url(#arrow-green)"/>
+
+        <!-- Arrow labels -->
+        <text x="207" y="118" font-size="9" fill="#6B7280">msgs</text>
+        <text x="222" y="245" font-size="9" fill="#2563EB">API</text>
+        <text x="355" y="420" font-size="9" fill="#059669">beckn</text>
+        <text x="612" y="420" font-size="9" fill="#059669">beckn</text>
+
+        <!-- GCP hosting boundary -->
+        <rect x="60" y="130" width="950" height="605" rx="16" fill="none" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="8,5" opacity="0.3"/>
+        <text x="75" y="725" font-size="11" fill="#93C5FD" font-weight="600">Hosted on GCP (Google Cloud)</text>
+
+        <!-- External label for Beckn Fabric -->
+        <text x="880" y="610" font-size="9" fill="#059669" font-weight="600">External</text>
+
+        <!-- ============ LAYER 9: Analytics & Intelligence ============ -->
+        <rect x="60" y="785" width="950" height="110" rx="14" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.9"/>
+        <text x="80" y="808" font-size="11" font-weight="700" fill="#5B21B6">Analytics &amp; Intelligence Layer</text>
+
+        <!-- Horizon 1 -->
+        <rect x="85" y="820" width="290" height="60" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="230" y="842" text-anchor="middle" font-size="12" font-weight="700" fill="#5B21B6">Horizon 1 &mdash; Descriptive</text>
+        <text x="230" y="858" text-anchor="middle" font-size="9.5" fill="#7C3AED">Analytics on existing data</text>
+        <text x="230" y="871" text-anchor="middle" font-size="9" fill="#7C3AED">(no new collection)</text>
+
+        <!-- Horizon 2 -->
+        <rect x="385" y="820" width="290" height="60" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="530" y="842" text-anchor="middle" font-size="12" font-weight="700" fill="#5B21B6">Horizon 2 &mdash; Predictive</text>
+        <text x="530" y="858" text-anchor="middle" font-size="9.5" fill="#7C3AED">ML risk engines,</text>
+        <text x="530" y="871" text-anchor="middle" font-size="9" fill="#7C3AED">outcome prediction</text>
+
+        <!-- Horizon 3 -->
+        <rect x="685" y="820" width="295" height="60" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="832" y="842" text-anchor="middle" font-size="12" font-weight="700" fill="#5B21B6">Horizon 3 &mdash; Pioneering</text>
+        <text x="832" y="858" text-anchor="middle" font-size="9.5" fill="#7C3AED">Multi-domain surveillance,</text>
+        <text x="832" y="871" text-anchor="middle" font-size="9" fill="#7C3AED">longitudinal studies</text>
+
+        <!-- Data flow from Kuza Platform to Analytics -->
+        <line x1="420" y1="710" x2="420" y2="785" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6" marker-end="url(#arrow-purple)"/>
+        <text x="430" y="750" font-size="9" fill="#7C3AED">events + outcomes</text>
+      </svg>
+    </div>
+
+    <!-- 3. Architecture Layers -->
+    <h2 id="layers">3. Architecture Layers</h2>
+    <p>The architecture is organised into <strong>nine layers</strong>. Layers 1-8 run on every deployment; Layer 9 (Analytics &amp; Intelligence) is additive and operates on the data emitted by the other layers.</p>
+
+    <h3 id="layer-1">3.1 Layer 1: Frontend Channels</h3>
+    <p>The platform is <strong>channel-agnostic</strong>. The same flow can be driven over any supported channel; channel choice is a function of the seeker's device and connectivity, not of the domain.</p>
+
+    <h4>WhatsApp (Seeker-Facing, Primary)</h4>
+    <p>
+      WhatsApp is the primary seeker-facing interface. The bulk of seeker interactions &mdash; discovery, provider
+      selection, confirmation, payment declaration, feedback, treatment reminders &mdash; occur through WhatsApp messages.
+    </p>
+    <ul>
+      <li><strong>Interactive buttons</strong> for small binary/ternary choices (Accept/Reject, Yes/No, payment method selection)</li>
+      <li><strong>Numbered text lists</strong> for longer option sets (provider lists, service categories, sub-categories)</li>
+      <li><strong>Free text input</strong> for location, quantity, symptoms, and other open-ended fields</li>
+      <li>Connected via <strong>WhatsApp Cloud API</strong></li>
+    </ul>
+
+    <h4>SMS / USSD (Low-Connectivity Fallback)</h4>
+    <p>For seekers without smartphones or data, the same flow engine is reachable via SMS and USSD shortcodes. Message structure is simplified (numeric menus, short prompts) but the underlying 7-step sequence is preserved.</p>
+
+    <h4>Mobile Lite (Field Workers)</h4>
+    <p>A <strong>TIBUlite-style</strong> lightweight mobile client for field workers (CHVs, CHPs, extension officers) operating in low-bandwidth areas. Supports offline queueing of Deliver / Record steps with sync-on-reconnect.</p>
+
+    <h4>Kuza Web App (Provider-Facing)</h4>
+    <p>
+      A lightweight Ionic Angular web application opened from WhatsApp button links &mdash; no native app installation
+      required. Providers (agripreneurs, clinicians, facilities) use it to:
+    </p>
+    <ul>
+      <li>Manage their service catalog / capability profile (add/edit services, set pricing, declare capabilities such as GeneXpert, vaccination, etc.)</li>
+      <li>View and accept/reject incoming orders / referrals</li>
+      <li>Update service status (in-progress, completed)</li>
+      <li>Capture clinical / visit records during the Record step</li>
+      <li>Manage their profile and service areas</li>
+    </ul>
+
+    <h3 id="layer-2">3.2 Layer 2: Channel Handlers</h3>
+    <div class="callout warning">
+      <div class="callout-title">Design Constraint</div>
+      <p>
+        The existing <code>webhook.php</code> remains UNTOUCHED. Only routing logic is added to branch
+        marketplace conversations to the new <code>beckn_marketplace_handler.php</code> based on trigger words
+        or message IDs.
+      </p>
+    </div>
+    <ul>
+      <li><strong>File:</strong> <code>beckn_marketplace_handler.php</code> (new PHP file on Kuza Platform)</li>
+      <li><strong>State machine:</strong> manages conversational flow for the 4 marketplace domains (Livelihood, Household, Market, Advisory)</li>
+      <li><strong>Translates</strong> WhatsApp interactions into BAP API calls</li>
+      <li><strong>Receives</strong> async callbacks from BAP and formats WhatsApp response messages</li>
+      <li><strong>Own tables:</strong> conversation state, session tracking &mdash; separate from existing poultry chatbot tables (<code>chatbot_nodes</code>, <code>chatbot_transitions</code>)</li>
+      <li><strong>Provider notifications</strong> are triggered via a messaging queue/cron job, NOT through <code>webhook.php</code></li>
+    </ul>
+
+    <h3 id="layer-flow-engine">3.3 Layer 3: Flow Engine</h3>
+    <p>
+      The Flow Engine sits <strong>above BAP/BPP</strong> and <strong>below the Channel Handlers</strong>. It is the
+      domain-agnostic state machine that implements the 7-step lifecycle (Need &rarr; Search &rarr; Select &rarr; Confirm
+      &rarr; Deliver &rarr; Record &rarr; Outcome) and decides which Beckn call (if any) each step translates into.
+    </p>
+    <ul>
+      <li><strong>Flow templates</strong> per domain / vertical (<code>vaccination-booking</code>, <code>screening-referral</code>, <code>market-sell-produce</code>, <code>treatment-adherence</code>) are loaded at runtime.</li>
+      <li><strong>Transaction state</strong> is persisted per seeker session (<code>flow_instance_id</code>) and correlated with the Beckn transaction id.</li>
+      <li><strong>Routing</strong> &mdash; each step may produce a BAP call, a BPP-originated event, or a pure UX transition (e.g., the Need step has no network call).</li>
+      <li><strong>Progressive disclosure</strong> &mdash; the same template can render differently by actor role (seeker vs. coordinator vs. validator).</li>
+      <li><strong>Optional adoption</strong> &mdash; the engine is not required for read-only analytics; existing non-flow interactions (one-off surveys, content pulls) continue to operate independently.</li>
+    </ul>
+
+    <h3 id="layer-3">3.4 Layer 4: BAP (Beckn Application Platform)</h3>
+    <p>
+      The BAP is the seeker-side Beckn participant (e.g., farmer, patient). It acts as the bridge between the Flow Engine
+      and the Beckn network.
+    </p>
+    <ul>
+      <li>Receives translated requests from the WhatsApp Handler</li>
+      <li>Constructs Beckn v2 protocol messages: <code>discover</code>, <code>select</code>, <code>init</code>, <code>confirm</code>, <code>status</code>, <code>cancel</code>, <code>rate</code></li>
+      <li>Sends protocol messages through the ONIX-BAP adapter</li>
+      <li>Receives async callbacks (<code>on_discover</code>, <code>on_select</code>, <code>on_init</code>, <code>on_confirm</code>, <code>on_status</code>, <code>on_cancel</code>, <code>on_rate</code>)</li>
+      <li>Pushes results back to WhatsApp Handler for farmer delivery</li>
+      <li>Hosted by Kuza on GCP</li>
+    </ul>
+
+    <h3 id="layer-4">3.5 Layer 5: BPP (Beckn Provider Platform)</h3>
+    <p>
+      The BPP is the provider-side Beckn participant. It manages the provider catalog, order lifecycle,
+      and serves the provider web interface.
+    </p>
+    <ul>
+      <li>Receives Beckn protocol requests from the network (via ONIX-BPP adapter)</li>
+      <li>Connects to Kuza Platform to fetch provider catalogs, service areas, and pricing</li>
+      <li>Manages order lifecycle on the provider side (create, accept, update status, complete)</li>
+      <li>Sends async Beckn responses back through ONIX-BPP adapter</li>
+      <li>Serves the <strong>Kuza Web App</strong> (provider interface) for catalog and order management</li>
+      <li>Hosted by Kuza on GCP</li>
+    </ul>
+
+    <h3 id="layer-5">3.6 Layer 6: Beckn Network Infrastructure</h3>
+    <p>
+      All Beckn network components are external to Kuza infrastructure, provided by Beckn Fabric.
+    </p>
+
+    <h4>ONIX Adapters</h4>
+    <ul>
+      <li>Plugin-based Go servers running the <code>fidedocker/onix-adapter</code> Docker image</li>
+      <li>Two instances: ONIX-BAP (seeker side &mdash; farmer / patient) and ONIX-BPP (provider side &mdash; agripreneur / clinician / facility)</li>
+      <li>Handle message signing, signature validation, schema validation, and network routing</li>
+      <li>Hosted on GCP as Docker containers</li>
+    </ul>
+
+    <h4>DeDi Registry</h4>
+    <ul>
+      <li>Endpoint: <code>fabric.nfh.global/registry/dedi</code></li>
+      <li>Stores participant identity, public keys, and callback URIs</li>
+      <li>Used for signature validation and dynamic routing between BAP and BPP</li>
+    </ul>
+
+    <h4>Catalog Service</h4>
+    <ul>
+      <li>Endpoint: <code>fabric.nfh.global/beckn/catalog</code></li>
+      <li>BPP publishes provider catalogs here</li>
+      <li>Queried by Discovery Service during <code>discover</code> requests</li>
+    </ul>
+
+    <h4>Discovery Service</h4>
+    <ul>
+      <li>Handles <code>discover</code> requests from BAP</li>
+      <li>Queries Catalog Service for matching providers</li>
+      <li>Returns results to BAP via <code>on_discover</code> callback</li>
+    </ul>
+
+    <h3 id="layer-6">3.7 Layer 7: Kuza Platform / Data Foundation</h3>
+    <p>
+      MySQL 8 (with a PostgreSQL migration under way in <code>kuza-next</code>) on GCP serves as the single source
+      of truth. The Beckn network is stateless &mdash; all persistent data lives here.
+    </p>
+    <div class="callout info">
+      <div class="callout-title">Sovereign Data &amp; Compliance</div>
+      <p>
+        Seeker / patient / farmer data stays in country. Records are persisted with a full audit trail
+        (status transitions, who updated, when). For the health domain, the record schema is designed to be
+        <strong>FHIR-compatible</strong> so clinical records can be exported into national health information
+        systems without reshaping.
+      </p>
+    </div>
+
+    <h4>Existing Tables Used</h4>
+    <ul>
+      <li><code>user</code> &mdash; unified seeker / provider identity (agripreneurs, farmers, clinicians, patients, CHPs)</li>
+      <li>Partner and organization data</li>
+      <li>Content library (for Advisory domain, agri &amp; health)</li>
+    </ul>
+
+    <h4>New Tables Required</h4>
+    <table>
+      <thead>
+        <tr><th>Table</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>beckn_provider_catalog</code></td><td>Services offered by providers, with pricing per service</td></tr>
+        <tr><td><code>beckn_provider_service_areas</code></td><td>County + Sub-County mappings for provider coverage areas</td></tr>
+        <tr><td><code>beckn_subcategory_master</code></td><td>Dynamic taxonomy of service sub-categories</td></tr>
+        <tr><td><code>beckn_orders</code></td><td>Order records with full lifecycle tracking</td></tr>
+        <tr><td><code>beckn_order_status_history</code></td><td>Audit trail of status transitions per order</td></tr>
+        <tr><td><code>beckn_payments</code></td><td>Payment records (farmer-side and provider-side)</td></tr>
+        <tr><td><code>beckn_feedback</code></td><td>Feedback and ratings from both parties</td></tr>
+        <tr><td><code>beckn_conversation_state</code></td><td>Marketplace conversation state machine data</td></tr>
+        <tr><td><code>beckn_farmer_profile</code></td><td>One-time farmer profile fields (location, preferences)</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="layer-7">3.8 Layer 8: Google Cloud Services</h3>
+    <p>Google contributes to the platform across <strong>three distinct service tiers</strong>: cloud infrastructure for hosting, content APIs for serving curated domain content, and AI interfaces for intelligent processing. Each is consumed at a different point in the pipeline.</p>
+
+    <h4>3.8.1 Google Cloud Platform (GCP) &mdash; Hosting Infrastructure</h4>
+    <p>The entire Kuza-built stack is deployed on GCP. This is the foundational layer on which everything Kuza builds runs.</p>
+    <ul>
+      <li><strong>Compute:</strong> hosts the WhatsApp Handler, BAP application, BPP application, Kuza Web App, ONIX adapters (Docker)</li>
+      <li><strong>Database:</strong> hosts MySQL 8 (the Kuza Platform data store)</li>
+      <li><strong>Networking:</strong> public endpoints, TLS termination, load balancing for BAP / BPP callbacks</li>
+      <li><strong>Co-location benefit:</strong> Kuza application code and Google Content APIs / AI interfaces are co-located on the same cloud, minimising latency for in-flow API calls</li>
+    </ul>
+
+    <h4>3.8.2 Google Content APIs &mdash; Curated Domain Content</h4>
+    <p>Google publishes a set of <strong>curated content APIs per domain</strong> (agri, health, market, finance, etc.) that serve <em>informational / educational</em> content to farmers via the chatbot. These are <strong>separate from Beckn transactional catalog data</strong> &mdash; they don't list providers or services for sale, they deliver knowledge.</p>
+    <ul>
+      <li><strong>Primary consumer:</strong> Advisory flow &mdash; the BPP calls Google Content APIs (and Google AI) during <code>on_discover</code> processing to source advisory material. Content may include curated articles, videos, audio, infographics, or AI-generated summaries.</li>
+      <li><strong>Secondary consumers:</strong> Livelihood / Household / Market flows &mdash; these can enrich a transaction with supplementary content (e.g., "Best practices for vaccinating broilers" attached to a Vaccination order; "Egg storage tips" attached to a Market produce sale). Used optionally to add value beyond the transaction.</li>
+      <li><strong>Domain coverage:</strong> agri, health, market, finance, education &mdash; matched to Kuza's flow categories. Each domain has its own taxonomy of categories and sub-categories that align with the master data taxonomy in Kuza Platform.</li>
+      <li><strong>Delivery format:</strong> APIs return content payloads (text, media URLs, structured guides) that the BPP wraps into the Beckn <code>on_discover</code> callback for Advisory, or surfaces as supplementary messages in the chatbot for other flows.</li>
+      <li><strong>Called from:</strong> BPP application logic (during request processing) and optionally from the WhatsApp Handler for inline content.</li>
+    </ul>
+
+    <h4>3.8.3 Google AI Interfaces &mdash; Intelligent Processing</h4>
+    <p>Distinct from content APIs, the AI interfaces provide <em>computational</em> services that process input and return derived results.</p>
+    <ul>
+      <li><strong>Location normalization (all flows):</strong> Farmer enters free-text location (village / ward / county) &rarr; PHP handler sends text to Google AI &rarr; AI maps to structured County + Sub-County &rarr; PHP handler sends confirmation message to farmer on WhatsApp &rarr; farmer confirms or corrects.</li>
+      <li><strong>Advisory content generation (Advisory flow):</strong> When curated content from the Content APIs needs personalisation, summarisation, or translation, the BPP combines Content API output with farmer context and passes it through the Google AI interface to produce the final response delivered to the farmer.</li>
+      <li><strong>Future:</strong> intent extraction from free-text farmer queries, language translation (English &harr; Swahili), sentiment analysis on feedback.</li>
+      <li><strong>Called from:</strong> PHP handler (location normalization) and BPP (advisory generation, future intent extraction).</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <strong>Content APIs vs AI Interfaces &mdash; how they relate:</strong>
+      Content APIs serve <em>what we know</em> (curated knowledge bases per domain). AI Interfaces serve <em>what we infer</em> (normalising, generating, translating). The Advisory flow typically uses both: Content API supplies the source material, AI Interface tailors it for the specific farmer.
+    </div>
+
+    <h3 id="layer-analytics">3.9 Layer 9: Analytics &amp; Intelligence</h3>
+    <p>
+      Layer 9 sits <em>beside</em> the transactional stack and consumes the event / outcome stream that every flow emits.
+      Because outcomes are a first-class concept in the Flow Engine, analytics and ML have rich training signals without
+      needing bespoke collection pipelines.
+    </p>
+    <p>Deployment is staged along three <strong>horizons</strong>:</p>
+    <ul>
+      <li><strong>Horizon 1 &mdash; Descriptive analytics on existing data</strong>: dashboards, cohort performance, funnel conversion, provider scorecards &mdash; no new collection.</li>
+      <li><strong>Horizon 2 &mdash; Predictive ML</strong>: farmer risk scoring (mortality, profitability), patient adherence risk, outcome prediction, facility capability-gap detection.</li>
+      <li><strong>Horizon 3 &mdash; Pioneering surveillance</strong>: multi-domain, longitudinal studies (e.g., linking nutrition + TB outcomes, weather + animal disease). This is only feasible <em>because</em> the platform is domain-agnostic.</li>
+    </ul>
+    <div class="callout info">
+      <div class="callout-title">Flow Engine is optional until proven</div>
+      <p>Horizon 1 analytics can run on any existing Kuza data without requiring the Flow Engine. Horizon 2 and 3 become meaningful as flow-emitted outcome data accumulates.</p>
+    </div>
+
+    <!-- 4. Key Data Flows -->
+    <h2 id="data-flows">4. Key Data Flows</h2>
+
+    <div class="flow-block" id="flow-a">
+      <h4>Flow A: Farmer Discovers and Books a Service (Livelihood / Household)</h4>
+      <pre><code>Farmer (WhatsApp): Selects category --> service --> enters quantity
+  --> webhook.php --> beckn_marketplace_handler.php
+    Farmer types location (free text, e.g. "Naivasha")
+    --> PHP Handler calls Google AI for location normalization
+    <-- Google AI returns {county: "Nakuru", subCounty: "Naivasha"}
+    --> WhatsApp: "Nakuru County, Naivasha Sub-County. Correct?" [Yes] [No]
+    Farmer confirms [Yes]
+    --> BAP Client --> ONIX-BAP --> [Beckn Network / Discovery Service] --> ONIX-BPP --> BPP
+      --> Kuza Platform (query providers by location + category + subCategory)
+    <-- BPP --> ONIX-BPP --> [Beckn Network] --> ONIX-BAP --> BAP Client
+  <-- beckn_marketplace_handler.php --> WhatsApp (list of providers with prices)
+
+(continues through select / init / confirm / status / update / cancel / rate / support &mdash;
+ see Section 4.6 for the complete Beckn endpoint mapping covering the full order lifecycle.)</code></pre>
+    </div>
+
+    <div class="flow-block" id="flow-b">
+      <h4>Flow B: Provider Receives and Accepts Order</h4>
+      <pre><code>Order confirmed in Beckn
+  --> BPP --> Kuza Platform (create order record)
+  --> Messaging Queue / Cron --> WhatsApp Cloud API --> Provider WhatsApp
+    Provider taps [Accept] button in WhatsApp
+      --> webhook.php --> provider routing --> BPP --> Beckn update
+    Provider taps [View Details] link
+      --> Opens Kuza Web App in browser --> reads from Kuza Platform</code></pre>
+    </div>
+
+    <div class="flow-block" id="flow-c">
+      <h4>Flow C: Provider Completes Service, Farmer Confirms</h4>
+      <pre><code>Provider (Kuza Web App):
+  --> Marks service complete, enters payment details, notes
+  --> BPP --> Beckn status update --> ONIX-BAP --> BAP
+  --> beckn_marketplace_handler.php --> WhatsApp to Farmer
+    "Was the service completed?" [Yes] [No]
+  Farmer taps [Yes]
+  --> webhook.php --> beckn_marketplace_handler.php
+    --> "How did you pay?" [Cash] [M-Pesa]
+  Farmer selects payment method
+  --> Order marked FARMER_CONFIRMED --> CLOSED</code></pre>
+    </div>
+
+    <div class="flow-block" id="flow-d">
+      <h4>Flow D: Farmer Gets Advisory Content (Google Content APIs + AI)</h4>
+      <pre><code>Farmer (WhatsApp): Selects Advisory --> Domain (Agri/Health/Market/Finance) --> Category --> Sub-category
+  --> webhook.php --> beckn_marketplace_handler.php
+    --> BAP Client --> ONIX-BAP --> [Beckn Network] --> ONIX-BPP --> BPP
+
+      ┌── BPP processing ──────────────────────────────────────────┐
+      │ 1. BPP calls Google Content API for {domain, category,     │
+      │    sub-category} --> returns curated content payload       │
+      │    (articles, video URLs, guides)                          │
+      │ 2. (Optional) BPP calls Google AI Interface to             │
+      │    personalise / summarise / translate using farmer        │
+      │    context (location, enterprise, language)                │
+      │ 3. BPP composes the final advisory response                │
+      └────────────────────────────────────────────────────────────┘
+
+    <-- BPP --> ONIX-BPP --> [Beckn Network] --> ONIX-BAP --> BAP Client
+  <-- beckn_marketplace_handler.php --> WhatsApp (curated/AI-tailored advisory)
+
+Google Content APIs supply the source material; Google AI tailors it.
+Advisory is free, no order lifecycle. Content delivered immediately via on_discover.</code></pre>
+      <p style="margin-top:0.75rem; font-size:0.875rem;"><strong>Domain-agnostic:</strong> this flow works for agricultural advisory AND health advisory (e.g., TB awareness, post-TB care education, nutrition counselling). Only the content taxonomy and the Google Content API endpoint change.</p>
+    </div>
+
+    <div class="flow-block" id="flow-e">
+      <h4>Flow E: Market Produce (Farmer Sells)</h4>
+      <pre><code>Same flow as A but with reversed economics:
+- Farmer has produce to sell (quantity + type)
+- discover returns aggregators/buyers with buying prices
+- Aggregator collects produce from farmer
+- Aggregator pays farmer (not farmer pays provider)
+- Both parties confirm and provide feedback
+
+(continues through the same full Beckn lifecycle &mdash;
+ see Section 4.6 for the complete endpoint mapping including cancellation &amp; feedback.)</code></pre>
+    </div>
+
+    <!-- 4.6 Complete Beckn Endpoint Mapping -->
+    <h3 id="beckn-endpoint-mapping">4.6 Complete Beckn Endpoint Mapping</h3>
+    <p>This section maps every user-facing step in each flow to the corresponding Beckn v2 protocol endpoint, covering the <strong>full order lifecycle</strong> &mdash; discovery, selection, initialization, confirmation, fulfilment status, in-flight updates, cancellation, rating/feedback, and support.</p>
+
+    <p><strong>Beckn endpoints reference:</strong></p>
+    <ul>
+      <li><code>discover</code> / <code>on_discover</code> &mdash; find services/providers in the network</li>
+      <li><code>select</code> / <code>on_select</code> &mdash; request a priced quote for a specific item</li>
+      <li><code>init</code> / <code>on_init</code> &mdash; submit billing &amp; fulfilment details, receive draft order</li>
+      <li><code>confirm</code> / <code>on_confirm</code> &mdash; create the binding order</li>
+      <li><code>status</code> / <code>on_status</code> &mdash; query or push the current state of the contract</li>
+      <li><code>update</code> / <code>on_update</code> &mdash; mutate an existing contract (e.g. reschedule, report payment, add notes)</li>
+      <li><code>cancel</code> / <code>on_cancel</code> &mdash; cancel an order (before or after provider acceptance)</li>
+      <li><code>rate</code> / <code>on_rate</code> &mdash; submit ratings / feedback on provider or farmer</li>
+      <li><code>support</code> / <code>on_support</code> &mdash; request customer support details</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <strong>Conventions used in the tables below:</strong>
+      <ul>
+        <li><strong>BAP &rarr; BPP</strong> means the call originates at the BAP (farmer side) and is routed through ONIX / Beckn Network to the BPP (provider side). The corresponding <code>on_*</code> callback travels in the opposite direction.</li>
+        <li><strong>status</strong> calls can be <em>pull</em> (BAP &rarr; BPP to query) or <em>push</em> (BPP &rarr; BAP as a notification). Both are used.</li>
+        <li>Status values referenced come from <code>LocalServiceFulfillmentAttributes.serviceStatus</code>: <code>ORDER_PLACED</code>, <code>PROVIDER_ACCEPTED</code>, <code>PROVIDER_REJECTED</code>, <code>IN_PROGRESS</code>, <code>COMPLETED</code>, <code>FARMER_CONFIRMED</code>, <code>CANCELLED</code>, <code>CLOSED</code>.</li>
+      </ul>
+    </div>
+
+    <!-- ════════ LIVELIHOOD ════════ -->
+    <h4 id="mapping-livelihood">4.6.1 Livelihood Services &mdash; Complete Lifecycle</h4>
+    <p><em>Example: Poultry vaccination, feed supply, brooding, incubation, trades &amp; skills.</em></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>User-Facing Step</th>
+          <th>Beckn Call</th>
+          <th>Direction</th>
+          <th>Payload Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="2"><strong>Discovery</strong></td>
+            <td>Farmer picks category, sub-category, service, quantity, location, preferred date</td>
+            <td><code>discover</code></td><td>BAP &rarr; BPP</td>
+            <td>Intent: category=Livelihood-Services, subCategory, quantityRequired, farmerLocation, scheduledDate</td></tr>
+        <tr><td>System returns providers matching service area + service</td>
+            <td><code>on_discover</code></td><td>BPP &rarr; BAP</td>
+            <td>Catalog with providers, items (LivelihoodItemAttributes), offers (LocalServiceOfferAttributes) filtered by service area</td></tr>
+
+        <tr><td rowspan="2"><strong>Selection</strong></td>
+            <td>Farmer selects one provider from the list</td>
+            <td><code>select</code></td><td>BAP &rarr; BPP</td>
+            <td>providerId, itemId, offerId, quantityRequired</td></tr>
+        <tr><td>BPP returns final quote + cancellation policy</td>
+            <td><code>on_select</code></td><td>BPP &rarr; BAP</td>
+            <td>Final priceAmount (unit price &times; quantity), cancellationPolicy, confirmed offer terms</td></tr>
+
+        <tr><td rowspan="2"><strong>Initialization</strong></td>
+            <td>Farmer provides contact details (auto from WhatsApp profile) and scheduled date</td>
+            <td><code>init</code></td><td>BAP &rarr; BPP</td>
+            <td>farmer contact, farmerLocation, scheduledDate, billing reference</td></tr>
+        <tr><td>BPP returns draft order with payment terms</td>
+            <td><code>on_init</code></td><td>BPP &rarr; BAP</td>
+            <td>Draft order, payment terms (acceptedPaymentMethods: CASH/MPESA), total</td></tr>
+
+        <tr><td rowspan="2"><strong>Confirmation</strong></td>
+            <td>Farmer taps [Confirm] on WhatsApp summary</td>
+            <td><code>confirm</code></td><td>BAP &rarr; BPP</td>
+            <td>Confirmation with consent flag</td></tr>
+        <tr><td>Order created, provider notified</td>
+            <td><code>on_confirm</code></td><td>BPP &rarr; BAP</td>
+            <td>orderId, provider details, serviceStatus: ORDER_PLACED</td></tr>
+
+        <tr><td rowspan="4"><strong>Provider Response</strong></td>
+            <td>Provider taps [Accept] in WhatsApp notification</td>
+            <td><code>status</code> (push)</td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: PROVIDER_ACCEPTED, confirmedVisitTime</td></tr>
+        <tr><td>Farmer receives "Provider accepted. Visit on &lt;date&gt;. Contact: &lt;phone&gt;"</td>
+            <td><em>(push notification, no new call)</em></td><td>&mdash;</td>
+            <td>Farmer notified on WhatsApp</td></tr>
+        <tr><td>Provider taps [Reject] instead</td>
+            <td><code>status</code> (push)</td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: PROVIDER_REJECTED &rarr; CLOSED; farmer re-presented with alternative providers</td></tr>
+        <tr><td>Farmer checks order status manually</td>
+            <td><code>status</code> (pull)</td><td>BAP &rarr; BPP</td>
+            <td>Query by orderId; returns <code>on_status</code> with current state</td></tr>
+
+        <tr><td rowspan="2"><strong>Mid-flight Changes</strong></td>
+            <td>Provider or farmer changes date, quantity, time slot</td>
+            <td><code>update</code></td><td>BAP &harr; BPP (either side)</td>
+            <td>Updated scheduledDate / quantityRequired / confirmedVisitTime</td></tr>
+        <tr><td>Other side confirms the change</td>
+            <td><code>on_update</code></td><td>Opposite direction</td>
+            <td>Revised order</td></tr>
+
+        <tr><td rowspan="2"><strong>Service Execution</strong></td>
+            <td>Provider marks service in progress (via Kuza Web App)</td>
+            <td><code>status</code> (push)</td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: IN_PROGRESS</td></tr>
+        <tr><td>Provider completes service: enters actualServiceDate, payment method, amount received, notes, follow-up flag</td>
+            <td><code>update</code> + <code>status</code></td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: COMPLETED; providerAmountReceived, providerPaymentReceived: true, providerNotes, followUpRequired; on_update then on_status</td></tr>
+
+        <tr><td rowspan="3"><strong>Farmer Confirmation</strong></td>
+            <td>Farmer receives "Was the service completed?" [Yes] [No]</td>
+            <td><em>(WhatsApp; no Beckn call yet)</em></td><td>&mdash;</td><td>&mdash;</td></tr>
+        <tr><td>Farmer taps [Yes] &rarr; "How did you pay?" [Cash] [M-Pesa]</td>
+            <td><code>update</code></td><td>BAP &rarr; BPP</td>
+            <td>serviceConfirmedByFarmer: true, farmerPaymentMethod, farmerPaymentStatus: PAID</td></tr>
+        <tr><td>System moves to FARMER_CONFIRMED &rarr; CLOSED</td>
+            <td><code>on_update</code> + <code>status</code></td><td>BPP &rarr; BAP</td>
+            <td>serviceStatus: FARMER_CONFIRMED &rarr; CLOSED</td></tr>
+
+        <tr><td rowspan="4"><strong>Cancellation</strong></td>
+            <td>Farmer cancels before PROVIDER_ACCEPTED (always free)</td>
+            <td><code>cancel</code></td><td>BAP &rarr; BPP</td>
+            <td>cancellationReason, orderId</td></tr>
+        <tr><td>Farmer cancels after PROVIDER_ACCEPTED (within cancellation window)</td>
+            <td><code>cancel</code></td><td>BAP &rarr; BPP</td>
+            <td>cancellationReason; BPP applies cancellationPolicy (refundable flag, window hours)</td></tr>
+        <tr><td>Provider cancels (e.g., cannot service)</td>
+            <td><code>cancel</code></td><td>BPP &rarr; BAP</td>
+            <td>cancellationReason; farmer re-presented with alternatives</td></tr>
+        <tr><td>Counterparty acknowledges</td>
+            <td><code>on_cancel</code></td><td>Opposite direction</td>
+            <td>serviceStatus: CANCELLED &rarr; CLOSED; refund details if applicable</td></tr>
+
+        <tr><td rowspan="3"><strong>Feedback / Rating</strong></td>
+            <td>Farmer rates provider (1-5) + selects feedback option + optional text</td>
+            <td><code>rate</code></td><td>BAP &rarr; BPP</td>
+            <td>target: providerId, rating, selectedOption, additionalText (farmerFeedback)</td></tr>
+        <tr><td>Provider rates farmer (cooperation, timeliness, payment)</td>
+            <td><code>rate</code></td><td>BPP &rarr; BAP</td>
+            <td>target: farmerId, rating, selectedOption, additionalText (providerFeedback)</td></tr>
+        <tr><td>Acknowledgement</td>
+            <td><code>on_rate</code></td><td>Opposite direction</td>
+            <td>Feedback recorded confirmation</td></tr>
+
+        <tr><td rowspan="2"><strong>Support</strong></td>
+            <td>Farmer requests provider contact / help</td>
+            <td><code>support</code></td><td>BAP &rarr; BPP</td>
+            <td>ref: orderId</td></tr>
+        <tr><td>BPP returns contact info</td>
+            <td><code>on_support</code></td><td>BPP &rarr; BAP</td>
+            <td>contactInfo: phone / email / WhatsApp</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ════════ HOUSEHOLD ════════ -->
+    <h4 id="mapping-household">4.6.2 Household Services &mdash; Complete Lifecycle</h4>
+    <p><em>Example: School fee payment, hospital checkup, insurance enrolment, consumer goods delivery.</em></p>
+    <p>Structurally <strong>identical</strong> to Livelihood mapping (4.6.1). The Beckn endpoint sequence and semantics are the same. Category-specific differences are in the payload fields of <code>on_discover</code> / <code>on_select</code>:</p>
+    <ul>
+      <li><code>HouseholdItemAttributes</code> replaces <code>LivelihoodItemAttributes</code></li>
+      <li><code>subCategory</code> values: Education, Health, Insurance, Consumer Goods</li>
+      <li><code>serviceMode</code> enum: SERVICE_DELIVERY / PRODUCT_DELIVERY / FACILITY_VISIT / DIGITAL</li>
+      <li><code>beneficiaryType</code> (INDIVIDUAL / HOUSEHOLD / CHILD / ELDERLY) and <code>documentsRequired</code> may be populated</li>
+      <li>Some services (e.g., school fee payment) may have <code>scheduledDate</code> as the payment deadline rather than a visit date</li>
+    </ul>
+    <p>All lifecycle phases &mdash; discovery, selection, init, confirm, status, update, cancel, rate, support &mdash; apply the same way. The full Livelihood table above applies to Household with the above payload differences.</p>
+
+    <!-- ════════ MARKET PRODUCE ════════ -->
+    <h4 id="mapping-market">4.6.3 Market Produce &mdash; Complete Lifecycle (Reversed Economics)</h4>
+    <p><em>Example: Farmer sells eggs, milk, farm produce to an aggregator / buyer. Money flows provider &rarr; farmer.</em></p>
+    <p>The Beckn endpoint sequence is the <strong>same as Livelihood</strong>. The semantic reversal is in the payload content, not in the protocol flow. Highlights:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Beckn Call</th>
+          <th>Semantic Reversal (vs Livelihood)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Discovery</td><td><code>discover</code> / <code>on_discover</code></td>
+            <td>Farmer advertises produce (<code>quantityAvailable</code>, <code>produceCategory</code>); BPP returns aggregators/buyers with <code>buying</code> prices and <code>collectionMode</code> (FARM_GATE_PICKUP / COLLECTION_POINT / FARMER_DELIVERS)</td></tr>
+        <tr><td>Selection</td><td><code>select</code> / <code>on_select</code></td>
+            <td>Quote is the <strong>buying price per unit</strong> aggregator offers for farmer's produce &times; quantity</td></tr>
+        <tr><td>Init / Confirm</td><td><code>init</code>, <code>confirm</code> (and <code>on_*</code>)</td>
+            <td>Identical protocol, order created to pick up produce at farmer's location / collection point</td></tr>
+        <tr><td>Provider acceptance</td><td><code>status</code> (push)</td>
+            <td>Aggregator accepts the collection request; serviceStatus: PROVIDER_ACCEPTED</td></tr>
+        <tr><td>Fulfilment</td><td><code>status</code> / <code>update</code></td>
+            <td>Aggregator collects produce, grades it (<code>acceptedGrades</code>), pays farmer; populates <code>providerPaymentReceived</code> to indicate <em>aggregator paid farmer</em> (NOT farmer paid provider). <code>amountReceived</code> = amount paid to farmer.</td></tr>
+        <tr><td>Farmer confirmation</td><td><code>update</code></td>
+            <td>Farmer confirms produce was collected and reports method received (Cash / M-Pesa); <code>farmerPaymentStatus: PAID</code> = farmer confirms they received payment</td></tr>
+        <tr><td>Cancellation</td><td><code>cancel</code> / <code>on_cancel</code></td>
+            <td>Either side can cancel before collection. After partial collection, use <code>update</code> to adjust quantity actually collected rather than full cancel.</td></tr>
+        <tr><td>Rate</td><td><code>rate</code> / <code>on_rate</code></td>
+            <td>Farmer rates aggregator's fairness (grading, price honoured, payment promptness); aggregator rates produce quality &amp; farmer reliability</td></tr>
+        <tr><td>Support</td><td><code>support</code> / <code>on_support</code></td>
+            <td>Same contract as Livelihood</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ════════ ADVISORY ════════ -->
+    <h4 id="mapping-advisory">4.6.4 Advisory Content &mdash; Discover-Only Lifecycle</h4>
+    <p><em>Example: Farmer requests advisory on poultry care, financial literacy, health &amp; nutrition.</em></p>
+    <p>Advisory is <strong>free, has no order, no payment, no scheduling</strong>. Beckn endpoints used are limited to discovery and optional feedback.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>User-Facing Step</th>
+          <th>Beckn Call</th>
+          <th>Direction</th>
+          <th>Payload Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="4"><strong>Discovery with Google Content APIs + AI</strong></td>
+            <td>Farmer selects Advisory &rarr; domain &rarr; category &rarr; sub-category</td>
+            <td><code>discover</code></td><td>BAP &rarr; BPP</td>
+            <td>Intent: category=Advisory-Content, subCategory (topic), farmerContext (location, enterprise, language)</td></tr>
+        <tr><td>BPP calls <strong>Google Content APIs</strong> (per chosen domain &mdash; agri / health / market / finance) to retrieve curated content</td>
+            <td><em>(BPP-internal; not a Beckn call)</em></td><td>BPP &harr; Google Content API</td>
+            <td>Curated payload: articles, video URLs, structured guides, infographics</td></tr>
+        <tr><td>BPP optionally calls <strong>Google AI Interfaces</strong> to personalise / summarise / translate content using farmer context</td>
+            <td><em>(BPP-internal; not a Beckn call)</em></td><td>BPP &harr; Google AI</td>
+            <td>Tailored content matched to farmer language, location, enterprise</td></tr>
+        <tr><td>Final advisory delivered to farmer on WhatsApp</td>
+            <td><code>on_discover</code></td><td>BPP &rarr; BAP</td>
+            <td>Catalog with AdvisoryContentItemAttributes: contentType, contentUrl / inline text, contentDuration, targetAudience</td></tr>
+
+        <tr><td rowspan="2"><strong>Feedback</strong> (optional)</td>
+            <td>Farmer answers "Was this helpful?" [Yes] [No] or rates content</td>
+            <td><code>rate</code></td><td>BAP &rarr; BPP</td>
+            <td>target: contentId, rating (binary helpful/not or 1-5), optional additionalText</td></tr>
+        <tr><td>Acknowledgement</td>
+            <td><code>on_rate</code></td><td>BPP &rarr; BAP</td>
+            <td>Feedback recorded; may trigger content improvement feedback loop</td></tr>
+
+        <tr><td><strong>Support</strong> (rare)</td>
+            <td>Farmer asks for more info / clarification on content</td>
+            <td><code>support</code> / <code>on_support</code></td><td>BAP &harr; BPP</td>
+            <td>Contact info for advisory provider / content author (if applicable); typically not used in pilot</td></tr>
+
+        <tr><td><strong>Not applicable</strong></td>
+            <td colspan="4"><code>select</code>, <code>init</code>, <code>confirm</code>, <code>status</code>, <code>update</code>, <code>cancel</code> &mdash; advisory has no order, so these endpoints are not used.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-info">
+      <strong>Summary of endpoint coverage per flow:</strong>
+      <table style="margin-top: 0.75rem;">
+        <thead>
+          <tr>
+            <th>Flow</th>
+            <th>discover</th><th>select</th><th>init</th><th>confirm</th>
+            <th>status</th><th>update</th><th>cancel</th><th>rate</th><th>support</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Livelihood</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td></tr>
+          <tr><td>Household</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td></tr>
+          <tr><td>Market Produce</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td>
+              <td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td><td>&check;</td></tr>
+          <tr><td>Advisory</td>
+              <td>&check;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+              <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&check;</td><td>(rare)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4.7 Domain-Specific Flow Examples -->
+    <h3 id="domain-flows">4.7 Domain-Specific Flow Examples</h3>
+    <p>The same 7-step flow engine powers agri and health. Below, the two exemplars side-by-side show that <strong>only vocabulary and payload change</strong> &mdash; the sequence, engine, and infrastructure are identical.</p>
+
+    <table>
+      <thead>
+        <tr><th>Step</th><th>Agri &mdash; Vaccination</th><th>Health &mdash; TB Screening</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Need</strong></td><td>Farmer's flock needs vaccination</td><td>Patient has persistent cough &gt; 2 weeks</td></tr>
+        <tr><td><strong>Search</strong></td><td><code>discover</code> near Naivasha</td><td><code>discover</code> GeneXpert facility near Kisumu</td></tr>
+        <tr><td><strong>Select</strong></td><td>Pick John Kariuki (vet)</td><td>Pick Kisumu County Hospital</td></tr>
+        <tr><td><strong>Confirm</strong></td><td>Confirm 200 birds @ KES 30</td><td>Confirm referral, sputum collection date</td></tr>
+        <tr><td><strong>Deliver</strong></td><td>Vaccination performed</td><td>Sputum collected, sent for GeneXpert</td></tr>
+        <tr><td><strong>Record</strong></td><td>Provider notes 200 birds, healthy</td><td>Lab records test result (FHIR-compatible)</td></tr>
+        <tr><td><strong>Outcome</strong></td><td>Farmer confirms, payment, feedback</td><td>TB-positive &rarr; initiated on treatment; TB-negative &rarr; close</td></tr>
+      </tbody>
+    </table>
+
+    <div class="flow-block" id="flow-f">
+      <h4>Flow F: TB Screening &amp; Referral (Health domain)</h4>
+      <pre><code>Patient (WhatsApp): reports persistent cough via symptom triage
+  --> webhook.php --> flow handler (template: health-services / screening-referral)
+    Patient types location (free text, e.g. "Kisumu")
+    --> Handler calls Google AI for location normalization
+    <-- {county: "Kisumu", subCounty: "Kisumu Central"}
+    --> Flow Engine: Search step
+    --> BAP --> ONIX-BAP --> [Beckn Network] --> ONIX-BPP --> BPP
+      --> Kuza Platform (query facilities by capability=GeneXpert + location)
+    <-- on_discover: HealthScreeningItemAttributes (facility, capabilities, hours)
+    Patient selects Kisumu County Hospital
+  --> select / init / confirm --> order_id generated, sputum collection scheduled
+  --> status(PROVIDER_ACCEPTED) --> WhatsApp "Visit on &lt;date&gt;. Bring ID."
+  --> Deliver: patient visits, sputum collected
+  --> Record: clinician enters test result via Kuza Web App --> status(COMPLETED)
+  --> Outcome: HEALTH_OUTCOME_RECORDED
+        result=POSITIVE --> auto-triggers treatment-adherence flow (Flow G)
+        result=NEGATIVE --> close, advisory content on when to re-screen</code></pre>
+    </div>
+
+    <div class="flow-block" id="flow-g">
+      <h4>Flow G: TB Treatment Adherence (Health domain)</h4>
+      <pre><code>Trigger: Flow F completes with result=POSITIVE (auto) OR clinician initiates manually
+  --> Flow Engine instantiates template: health-services / treatment-adherence
+  --> Seeker roles: patient (primary) + CHP (Provider for DOT supervision)
+
+Daily loop (6-month regimen):
+  Scheduler cron --> WhatsApp reminder to patient "Did you take today's dose?" [Yes] [No]
+    Patient [Yes] --> update(dose_taken=true) --> Record step
+    Patient [No]  --> escalation --> CHP receives DOT visit task
+                   --> CHP completes visit in Mobile Lite --> Record step
+  Weekly:
+    CHP confirms supervision visit, uploads signed DOT form
+    Coordinator (SCTLC/CTLC) reviews adherence dashboard
+  End of regimen:
+    Outcome: CURED / TREATMENT_COMPLETED / LOST_TO_FOLLOWUP / FAILED
+    --> HEALTH_OUTCOME_RECORDED event --> Analytics layer
+
+Note: Same state machine, same BAP/BPP, same Kuza data store as any agri flow.
+Only the flow template, capability tags, outcome vocabulary, and payload schemas differ.</code></pre>
+    </div>
+
+    <!-- 5. Component Ownership -->
+    <h2 id="ownership">5. Component Ownership</h2>
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Built By</th><th>Hosted On</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Channel Handlers (WhatsApp, SMS/USSD, Mobile Lite) &mdash; incl. <code>beckn_marketplace_handler.php</code></td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>Flow Engine (7-step state machine + flow templates)</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>BAP application logic (agri + health)</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>BPP application logic (agri + health)</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>Kuza Web App (provider interface)</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>Provider WhatsApp notifications</td><td>Kuza</td><td>GCP</td></tr>
+        <tr><td>ONIX Adapters (BAP + BPP)</td><td>Beckn (open source, Go)</td><td>GCP (Docker)</td></tr>
+        <tr><td>DeDi Registry</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
+        <tr><td>Catalog Service</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
+        <tr><td>Discovery Service</td><td>Beckn</td><td>Beckn Fabric (external)</td></tr>
+        <tr><td>Google Cloud Platform (GCP) &mdash; hosting infrastructure</td><td>Google</td><td>GCP</td></tr>
+        <tr><td>Google Content APIs (curated content for agri / health / market / finance)</td><td>Google</td><td>GCP</td></tr>
+        <tr><td>Google AI Interfaces (location normalization, content tailoring, future intent extraction)</td><td>Google</td><td>GCP</td></tr>
+        <tr><td>MySQL database (with PostgreSQL migration in flight via <code>kuza-next</code>)</td><td>Kuza</td><td>GCP (in-country)</td></tr>
+        <tr><td>Analytics &amp; Intelligence layer (dashboards, ML models, surveillance)</td><td>Kuza</td><td>GCP</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 6. Database Schema -->
+    <h2 id="database-schema">6. Database Schema</h2>
+    <p>
+      The following schema additions are required on MySQL 8 (GCP). These tables live alongside existing
+      Kuza Platform tables and reference the existing <code>user</code> table via foreign keys.
+    </p>
+
+    <h3>Entity Relationship Summary</h3>
+    <pre><code>user (existing)
+  |-- beckn_farmer_profile      (1:1, farmer-specific fields)
+  |-- beckn_provider_catalog    (1:N, provider's services)
+  |-- beckn_provider_service_areas (1:N, coverage areas)
+
+beckn_subcategory_master        (standalone taxonomy)
+
+beckn_orders
+  |-- beckn_order_status_history (1:N, audit trail)
+  |-- beckn_payments             (1:N, farmer + provider payments)
+  |-- beckn_feedback             (1:N, ratings from both parties)
+
+beckn_conversation_state        (keyed by phone + session)</code></pre>
+
+    <h3>Key Table Definitions</h3>
+
+    <h4><code>beckn_orders</code></h4>
+    <pre><code>order_id          BIGINT AUTO_INCREMENT PRIMARY KEY
+order_uuid        VARCHAR(36) UNIQUE NOT NULL
+beckn_order_id    VARCHAR(255)        -- Beckn network order ID
+farmer_user_id    INT                 -- FK to user.id
+provider_user_id  INT                 -- FK to user.id
+category          VARCHAR(100)        -- livelihood | household | market | advisory
+sub_category      VARCHAR(255)
+service_name      VARCHAR(255)
+quantity          DECIMAL(10,2)
+unit              VARCHAR(50)
+quoted_price      DECIMAL(10,2)
+currency          VARCHAR(10) DEFAULT 'KES'
+status            ENUM('ORDER_PLACED','PROVIDER_ACCEPTED','PROVIDER_REJECTED',
+                       'IN_PROGRESS','COMPLETED','FARMER_CONFIRMED',
+                       'CANCELLED','CLOSED')
+farmer_location   VARCHAR(255)        -- normalized county/sub-county
+provider_location VARCHAR(255)
+payment_method    VARCHAR(50)         -- cash | mpesa
+created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+partner_id        VARCHAR(50)         -- multi-tenancy scope</code></pre>
+
+    <h4><code>beckn_conversation_state</code></h4>
+    <pre><code>id                BIGINT AUTO_INCREMENT PRIMARY KEY
+phone_number      VARCHAR(20) NOT NULL
+session_id        VARCHAR(100)
+current_flow      ENUM('livelihood','household','market','advisory')
+current_step      VARCHAR(100)
+state_data        JSON                -- accumulated selections, context
+beckn_txn_id      VARCHAR(255)        -- Beckn transaction correlation
+last_activity     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+partner_id        VARCHAR(50)
+INDEX idx_phone_session (phone_number, session_id)</code></pre>
+
+    <!-- 7. Deployment -->
+    <h2 id="deployment">7. Deployment Topology</h2>
+    <p>
+      All Kuza-built components are deployed on Google Cloud Platform (GCP), in-country to preserve
+      <strong>data sovereignty</strong> for patient and farmer records. Beckn Fabric services
+      are externally hosted and accessed over HTTPS.
+    </p>
+    <div class="callout info">
+      <div class="callout-title">Health-domain deployment note</div>
+      <p>For health-services deployments, the Kuza Platform data store exposes a <strong>FHIR-compatible</strong> export adapter so clinical records can be synchronised with MoH systems without reshaping. Audit trail (who changed what, when) is retained on every record, and seeker / patient PII never leaves the in-country GCP region.</p>
+    </div>
+
+    <h3>GCP Instance Layout</h3>
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Runtime</th><th>Port</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Kuza Platform (PHP)</td><td>Apache + PHP 7.4</td><td>443</td><td>Existing platform + WhatsApp Handler + BAP + BPP</td></tr>
+        <tr><td>Kuza Web App</td><td>Nginx (static)</td><td>443</td><td>Ionic Angular build served as static files</td></tr>
+        <tr><td>ONIX-BAP</td><td>Docker (<code>fidedocker/onix-adapter</code>)</td><td>5001</td><td>BAP-side adapter configuration</td></tr>
+        <tr><td>ONIX-BPP</td><td>Docker (<code>fidedocker/onix-adapter</code>)</td><td>5002</td><td>BPP-side adapter configuration</td></tr>
+        <tr><td>Google Content APIs</td><td>Cloud Run / API Gateway</td><td>443</td><td>Curated content per domain (agri / health / market / finance) for chatbot delivery</td></tr>
+        <tr><td>Google AI Interfaces</td><td>Cloud Functions / Vertex AI / API</td><td>443</td><td>Location normalization, content tailoring (summarisation, translation, personalisation)</td></tr>
+        <tr><td>MySQL 8</td><td>MySQL Server</td><td>3306</td><td>Single database instance</td></tr>
+      </tbody>
+    </table>
+
+    <h3>External Dependencies</h3>
+    <table>
+      <thead>
+        <tr><th>Service</th><th>Endpoint</th><th>Protocol</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>WhatsApp Cloud API</td><td><code>graph.facebook.com</code></td><td>HTTPS REST</td></tr>
+        <tr><td>DeDi Registry</td><td><code>fabric.nfh.global/registry/dedi</code></td><td>HTTPS REST</td></tr>
+        <tr><td>Beckn Catalog Service</td><td><code>fabric.nfh.global/beckn/catalog</code></td><td>HTTPS REST</td></tr>
+        <tr><td>Beckn Discovery Service</td><td><code>fabric.nfh.global</code></td><td>HTTPS REST (Beckn v2)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout success">
+      <div class="callout-title">Deployment Note</div>
+      <p>
+        ONIX adapters run as Docker containers on the same GCP instance. They require outbound HTTPS access to
+        Beckn Fabric endpoints and inbound access from the BAP/BPP application logic on localhost.
+      </p>
+    </div>
+
+    <!-- 8. Domain-Shared vs Domain-Specific -->
+    <h2 id="domain-split">8. Domain-Shared vs Domain-Specific</h2>
+    <p>A clear separation between what is <em>shared across all domains</em> and what is <em>bespoke per domain</em> is what makes adding the next domain (e.g., education, finance, agri-insurance) a matter of configuration rather than re-architecture.</p>
+
+    <table>
+      <thead>
+        <tr><th>Concern</th><th>Domain-Shared (one implementation)</th><th>Domain-Specific (per domain)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Flow orchestration</td><td>7-step Flow Engine, state machine, transaction correlation</td><td>Flow templates (vaccination, screening, treatment-adherence)</td></tr>
+        <tr><td>Beckn protocol</td><td>BAP / BPP / ONIX / Network / Registry / Catalog / Discovery</td><td>Beckn domain code (<code>local-services</code> vs <code>health-services</code>); extension schemas (<code>LivelihoodItemAttributes</code> vs <code>HealthScreeningItemAttributes</code>)</td></tr>
+        <tr><td>Channels</td><td>WhatsApp, Web App, SMS/USSD, Mobile Lite</td><td>&mdash; (no variation)</td></tr>
+        <tr><td>Data layer</td><td>Kuza Platform (MySQL / PG), audit trail, multi-tenancy, partner scoping</td><td>Record schemas (FHIR-compatible for health; none required for agri); regulatory / compliance fields</td></tr>
+        <tr><td>Identity &amp; actors</td><td>Seeker / Provider / Coordinator / Validator / Sponsor abstraction; UUID spine</td><td>Role vocabulary (farmer / patient; agripreneur / clinician / lab / CHP)</td></tr>
+        <tr><td>Matching</td><td>Service-area + capability-tag matching engine</td><td>Capability vocabulary (vet, agrovet vs clinician, GeneXpert, X-ray)</td></tr>
+        <tr><td>Google services</td><td>GCP hosting, AI location normalization, AI tailoring</td><td>Content API endpoint per domain (agri / health / market / finance)</td></tr>
+        <tr><td>Analytics</td><td>Event / outcome ingestion pipeline; 3-horizon model</td><td>Outcome definition (harvest yield vs cure / mortality); KPIs; dashboards</td></tr>
+        <tr><td>Master data</td><td>Counties, sub-counties, wards (shared across domains)</td><td>Sub-category taxonomies; outcome vocabularies</td></tr>
+      </tbody>
+    </table>
+
+    <!-- 9. Architectural Principles -->
+    <h2 id="principles">9. Architectural Principles</h2>
+    <p>Seven principles guide the design and evolution of the platform. They originate in TIBU (the health deployment) and have been generalised to apply to all domains:</p>
+    <ol>
+      <li><strong>Preserve, don't replace</strong> &mdash; existing data systems (Kuza MySQL, TIBU registers, MoH systems) stay; the platform adds orchestration on top. No rip-and-replace.</li>
+      <li><strong>UUID is the spine</strong> &mdash; every entity (seeker, provider, order, flow instance, outcome) has a universal UUID so records can be linked across systems, domains, and time.</li>
+      <li><strong>Channel-agnostic intelligence</strong> &mdash; the same decision / flow step can be delivered via WhatsApp, Web, SMS/USSD, or Mobile Lite. Channel is a rendering concern, not a logic concern.</li>
+      <li><strong>Domain-agnostic infrastructure</strong> &mdash; the same Flow Engine handles agri and health. Adding a domain is a configuration of templates, schemas, and taxonomies &mdash; not new infrastructure.</li>
+      <li><strong>Sovereign data</strong> &mdash; patient / farmer data stays in country, with full audit trail. Schemas are compliant (FHIR-compatible for health; auditable for agri).</li>
+      <li><strong>Progressive disclosure</strong> &mdash; UI complexity matches user role. A seeker sees a short prompt; a coordinator sees a dashboard; a validator sees an audit view. Same underlying data, different surfaces.</li>
+      <li><strong>Flow Engine is optional until proven</strong> &mdash; analytics (Horizon 1) can run without it. The engine earns its place as outcome data accumulates and ML (Horizon 2-3) becomes viable.</li>
+    </ol>
+
+  </main>
+</div>
+
+</body>
+</html>

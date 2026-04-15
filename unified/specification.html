@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFH-Kuza-Google &mdash; Unified Multi-Domain Specification</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #1a1a2e;
+    background: #f8f9fc;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ───────────────────────────────────────────── */
+  .page-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 2.5rem 4rem; background: #fff; min-height: 100vh; box-shadow: 0 0 40px rgba(0,0,0,.06); }
+
+  /* ── Cover ────────────────────────────────────────────── */
+  .cover { text-align: center; padding: 3rem 0 2.5rem; border-bottom: 3px solid #1a73e8; margin-bottom: 2.5rem; }
+  .cover h1 { font-size: 2.2rem; font-weight: 700; color: #1a1a2e; letter-spacing: -.02em; margin-bottom: .35rem; }
+  .cover .subtitle { font-size: 1.15rem; color: #5f6368; margin-bottom: 1.5rem; }
+  .cover .meta { font-size: .85rem; color: #80868b; }
+  .cover .meta span { display: inline-block; margin: 0 .75rem; }
+  .partner-logos { display: flex; justify-content: center; gap: 2rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .partner-badge { display: inline-block; padding: .4rem 1.1rem; border-radius: 6px; font-weight: 600; font-size: .82rem; letter-spacing: .03em; }
+  .partner-badge.kuza   { background: #e8f5e9; color: #2e7d32; }
+  .partner-badge.google { background: #e3f2fd; color: #1565c0; }
+  .partner-badge.beckn  { background: #fce4ec; color: #c62828; }
+  .partner-badge.ntld   { background: #f3e5f5; color: #6a1b9a; }
+
+  /* ── Typography ───────────────────────────────────────── */
+  h2 { font-size: 1.55rem; font-weight: 700; color: #1a1a2e; margin: 2.8rem 0 1rem; padding-bottom: .45rem; border-bottom: 2px solid #e8eaed; }
+  h3 { font-size: 1.2rem; font-weight: 600; color: #202124; margin: 2rem 0 .75rem; }
+  h4 { font-size: 1.05rem; font-weight: 600; color: #3c4043; margin: 1.5rem 0 .6rem; }
+  p  { margin-bottom: 1rem; }
+  ul, ol { margin: 0 0 1rem 1.6rem; }
+  li { margin-bottom: .35rem; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+  a { color: #1a73e8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Table of Contents ────────────────────────────────── */
+  .toc { background: #f1f3f4; border-radius: 8px; padding: 1.5rem 2rem; margin-bottom: 2.5rem; }
+  .toc h2 { font-size: 1.15rem; margin: 0 0 .8rem; border: none; padding: 0; color: #3c4043; }
+  .toc ol { margin: 0; padding: 0; list-style: none; counter-reset: toc-counter; }
+  .toc > ol > li { counter-increment: toc-counter; margin-bottom: .3rem; }
+  .toc > ol > li > a::before { content: counter(toc-counter) ". "; font-weight: 600; color: #5f6368; }
+  .toc a { color: #1a73e8; font-size: .95rem; }
+  .toc ol ol { margin: .2rem 0 .2rem 1.4rem; }
+  .toc ol ol li { margin-bottom: .15rem; }
+  .toc ol ol a { font-size: .88rem; color: #5f6368; }
+
+  /* ── Tables ───────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: .9rem; }
+  thead th { background: #1a73e8; color: #fff; font-weight: 600; padding: .6rem .75rem; text-align: left; }
+  tbody td { padding: .55rem .75rem; border-bottom: 1px solid #e8eaed; vertical-align: top; }
+  tbody tr:nth-child(even) { background: #f8f9fa; }
+  tbody tr:hover { background: #e8f0fe; }
+  td code, th code { background: rgba(255,255,255,.25); padding: .1rem .35rem; border-radius: 3px; font-size: .85em; }
+
+  /* ── Code Blocks ──────────────────────────────────────── */
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 1.1rem 1.3rem; border-radius: 8px; overflow-x: auto; font-size: .85rem; line-height: 1.6; margin: 1rem 0 1.5rem; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+  p code, li code { background: #f1f3f4; color: #c62828; padding: .15rem .4rem; border-radius: 4px; font-size: .88em; }
+
+  /* ── Callout Boxes ────────────────────────────────────── */
+  .callout { border-left: 4px solid; border-radius: 0 8px 8px 0; padding: 1rem 1.2rem; margin: 1.2rem 0; }
+  .callout-info    { border-color: #1a73e8; background: #e8f0fe; }
+  .callout-warning { border-color: #f9a825; background: #fff8e1; }
+  .callout-success { border-color: #34a853; background: #e8f5e9; }
+  .callout-health  { border-color: #6a1b9a; background: #f3e5f5; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout-label { font-weight: 700; font-size: .82rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .3rem; }
+  .callout-info .callout-label    { color: #1a73e8; }
+  .callout-warning .callout-label { color: #e65100; }
+  .callout-success .callout-label { color: #2e7d32; }
+  .callout-health .callout-label  { color: #6a1b9a; }
+
+  /* ── Domain Pill ──────────────────────────────────────── */
+  .domain-pill { display: inline-block; padding: .1rem .55rem; border-radius: 12px; font-size: .72rem; font-weight: 600; letter-spacing: .03em; margin-left: .4rem; vertical-align: middle; }
+  .domain-local  { background: #e8f5e9; color: #2e7d32; }
+  .domain-health { background: #f3e5f5; color: #6a1b9a; }
+
+  /* ── SVG Diagrams ─────────────────────────────────────── */
+  .diagram-wrap { margin: 1.5rem 0; text-align: center; overflow-x: auto; }
+  .diagram-wrap svg { max-width: 100%; height: auto; }
+  .diagram-caption { font-size: .82rem; color: #80868b; margin-top: .5rem; font-style: italic; }
+
+  /* ── Print ────────────────────────────────────────────── */
+  @media print {
+    body { background: #fff; }
+    .page-wrap { box-shadow: none; padding: 0; max-width: 100%; }
+    h2 { break-before: page; }
+    .toc { break-after: page; }
+    pre { white-space: pre-wrap; word-break: break-all; }
+    table { font-size: .8rem; }
+    .no-print { display: none; }
+  }
+
+  /* ── Responsive ───────────────────────────────────────── */
+  @media (max-width: 700px) {
+    .page-wrap { padding: 1rem 1.2rem 2rem; }
+    .cover h1 { font-size: 1.6rem; }
+    table { font-size: .8rem; }
+    pre { font-size: .78rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ════════════════════════════════════════════════════════
+     COVER
+     ════════════════════════════════════════════════════════ -->
+<header class="cover">
+  <h1>NFH-Kuza-Google &mdash; Unified Multi-Domain Specification</h1>
+  <p class="subtitle">Single platform serving Local Services (Agri/Rural) and Health Services (TIBU/NTLD-P)</p>
+  <p class="subtitle" style="font-size:.95rem;color:#3c4043;">One Flow Engine. Multiple Domains. Shared Infrastructure.</p>
+  <div class="partner-logos">
+    <span class="partner-badge kuza">Kuza &mdash; Platform</span>
+    <span class="partner-badge google">Google &mdash; Cloud &amp; AI</span>
+    <span class="partner-badge beckn">Beckn &mdash; Open Network</span>
+    <span class="partner-badge ntld">NTLD-P &mdash; Health Partner</span>
+  </div>
+  <p class="meta">
+    <span>Version 2.0</span>
+    <span>|</span>
+    <span>10 April 2026</span>
+    <span>|</span>
+    <span>Status: Draft</span>
+  </p>
+</header>
+
+<!-- ════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+     ════════════════════════════════════════════════════════ -->
+<nav class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#s1">Executive Summary</a></li>
+    <li><a href="#s2">Unified Flow Engine &mdash; 7-Step Model</a></li>
+    <li><a href="#s3">Actors &mdash; Generalised Roles</a></li>
+    <li><a href="#s4">Service Categories &amp; Taxonomy</a>
+      <ol>
+        <li><a href="#s4-local">Local Services Domain</a></li>
+        <li><a href="#s4-health">Health Services Domain</a></li>
+      </ol>
+    </li>
+    <li><a href="#s5">Detailed Flow Specifications</a>
+      <ol>
+        <li><a href="#s5-1">Livelihood Services Flow (Local)</a></li>
+        <li><a href="#s5-2">Household Services Flow (Local)</a></li>
+        <li><a href="#s5-3">Market Produce Flow (Local)</a></li>
+        <li><a href="#s5-4">Advisory Content Flow (Local)</a></li>
+        <li><a href="#s5-5">TB Screening Flow (Health)</a></li>
+        <li><a href="#s5-6">TB Treatment &amp; Adherence Flow (Health)</a></li>
+        <li><a href="#s5-7">TB Supervision Flow (Health)</a></li>
+        <li><a href="#s5-8">Post-TB Lung Health Flow (Health)</a></li>
+      </ol>
+    </li>
+    <li><a href="#s6">Data Model</a>
+      <ol>
+        <li><a href="#s6-1">Farmer Profile (Local)</a></li>
+        <li><a href="#s6-2">Provider Profile (Local)</a></li>
+        <li><a href="#s6-3">Patient Profile (Health)</a></li>
+        <li><a href="#s6-4">Health Facility Profile (Health)</a></li>
+        <li><a href="#s6-5">Coordinator Profile (Health)</a></li>
+        <li><a href="#s6-6">Transaction Fields &mdash; Seeker Side</a></li>
+        <li><a href="#s6-7">Transaction Fields &mdash; Provider Side</a></li>
+        <li><a href="#s6-8">Health Transaction Fields</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7">Service Status Lifecycle (Unified)</a></li>
+    <li><a href="#s8">Domain Detection &amp; User Routing</a></li>
+    <li><a href="#s9">WhatsApp Message Formats</a></li>
+    <li><a href="#s10">Location &amp; Matching</a></li>
+    <li><a href="#s11">Payment Model</a></li>
+    <li><a href="#s12">Provider Onboarding &amp; Catalog Management</a></li>
+    <li><a href="#s13">Integration Points</a>
+      <ol>
+        <li><a href="#s13-1">WhatsApp Cloud API</a></li>
+        <li><a href="#s13-2">Beckn Network</a></li>
+        <li><a href="#s13-3">Google Cloud Services</a></li>
+        <li><a href="#s13-4">Kuza Platform</a></li>
+        <li><a href="#s13-5">Health-System Integrations (TIBU / DHIS2 / FHIR)</a></li>
+      </ol>
+    </li>
+    <li><a href="#s14">Analytics &amp; Intelligence (Three Horizons)</a></li>
+    <li><a href="#s15">Sovereign Data &amp; Compliance</a></li>
+    <li><a href="#s16">Non-Functional Requirements</a></li>
+    <li><a href="#s17">Pilot Scope &amp; Future Extensions</a></li>
+  </ol>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════
+     1. EXECUTIVE SUMMARY
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s1">1. Executive Summary</h2>
+
+<p><strong>NFH-Kuza-Google</strong> is a unified service-orchestration platform that connects <strong>seekers</strong> (individuals, households, patients) with <strong>providers</strong> (agripreneurs, vets, aggregators, health facilities, clinicians) through a <strong>single flow engine</strong> delivered over <strong>WhatsApp</strong> and <strong>web apps</strong>, using the <strong>Beckn open network protocol</strong> for interoperability.</p>
+
+<p>The platform now serves <strong>two domains</strong> in parallel, sharing the same architecture, channels, flow engine, and data infrastructure:</p>
+
+<table>
+  <thead><tr><th>Domain</th><th>Beckn Code</th><th>Primary Partners</th><th>Flows</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="domain-pill domain-local">Local Services</span> Agri / Rural livelihoods</td>
+      <td><code>local-services</code></td>
+      <td>Kuza, agripreneur networks, rural aggregators</td>
+      <td>Livelihood, Household, Market, Advisory</td>
+    </tr>
+    <tr>
+      <td><span class="domain-pill domain-health">Health Services</span> TB / NTLD-P</td>
+      <td><code>health-services</code></td>
+      <td>NTLD-P, Ministry of Health (Kenya), Global Fund, county health systems</td>
+      <td>TB Screening, TB Treatment, TB Supervision, Post-TB Lung Health</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout callout-info">
+  <p class="callout-label">Partners</p>
+  <p><strong>Kuza</strong> &mdash; Platform technology, seeker &amp; provider networks, field operations, domain expertise (agri + health).<br>
+  <strong>Google</strong> &mdash; Cloud infrastructure (GCP) hosting the unified stack; Content APIs serving curated domain content (agri, health, market, finance); AI interfaces (location normalisation, content tailoring, triage assist, translation, generation).<br>
+  <strong>Beckn</strong> &mdash; Open network protocol, DeDi Registry, ONIX adapters, Catalog &amp; Discovery Services &mdash; one network, two domain codes.<br>
+  <strong>NTLD-P</strong> &mdash; Kenya National TB &amp; Leprosy Programme &mdash; health-domain partner, clinical guidelines, TIBU register alignment, Global Fund compliance.</p>
+</div>
+
+<h3>Key Characteristics</h3>
+<table>
+  <thead><tr><th>Characteristic</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Unified Flow Engine</strong></td><td>Both domains share a single 7-step flow model (Need &rarr; Search &rarr; Select &rarr; Confirm &rarr; Deliver &rarr; Record &rarr; Outcome). Domain-specific extensions plug in as schemas.</td></tr>
+    <tr><td><strong>Channel-first</strong></td><td>Seekers (farmers, patients, CHPs) interact via WhatsApp &mdash; no app installation. Providers use WhatsApp + browser-based web apps.</td></tr>
+    <tr><td><strong>Multi-domain, single platform</strong></td><td>Same webhook, same auth, same storage, same analytics stack serves both Agri and Health. Domain is a discriminator, not a separate system.</td></tr>
+    <tr><td><strong>Cross-role</strong></td><td>One person can be a seeker in one flow and a provider in another (e.g., a CHP screens patients AND receives mentorship supervision).</td></tr>
+    <tr><td><strong>Location-based</strong></td><td>Providers/facilities matched by registered service area (County + Sub-County) and capability.</td></tr>
+    <tr><td><strong>Kenya pilot</strong></td><td>47 Counties / Sub-Counties, KES currency, M-Pesa mobile money, alignment with Ministry of Health and Kenya national TB programme.</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     2. UNIFIED FLOW ENGINE
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s2">2. Unified Flow Engine &mdash; 7-Step Model</h2>
+
+<p>All interactions on the platform &mdash; across both domains &mdash; are expressed as instances of a single <strong>7-step flow</strong>. A "flow" is any journey where a seeker with a need is matched to a provider who can serve it and whose outcome is recorded. Whether the need is "vaccinate 200 birds" or "screen me for TB", the pipeline is the same.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <defs>
+    <marker id="fe-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#1a73e8"/></marker>
+  </defs>
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Unified Flow Engine &mdash; 7 Steps</text>
+
+  <!-- 7 Steps -->
+  <g font-family="Segoe UI, sans-serif">
+    <rect x="10"  y="70" width="115" height="60" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+    <text x="67"  y="96" text-anchor="middle" font-size="12" font-weight="700" fill="#1a73e8">1. Need</text>
+    <text x="67"  y="114" text-anchor="middle" font-size="9" fill="#3c4043">Seeker has need</text>
+
+    <line x1="126" y1="100" x2="140" y2="100" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#fe-arr)"/>
+
+    <rect x="142" y="70" width="115" height="60" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+    <text x="199" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="#1a73e8">2. Search</text>
+    <text x="199" y="114" text-anchor="middle" font-size="9" fill="#3c4043">Find who helps</text>
+
+    <line x1="258" y1="100" x2="272" y2="100" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#fe-arr)"/>
+
+    <rect x="274" y="70" width="115" height="60" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+    <text x="331" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="#e65100">3. Select</text>
+    <text x="331" y="114" text-anchor="middle" font-size="9" fill="#3c4043">Match + quote</text>
+
+    <line x1="390" y1="100" x2="404" y2="100" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#fe-arr)"/>
+
+    <rect x="406" y="70" width="115" height="60" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+    <text x="463" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="#e65100">4. Confirm</text>
+    <text x="463" y="114" text-anchor="middle" font-size="9" fill="#3c4043">Binding contract</text>
+
+    <line x1="522" y1="100" x2="536" y2="100" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#fe-arr)"/>
+
+    <rect x="538" y="70" width="115" height="60" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+    <text x="595" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="#34a853">5. Deliver</text>
+    <text x="595" y="114" text-anchor="middle" font-size="9" fill="#3c4043">Service rendered</text>
+
+    <line x1="654" y1="100" x2="668" y2="100" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#fe-arr)"/>
+
+    <rect x="670" y="70" width="115" height="60" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+    <text x="727" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="#34a853">6. Record</text>
+    <text x="727" y="114" text-anchor="middle" font-size="9" fill="#3c4043">Data captured</text>
+
+    <line x1="727" y1="130" x2="727" y2="154" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#fe-arr)"/>
+
+    <rect x="670" y="156" width="115" height="60" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+    <text x="727" y="182" text-anchor="middle" font-size="12" font-weight="700" fill="#6a1b9a">7. Outcome</text>
+    <text x="727" y="200" text-anchor="middle" font-size="9" fill="#3c4043">Tracked to result</text>
+  </g>
+</svg>
+<p class="diagram-caption">Figure 2.1 &mdash; The unified 7-step model spans both Local Services and Health Services flows.</p>
+</div>
+
+<h3>2.1 The Seven Steps</h3>
+<table>
+  <thead><tr><th>Step</th><th>Meaning</th><th>Local Services Example</th><th>Health Services Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1. Need</strong></td><td>A seeker has a need</td><td>Farmer needs 200 birds vaccinated</td><td>Patient has been coughing &gt;2 weeks; household contact needs screening</td></tr>
+    <tr><td><strong>2. Search</strong></td><td>Identify who can help, by capability + location</td><td>Discover vets serving Naivasha Sub-County</td><td>Discover screening facilities with GeneXpert serving Kisumu Central</td></tr>
+    <tr><td><strong>3. Select</strong></td><td>Match to best provider, with quote/booking</td><td>Choose vet with best rating and price</td><td>Choose nearest screening facility; generate referral slip</td></tr>
+    <tr><td><strong>4. Confirm</strong></td><td>Both sides agree &mdash; binding contract</td><td>Farmer confirms booking, provider accepts</td><td>Patient confirms appointment; facility accepts referral</td></tr>
+    <tr><td><strong>5. Deliver</strong></td><td>Service rendered</td><td>Vet visits farm and vaccinates birds</td><td>Sputum collected and sent to lab; drugs dispensed</td></tr>
+    <tr><td><strong>6. Record</strong></td><td>Data captured</td><td>Visit notes, amount paid, method</td><td>Clinical record, lab result, adherence log, payment claim</td></tr>
+    <tr><td><strong>7. Outcome</strong></td><td>Tracked to result</td><td>Farmer rates provider; repeat-visit flag</td><td>TB positive/negative; treatment cured / completed / failed / died / lost</td></tr>
+  </tbody>
+</table>
+
+<h3>2.2 Mapping to Beckn Endpoints</h3>
+<table>
+  <thead><tr><th>Flow Step</th><th>Beckn Verb(s)</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Need</td><td><em>(implicit)</em></td><td>Captured as conversational state; not an on-network event</td></tr>
+    <tr><td>Search</td><td><code>discover</code> / <code>on_discover</code></td><td>Provider/facility catalog query</td></tr>
+    <tr><td>Select</td><td><code>select</code> / <code>on_select</code> &rarr; <code>init</code> / <code>on_init</code></td><td>Quote/booking creation</td></tr>
+    <tr><td>Confirm</td><td><code>confirm</code> / <code>on_confirm</code></td><td>Binding order / referral / appointment</td></tr>
+    <tr><td>Deliver</td><td><code>status</code> updates</td><td>In-progress telemetry</td></tr>
+    <tr><td>Record</td><td><code>update</code> + <code>status</code></td><td>Clinical / operational record written back to registers</td></tr>
+    <tr><td>Outcome</td><td><code>rate</code> / <code>on_rate</code> + custom outcome events</td><td>Health outcomes (cured / lost / died) are captured as structured outcome payloads</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-success">
+  <p class="callout-label">Why this matters</p>
+  <p>A single conversational engine, a single order state machine, a single analytics pipeline, and a single Beckn adapter serve both domains. Adding a new vertical (HIV, malaria, cash-transfer) becomes a schema + taxonomy exercise &mdash; not a new platform.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     3. ACTORS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s3">3. Actors &mdash; Generalised Roles</h2>
+
+<p>Rather than hard-coding "Farmer" and "Provider", the platform models five <strong>abstract roles</strong>. A single individual can occupy different roles in different flows.</p>
+
+<h3>3.1 Seeker</h3>
+<p>An individual or household with a need that can be served by the network.</p>
+<ul>
+  <li><strong>Farmer / Rural Household</strong> <span class="domain-pill domain-local">Local</span> &mdash; discovers and books rural services; sells produce.</li>
+  <li><strong>Patient / Family</strong> <span class="domain-pill domain-health">Health</span> &mdash; discovers TB screening, treatment, post-TB follow-up.</li>
+  <li><strong>Household contact</strong> <span class="domain-pill domain-health">Health</span> &mdash; needs preventive screening after a household TB case.</li>
+  <li><strong>Primary interface:</strong> WhatsApp.</li>
+  <li><strong>Profile captured once:</strong> name, phone, location (village/ward/county), optional GPS, preferred language, domain-specific attributes (enterprise for farmer; gender/DOB/consent for patient).</li>
+</ul>
+
+<h3>3.2 Provider</h3>
+<p>An entity that delivers the service.</p>
+<ul>
+  <li><strong>Agripreneurs / Service Providers</strong> <span class="domain-pill domain-local">Local</span> &mdash; vets, agro-vets, aggregators, trainers, tradespeople.</li>
+  <li><strong>Health Facilities</strong> <span class="domain-pill domain-health">Health</span> &mdash; dispensaries, health centres, sub-county hospitals, county referral hospitals, labs (GeneXpert, culture).</li>
+  <li><strong>Clinical staff</strong> <span class="domain-pill domain-health">Health</span> &mdash; clinicians, nurses, lab technicians, pharmacy staff (linked to a facility).</li>
+  <li><strong>Primary interface:</strong> WhatsApp notifications + browser-based Web App for detailed management.</li>
+  <li>A single provider/facility can offer services across multiple categories within its domain.</li>
+</ul>
+
+<h3>3.3 Coordinator</h3>
+<p>Supervisory or oversight roles that operate across many providers.</p>
+<ul>
+  <li><strong>Extension Officers</strong> <span class="domain-pill domain-local">Local</span> &mdash; area-level agri coordination.</li>
+  <li><strong>SCTLCs</strong> <span class="domain-pill domain-health">Health</span> &mdash; Sub-County TB &amp; Leprosy Coordinators.</li>
+  <li><strong>CTLCs</strong> <span class="domain-pill domain-health">Health</span> &mdash; County TB &amp; Leprosy Coordinators.</li>
+  <li><strong>NTLD-P Director</strong> <span class="domain-pill domain-health">Health</span> &mdash; national programme leadership with oversight across all counties.</li>
+  <li>In the platform, Coordinators appear as Seekers when consuming supervision flows, and as Validators when signing off on visits.</li>
+</ul>
+
+<h3>3.4 Validator</h3>
+<p>Labs, auditors, QA reviewers &mdash; parties whose confirmation is required to close a flow.</p>
+<ul>
+  <li><strong>Labs</strong> <span class="domain-pill domain-health">Health</span> &mdash; return GeneXpert / culture / DST results.</li>
+  <li><strong>Data-quality auditors</strong> <span class="domain-pill domain-health">Health</span> &mdash; validate facility data quality and mortality audits.</li>
+  <li><strong>Agri-input auditors</strong> <span class="domain-pill domain-local">Local</span> &mdash; optional QA on input provenance.</li>
+</ul>
+
+<h3>3.5 Sponsor</h3>
+<p>Entities that fund, commission, or benefit from aggregate outcomes.</p>
+<ul>
+  <li>Ministry of Health, Global Fund, TaifaCare <span class="domain-pill domain-health">Health</span></li>
+  <li>Donors, NGOs, government programmes <span class="domain-pill domain-local">Local</span> <span class="domain-pill domain-health">Health</span></li>
+</ul>
+
+<h3>3.6 Cross-Cutting Role &mdash; CHV / CHP</h3>
+<p>Community Health Volunteers / Community Health Promoters are particularly important because they simultaneously play <strong>multiple roles</strong>:</p>
+<ul>
+  <li>As a <strong>Provider</strong>: they actively screen household contacts and refer suspected cases.</li>
+  <li>As a <strong>Seeker</strong>: they need supervision, payment claims, mentorship.</li>
+  <li>The platform supports this by allowing a single user record to be attached to multiple role-profiles.</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════
+     4. SERVICE CATEGORIES & TAXONOMY
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s4">4. Service Categories &amp; Taxonomy</h2>
+
+<p>Each domain exposes its own top-level categories. Sub-categories are dynamic master data that can be extended without schema changes.</p>
+
+<h3 id="s4-local">4.1 Local Services Domain <span class="domain-pill domain-local">local-services</span></h3>
+<table>
+  <thead><tr><th>Category</th><th>Example Sub-Categories</th><th>Example Services</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Livelihood-Services</strong></td>
+      <td>Livestock Services, Crop Services, Trades &amp; Skills</td>
+      <td>Vaccination, brooding, deworming, feed supply, ploughing, spraying, tailoring, welding, carpentry</td>
+    </tr>
+    <tr>
+      <td><strong>Household-Services</strong></td>
+      <td>Education, Health, Insurance, Consumer Goods</td>
+      <td>School fees, tutoring, books, hospital checkup, pharmacy, crop/health insurance, household items</td>
+    </tr>
+    <tr>
+      <td><strong>Market-Produce</strong></td>
+      <td>Farm Produce, Livestock Products, Handicrafts &amp; Goods</td>
+      <td>Vegetables, grains, fruits, eggs, milk, meat, live birds, handmade goods</td>
+    </tr>
+    <tr>
+      <td><strong>Advisory-Content</strong></td>
+      <td>Agricultural Advisory, Financial Literacy, Health &amp; Nutrition, Business Skills</td>
+      <td>Poultry care, crop management, budgeting, nutrition guides</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="s4-health">4.2 Health Services Domain <span class="domain-pill domain-health">health-services</span></h3>
+<table>
+  <thead><tr><th>Category</th><th>Example Sub-Categories</th><th>Example Services</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>TB-Screening</strong></td>
+      <td>Symptom screening, Sputum collection, GeneXpert referral, Chest X-ray, Contact tracing, Active Case Finding (ACF)</td>
+      <td>Household contact screening, CHP-led symptom screening, GeneXpert test referral, CXR mobile clinic</td>
+    </tr>
+    <tr>
+      <td><strong>TB-Treatment</strong></td>
+      <td>DSTB, DRTB, TPT (TB Preventive Therapy), Pediatric TB, Adherence monitoring, ADR reporting</td>
+      <td>Monthly drug dispensing, adherence reminder, ADR capture, sputum conversion check</td>
+    </tr>
+    <tr>
+      <td><strong>TB-Supervision</strong></td>
+      <td>Facility supervision, CHP supervision, Data quality audit, Mortality audit, Mentorship</td>
+      <td>SCTLC quarterly facility visit, CHP household review, death audit, mentorship session</td>
+    </tr>
+    <tr>
+      <td><strong>Post-TB-Care</strong></td>
+      <td>PTLD (Post-TB Lung Disease) screening, Spirometry, Pulse oximetry, Lung function follow-up, Asthma management</td>
+      <td>Post-cure spirometry, 6-month PTLD review, referral to pulmonology</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout callout-warning">
+  <p class="callout-label">Dynamic Taxonomy</p>
+  <p>Sub-categories in both domains are <strong>not hardcoded</strong>. They are managed as master data in Kuza Platform and pulled dynamically. New sub-categories &mdash; or new top-level categories in additional verticals (HIV, malaria, NCDs) &mdash; can be added without schema changes.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     5. DETAILED FLOW SPECIFICATIONS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s5">5. Detailed Flow Specifications</h2>
+
+<!-- ── 5.1 Livelihood ──────────────────────────────────── -->
+<h3 id="s5-1">5.1 Livelihood Services Flow <span class="domain-pill domain-local">Local</span></h3>
+
+<p><strong>Example:</strong> Poultry Vaccination in Nakuru County</p>
+
+<!-- SVG: Livelihood Flow Diagram -->
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <defs>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#1a73e8"/></marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#34a853"/></marker>
+  </defs>
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Livelihood Services &mdash; Farmer WhatsApp Flow</text>
+
+  <rect x="10" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="75" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">1</text>
+  <text x="75" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Farmer says "Hi"</text>
+  <line x1="140" y1="62" x2="165" y2="62" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="168" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="233" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">2-3</text>
+  <text x="233" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Select [Livelihood]</text>
+  <line x1="298" y1="62" x2="323" y2="62" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="326" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="391" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">4-5</text>
+  <text x="391" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Select service type</text>
+  <line x1="456" y1="62" x2="481" y2="62" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="484" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="549" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">6-7</text>
+  <text x="549" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Enter quantity</text>
+  <line x1="614" y1="62" x2="639" y2="62" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="642" y="40" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="707" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">8-9</text>
+  <text x="707" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Share location</text>
+
+  <line x1="707" y1="84" x2="707" y2="110" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="642" y="112" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="707" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">10-11</text>
+  <text x="707" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Select date</text>
+  <line x1="642" y1="134" x2="614" y2="134" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="484" y="112" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="549" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">12</text>
+  <text x="549" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">View providers list</text>
+  <line x1="484" y1="134" x2="456" y2="134" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="326" y="112" width="130" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="391" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">13</text>
+  <text x="391" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Select provider</text>
+  <line x1="326" y1="134" x2="298" y2="134" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="168" y="112" width="130" height="44" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="233" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">14-15</text>
+  <text x="233" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Confirm booking</text>
+  <line x1="168" y1="134" x2="140" y2="134" stroke="#e65100" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="10" y="112" width="130" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="75" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">16</text>
+  <text x="75" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Order ID issued</text>
+
+  <line x1="75" y1="156" x2="75" y2="185" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="10" y="188" width="762" height="28" rx="4" fill="#fce4ec"/>
+  <text x="391" y="207" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">Provider Side</text>
+
+  <rect x="10" y="226" width="155" height="44" rx="8" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+  <text x="87" y="244" text-anchor="middle" font-size="10" font-weight="600" fill="#c62828">17</text>
+  <text x="87" y="259" text-anchor="middle" font-size="10" fill="#1a1a2e">WhatsApp notification</text>
+  <line x1="165" y1="248" x2="195" y2="248" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="198" y="226" width="155" height="44" rx="8" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+  <text x="275" y="244" text-anchor="middle" font-size="10" font-weight="600" fill="#c62828">17</text>
+  <text x="275" y="259" text-anchor="middle" font-size="10" fill="#1a1a2e">Accept / Reject</text>
+  <line x1="353" y1="248" x2="383" y2="248" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="386" y="226" width="155" height="44" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="463" y="244" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">18</text>
+  <text x="463" y="259" text-anchor="middle" font-size="10" fill="#1a1a2e">Farmer notified</text>
+
+  <rect x="10" y="290" width="762" height="28" rx="4" fill="#e8f5e9"/>
+  <text x="391" y="309" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Fulfillment &amp; Completion</text>
+
+  <rect x="10" y="328" width="145" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="82" y="346" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">19-20</text>
+  <text x="82" y="361" text-anchor="middle" font-size="10" fill="#1a1a2e">Confirm delivery</text>
+  <line x1="155" y1="350" x2="185" y2="350" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="188" y="328" width="145" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="260" y="346" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">21-22</text>
+  <text x="260" y="361" text-anchor="middle" font-size="10" fill="#1a1a2e">Report payment</text>
+  <line x1="333" y1="350" x2="363" y2="350" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="366" y="328" width="145" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="438" y="346" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">23</text>
+  <text x="438" y="361" text-anchor="middle" font-size="10" fill="#1a1a2e">Order complete</text>
+</svg>
+<p class="diagram-caption">Figure 5.1 &mdash; Livelihood Services: End-to-end flow from farmer request to completion</p>
+</div>
+
+<h4>Farmer WhatsApp Flow (Step by Step)</h4>
+<ol>
+  <li>Farmer sends <strong>"Hi"</strong></li>
+  <li>System: <em>"Welcome. What do you need help with?"</em> &mdash; 4 buttons: Livelihood, Household, Market, Advisory</li>
+  <li>Farmer selects <strong>[Livelihood]</strong></li>
+  <li>System: <em>"What service do you need?"</em> &mdash; Numbered list: 1. Vaccination 2. Inputs 3. Brooding 4. Incubation (pulled from master data)</li>
+  <li>Farmer selects "1" (Vaccination)</li>
+  <li>System: <em>"How many birds do you need vaccinated?"</em></li>
+  <li>Farmer enters number (e.g., "200")</li>
+  <li>System: <em>"Please share your location"</em> &mdash; farmer shares village/ward/county or live GPS location</li>
+  <li>Google AI normalises location. System confirms: <em>"Nakuru County, Naivasha Sub-County. Correct?"</em> [Yes] [No]</li>
+  <li>System: <em>"When do you need the service?"</em> &mdash; buttons: Today, Tomorrow, Choose date</li>
+  <li>Farmer selects preferred date</li>
+  <li>System: <em>"Available service providers near you:"</em> &mdash; Numbered list showing provider name, price, rating<br>
+      <code>1. John Kariuki - KES 30/bird - 4.5 stars</code><br>
+      <code>2. Peter Omondi - KES 25/bird - 4.2 stars</code></li>
+  <li>Farmer selects provider (e.g., "1")</li>
+  <li>System shows booking summary: Service, Date, Provider, Total Cost (200 birds x KES 30 = KES 6,000) &mdash; [Confirm] [Cancel]</li>
+  <li>Farmer taps <strong>[Confirm]</strong></li>
+  <li>System: <em>"Your request has been sent to the provider. Order ID: ORD-20260412-001"</em></li>
+  <li>Provider receives WhatsApp notification with Accept/Reject buttons</li>
+  <li>System updates farmer: <em>"Your request has been accepted by John Kariuki. Visit on 12 Apr 2026. Contact: +254 712 345 678"</em></li>
+  <li>After service, System asks: <em>"Was the vaccination completed?"</em> [Yes] [No]</li>
+  <li>Farmer taps <strong>[Yes]</strong></li>
+  <li>System asks: <em>"How did you pay?"</em> &mdash; buttons: [Cash] [M-Pesa]</li>
+  <li>Farmer selects payment method</li>
+  <li>System: <em>"Thank you. Your request is completed."</em></li>
+</ol>
+
+<h4>Provider Flow for Same Order</h4>
+<ol>
+  <li>Provider receives WhatsApp: <em>"New order received! Vaccination - 200 birds. Farmer: Mary Wanjiku, Naivasha, Nakuru. Date: 12 Apr 2026. Amount: KES 6,000"</em> &mdash; [Accept] [Reject] [View Details]</li>
+  <li>Provider taps <strong>[Accept]</strong> &rarr; order status changes to <code>PROVIDER_ACCEPTED</code> &rarr; farmer notified</li>
+  <li>Provider taps <strong>[View Details]</strong> &rarr; opens Kuza Web App showing full order</li>
+  <li>After completing service, provider opens web app &rarr; marks complete &rarr; enters: actual service date, payment received (yes/no), amount, payment method, notes, follow-up required (yes/no)</li>
+  <li>System triggers farmer confirmation flow (steps 19&ndash;23 above)</li>
+</ol>
+
+<h4>Beckn API Mapping</h4>
+<table>
+  <thead><tr><th>Flow Step</th><th>Beckn Action</th><th>Direction</th><th>Payload Summary</th></tr></thead>
+  <tbody>
+    <tr><td>Steps 3&ndash;11 (category + service + location + date)</td><td><code>discover</code></td><td>BAP &rarr; Network</td><td>category, subCategory, quantityRequired, farmerLocation, scheduledDate</td></tr>
+    <tr><td>Step 12 (provider list)</td><td><code>on_discover</code></td><td>Network &rarr; BAP</td><td>Catalog with providers, items, offers filtered by service area</td></tr>
+    <tr><td>Step 13 (select provider)</td><td><code>select</code></td><td>BAP &rarr; BPP</td><td>Selected provider ID + item ID + offer ID</td></tr>
+    <tr><td>Quote confirmation</td><td><code>on_select</code></td><td>BPP &rarr; BAP</td><td>Price quote, cancellation policy, provider details</td></tr>
+    <tr><td>Steps 14&ndash;15 (confirm booking)</td><td><code>init</code> + <code>confirm</code></td><td>BAP &rarr; BPP</td><td>Farmer contact, scheduled date, quantity, confirmation</td></tr>
+    <tr><td>Step 16 (order created)</td><td><code>on_confirm</code></td><td>BPP &rarr; BAP</td><td>Order ID, provider details, status=CONFIRMED</td></tr>
+    <tr><td>Steps 17&ndash;18 (provider accepts)</td><td><code>status</code> update</td><td>BPP &rarr; BAP</td><td>status=CONFIRMED, confirmedVisitTime</td></tr>
+    <tr><td>Steps 19&ndash;22 (completion + payment)</td><td><code>status</code> + <code>update</code></td><td>Both</td><td>status=DELIVERED &rarr; RECORDED, payment details</td></tr>
+    <tr><td>Feedback</td><td><code>rate</code> / <code>on_rate</code></td><td>Both</td><td>Outcome objects</td></tr>
+  </tbody>
+</table>
+
+<!-- ── 5.2 Household ──────────────────────────────────── -->
+<h3 id="s5-2">5.2 Household Services Flow <span class="domain-pill domain-local">Local</span></h3>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Household Services &mdash; Farmer WhatsApp Flow</text>
+
+  <rect x="10" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="70" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">1-2</text>
+  <text x="70" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Welcome menu</text>
+  <line x1="130" y1="65" x2="148" y2="65" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="151" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="211" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">3</text>
+  <text x="211" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select [Household]</text>
+  <line x1="271" y1="65" x2="289" y2="65" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="292" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="352" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">4-5</text>
+  <text x="352" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select sub-category</text>
+  <line x1="412" y1="65" x2="430" y2="65" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="433" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="493" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">6-7</text>
+  <text x="493" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Enter details</text>
+  <line x1="553" y1="65" x2="571" y2="65" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="574" y="44" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="634" y="62" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">8-11</text>
+  <text x="634" y="76" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Location + date</text>
+
+  <line x1="634" y1="86" x2="634" y2="108" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="574" y="110" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="634" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">12-13</text>
+  <text x="634" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select provider</text>
+  <line x1="574" y1="131" x2="553" y2="131" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="433" y="110" width="120" height="42" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="493" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#e65100">14-15</text>
+  <text x="493" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Confirm booking</text>
+  <line x1="433" y1="131" x2="412" y2="131" stroke="#e65100" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="292" y="110" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="352" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">16-18</text>
+  <text x="352" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Order + provider</text>
+  <line x1="292" y1="131" x2="271" y2="131" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="151" y="110" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="211" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">19-22</text>
+  <text x="211" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Deliver + pay</text>
+  <line x1="151" y1="131" x2="130" y2="131" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="10" y="110" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="70" y="128" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">23</text>
+  <text x="70" y="142" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Complete</text>
+</svg>
+<p class="diagram-caption">Figure 5.2 &mdash; Household Services: Structurally identical to Livelihood with domain-specific details</p>
+</div>
+
+<p>Structurally identical to Livelihood. Key differences:</p>
+<ul>
+  <li><strong>Sub-categories:</strong> Education, Health, Insurance, Consumer Goods</li>
+  <li><strong>Step 6 equivalent:</strong> Quantity/details question varies by service type (e.g., "Which school?" for fees, "How many items?" for products)</li>
+  <li><strong><code>serviceMode</code></strong> may be <code>FACILITY_VISIT</code>, <code>PRODUCT_DELIVERY</code>, <code>SERVICE_DELIVERY</code></li>
+  <li><strong><code>beneficiaryType</code></strong> can indicate CHILD, ELDERLY, etc.</li>
+</ul>
+
+<!-- ── 5.3 Market Produce ─────────────────────────────── -->
+<h3 id="s5-3">5.3 Market Produce Flow <span class="domain-pill domain-local">Local</span> (Reversed Economics)</h3>
+
+<div class="callout callout-warning">
+  <p class="callout-label">Key Difference</p>
+  <p>In this flow the farmer is the <strong>seller</strong> and the provider is the <strong>buyer/aggregator</strong>. Money flows from provider to farmer.</p>
+</div>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Market Produce &mdash; Reversed Economics Flow</text>
+
+  <rect x="10" y="38" width="12" height="12" rx="2" fill="#e8f0fe"/>
+  <text x="28" y="49" font-size="9" fill="#5f6368">Discovery</text>
+  <rect x="90" y="38" width="12" height="12" rx="2" fill="#fff3e0"/>
+  <text x="108" y="49" font-size="9" fill="#5f6368">Confirmation</text>
+  <rect x="190" y="38" width="12" height="12" rx="2" fill="#e8f5e9"/>
+  <text x="208" y="49" font-size="9" fill="#5f6368">Fulfilment</text>
+  <rect x="280" y="38" width="12" height="12" rx="2" fill="#fce4ec"/>
+  <text x="298" y="49" font-size="9" fill="#5f6368">Provider side</text>
+
+  <rect x="10" y="60" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="75" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">1-3</text>
+  <text x="75" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select [Market]</text>
+  <line x1="140" y1="81" x2="160" y2="81" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="163" y="60" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="228" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">4-7</text>
+  <text x="228" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select produce type</text>
+  <line x1="293" y1="81" x2="313" y2="81" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="316" y="60" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="381" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">8-9</text>
+  <text x="381" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Enter quantity</text>
+  <line x1="446" y1="81" x2="466" y2="81" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="469" y="60" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="534" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">10-11</text>
+  <text x="534" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Share location</text>
+  <line x1="599" y1="81" x2="619" y2="81" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="622" y="60" width="150" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="697" y="78" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">12</text>
+  <text x="697" y="92" text-anchor="middle" font-size="9.5" fill="#1a1a2e">View buyers list</text>
+
+  <line x1="697" y1="102" x2="697" y2="124" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="622" y="126" width="150" height="42" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="697" y="144" text-anchor="middle" font-size="9.5" font-weight="600" fill="#e65100">13-15</text>
+  <text x="697" y="158" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select buyer + confirm</text>
+  <line x1="622" y1="147" x2="599" y2="147" stroke="#e65100" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="469" y="126" width="130" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="534" y="144" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">16-18</text>
+  <text x="534" y="158" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Order + buyer accepts</text>
+  <line x1="469" y1="147" x2="446" y2="147" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="316" y="126" width="130" height="42" rx="8" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+  <text x="381" y="144" text-anchor="middle" font-size="9.5" font-weight="600" fill="#c62828">Collection</text>
+  <text x="381" y="158" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Pickup / deliver</text>
+  <line x1="316" y1="147" x2="293" y2="147" stroke="#c62828" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="163" y="126" width="130" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="228" y="144" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">19-22</text>
+  <text x="228" y="158" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Confirm + payment</text>
+  <line x1="163" y1="147" x2="140" y2="147" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="10" y="126" width="130" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="75" y="148" text-anchor="middle" font-size="10" font-weight="700" fill="#34a853">DONE</text>
+
+  <rect x="10" y="190" width="762" height="32" rx="6" fill="#fff8e1" stroke="#f9a825" stroke-width="1"/>
+  <text x="391" y="211" text-anchor="middle" font-size="11" font-weight="600" fill="#e65100">Money flows: Buyer/Aggregator (Provider) &#8594; Farmer (Seller)</text>
+</svg>
+<p class="diagram-caption">Figure 5.3 &mdash; Market Produce: Farmer is the seller, provider is the buyer. Money direction is reversed.</p>
+</div>
+
+<h4>Key Schema Differences</h4>
+<ul>
+  <li><code>discover</code> intent includes <code>produceCategory</code>, <code>quantityAvailable</code></li>
+  <li><code>on_discover</code> returns aggregators with <strong>buying prices</strong>, <code>collectionMode</code>, <code>minimumQuantity</code></li>
+  <li><code>collectionMode</code>: <code>FARM_GATE_PICKUP</code> | <code>COLLECTION_POINT</code> | <code>FARMER_DELIVERS</code></li>
+</ul>
+
+<!-- ── 5.4 Advisory ───────────────────────────────────── -->
+<h3 id="s5-4">5.4 Advisory Content Flow <span class="domain-pill domain-local">Local</span> (Discover-Only)</h3>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Advisory Content &mdash; Discover-Only Flow</text>
+
+  <rect x="10" y="48" width="110" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="65" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">1-3</text>
+  <text x="65" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select [Advisory]</text>
+  <line x1="120" y1="69" x2="143" y2="69" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="146" y="48" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="206" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">4-5</text>
+  <text x="206" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select topic area</text>
+  <line x1="266" y1="69" x2="289" y2="69" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="292" y="48" width="120" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="352" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">6-7</text>
+  <text x="352" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select sub-topic</text>
+  <line x1="412" y1="69" x2="435" y2="69" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="438" y="48" width="130" height="42" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="503" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1a73e8">8</text>
+  <text x="503" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">View content list</text>
+  <line x1="568" y1="69" x2="591" y2="69" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <rect x="594" y="48" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="654" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">9</text>
+  <text x="654" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Select content</text>
+  <line x1="714" y1="69" x2="737" y2="69" stroke="#34a853" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <rect x="740" y="48" width="120" height="42" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="800" y="66" text-anchor="middle" font-size="9.5" font-weight="600" fill="#34a853">10</text>
+  <text x="800" y="80" text-anchor="middle" font-size="9.5" fill="#1a1a2e">Content delivered</text>
+
+  <rect x="10" y="112" width="850" height="28" rx="6" fill="#e8f5e9" stroke="#34a853" stroke-width="1"/>
+  <text x="435" y="131" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d32">No order lifecycle. Only discover / on_discover. Content delivered immediately.</text>
+</svg>
+<p class="diagram-caption">Figure 5.4 &mdash; Advisory Content: Discover-only, no transaction lifecycle</p>
+</div>
+
+<p><strong>Beckn mapping:</strong> <code>discover</code> / <code>on_discover</code>. The BPP calls Google Content APIs during <code>on_discover</code> processing and optionally tailors output through Google AI Interfaces before returning the composed advisory.</p>
+
+<!-- ── 5.5 TB Screening ───────────────────────────────── -->
+<h3 id="s5-5">5.5 TB Screening Flow <span class="domain-pill domain-health">Health</span></h3>
+
+<p><strong>Example:</strong> Joseph in Kisumu has been coughing for 3 weeks.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <defs>
+    <marker id="h-arr-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#6a1b9a"/></marker>
+    <marker id="h-arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2e7d32"/></marker>
+  </defs>
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">TB Screening &mdash; Patient WhatsApp Flow</text>
+
+  <rect x="10" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="77" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">1-2</text>
+  <text x="77" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Patient says "Hi"</text>
+  <line x1="145" y1="62" x2="168" y2="62" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="170" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="237" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">3</text>
+  <text x="237" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Select [Get Screened]</text>
+  <line x1="305" y1="62" x2="328" y2="62" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="330" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="397" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">4-6</text>
+  <text x="397" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Symptom screening</text>
+  <line x1="465" y1="62" x2="488" y2="62" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="490" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="557" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">7-8</text>
+  <text x="557" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Triage + consent</text>
+  <line x1="625" y1="62" x2="648" y2="62" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="650" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="717" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">9-10</text>
+  <text x="717" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Share location</text>
+
+  <line x1="717" y1="84" x2="717" y2="110" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="650" y="112" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="717" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">11-12</text>
+  <text x="717" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Discover facilities</text>
+  <line x1="650" y1="134" x2="625" y2="134" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="490" y="112" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="557" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">13</text>
+  <text x="557" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Select facility</text>
+  <line x1="490" y1="134" x2="465" y2="134" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="330" y="112" width="135" height="44" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="397" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">14-15</text>
+  <text x="397" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Confirm referral</text>
+  <line x1="330" y1="134" x2="305" y2="134" stroke="#e65100" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="170" y="112" width="135" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="237" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">16</text>
+  <text x="237" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Referral slip issued</text>
+  <line x1="170" y1="134" x2="148" y2="134" stroke="#34a853" stroke-width="1.5" marker-end="url(#h-arr-green)"/>
+
+  <rect x="10" y="112" width="135" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="77" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">17</text>
+  <text x="77" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Facility notified</text>
+
+  <rect x="10" y="170" width="775" height="28" rx="4" fill="#f3e5f5"/>
+  <text x="397" y="189" text-anchor="middle" font-size="11" font-weight="700" fill="#6a1b9a">Facility Side (Deliver + Record)</text>
+
+  <rect x="10" y="210" width="155" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="87" y="228" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">18</text>
+  <text x="87" y="243" text-anchor="middle" font-size="10" fill="#1a1a2e">Sputum collected</text>
+  <line x1="165" y1="232" x2="195" y2="232" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="198" y="210" width="155" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="275" y="228" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">19</text>
+  <text x="275" y="243" text-anchor="middle" font-size="10" fill="#1a1a2e">Lab test (GeneXpert)</text>
+  <line x1="353" y1="232" x2="383" y2="232" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="386" y="210" width="155" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="463" y="228" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">20</text>
+  <text x="463" y="243" text-anchor="middle" font-size="10" fill="#1a1a2e">Result recorded</text>
+  <line x1="541" y1="232" x2="571" y2="232" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="574" y="210" width="155" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="651" y="228" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">21</text>
+  <text x="651" y="243" text-anchor="middle" font-size="10" fill="#1a1a2e">Patient notified</text>
+
+  <rect x="10" y="275" width="775" height="28" rx="4" fill="#e8f5e9"/>
+  <text x="397" y="294" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Outcome</text>
+
+  <rect x="10" y="314" width="250" height="50" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="135" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#34a853">NEGATIVE</text>
+  <text x="135" y="351" text-anchor="middle" font-size="9" fill="#1a1a2e">Follow-up advice; CLOSED</text>
+
+  <rect x="280" y="314" width="250" height="50" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="405" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">POSITIVE</text>
+  <text x="405" y="351" text-anchor="middle" font-size="9" fill="#1a1a2e">Auto-link to TB Treatment flow</text>
+
+  <rect x="550" y="314" width="235" height="50" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="667" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">LOST</text>
+  <text x="667" y="351" text-anchor="middle" font-size="9" fill="#1a1a2e">No sputum in 7 days; CHP follow-up</text>
+
+  <line x1="463" y1="254" x2="405" y2="310" stroke="#e65100" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <line x1="463" y1="254" x2="135" y2="310" stroke="#34a853" stroke-width="1.5" marker-end="url(#h-arr-green)"/>
+</svg>
+<p class="diagram-caption">Figure 5.5 &mdash; TB Screening: Symptom &rarr; referral &rarr; sputum &rarr; lab &rarr; outcome. Positive auto-links to treatment.</p>
+</div>
+
+<h4>Patient WhatsApp Flow (Step by Step)</h4>
+<ol>
+  <li>Joseph sends <strong>"Hi"</strong></li>
+  <li>System detects role (or asks if new): <em>"Welcome. How can we help?"</em> &mdash; Buttons: [Get Screened] [Treatment Help] [Find Facility] [Health Info]</li>
+  <li>Joseph taps <strong>[Get Screened]</strong></li>
+  <li>System: <em>"We'll ask a few quick questions. Have you been coughing for more than 2 weeks?"</em> [Yes] [No]</li>
+  <li>Joseph: [Yes] &rarr; further symptoms (fever, weight loss, night sweats, contact with TB patient)</li>
+  <li>System scores symptoms (presumptive TB if any positive)</li>
+  <li>System: <em>"You may need a TB test. May we share your information with a screening facility?"</em> [Yes, I consent] [No]</li>
+  <li>Joseph consents (DPDP-style consent captured)</li>
+  <li>System: <em>"Please share your location"</em></li>
+  <li>Google AI normalises &rarr; confirms County + Sub-County</li>
+  <li>System calls <code>discover</code> for facilities with capability <code>GeneXpert</code> in that location</li>
+  <li>System: <em>"Nearest facilities:"</em><br><code>1. Kisumu County Hospital (GeneXpert, 2.3 km)</code><br><code>2. Nyalenda Health Centre (Smear + referral, 4.1 km)</code></li>
+  <li>Joseph selects "1"</li>
+  <li>System shows referral summary (facility, service, date, patient ID) &mdash; [Confirm] [Cancel]</li>
+  <li>Joseph taps <strong>[Confirm]</strong></li>
+  <li>System: <em>"Referral sent. Slip ID: REF-20260412-017. Show this at facility."</em></li>
+  <li>Facility receives WhatsApp notification; clinician sees queued referral in web app</li>
+  <li>Joseph visits facility; sputum collected (Deliver)</li>
+  <li>Sample sent to GeneXpert; Validator (lab) returns result</li>
+  <li>Clinician records result in web app (Record) &mdash; writes back to TIBU register via patient UUID</li>
+  <li>System notifies Joseph: <em>"Your test result is ready. Please call the clinic."</em> (clinical result delivered by clinician, not bot)</li>
+  <li>Outcome: If POSITIVE &rarr; system auto-creates a TB Treatment flow linked to Joseph's UUID. If NEGATIVE &rarr; follow-up advice, flow CLOSED. If patient does not appear within 7 days &rarr; flow marked LOST and CHP receives follow-up task.</li>
+</ol>
+
+<!-- ── 5.6 TB Treatment ───────────────────────────────── -->
+<h3 id="s5-6">5.6 TB Treatment &amp; Adherence Flow <span class="domain-pill domain-health">Health</span></h3>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">TB Treatment &amp; Adherence &mdash; Monthly Cycle</text>
+
+  <rect x="10" y="50" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="85" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">ENROLLED</text>
+  <text x="85" y="86" text-anchor="middle" font-size="9" fill="#3c4043">From screening</text>
+
+  <line x1="160" y1="73" x2="188" y2="73" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="190" y="50" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="265" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">MONTHLY VISIT</text>
+  <text x="265" y="86" text-anchor="middle" font-size="9" fill="#3c4043">Schedule + reminder</text>
+
+  <line x1="340" y1="73" x2="368" y2="73" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="370" y="50" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="445" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">DRUG DISPENSING</text>
+  <text x="445" y="86" text-anchor="middle" font-size="9" fill="#3c4043">Pharmacy record</text>
+
+  <line x1="520" y1="73" x2="548" y2="73" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="550" y="50" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="625" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">ADHERENCE</text>
+  <text x="625" y="86" text-anchor="middle" font-size="9" fill="#3c4043">Daily WhatsApp check</text>
+
+  <line x1="700" y1="73" x2="728" y2="73" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="730" y="50" width="150" height="46" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="805" y="70" text-anchor="middle" font-size="10" font-weight="700" fill="#e65100">ADR CAPTURE</text>
+  <text x="805" y="86" text-anchor="middle" font-size="9" fill="#3c4043">Side effects</text>
+
+  <!-- Loop indicator -->
+  <path d="M625 96 Q 625 130 445 130 Q 265 130 265 96" stroke="#6a1b9a" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#h-arr-blue)"/>
+  <text x="445" y="148" text-anchor="middle" font-size="9.5" fill="#6a1b9a" font-style="italic">Repeat monthly for 6 months (DSTB) / up to 20 months (DRTB)</text>
+
+  <!-- End of regimen -->
+  <rect x="10" y="180" width="175" height="32" rx="6" fill="#e8f5e9"/>
+  <text x="97" y="201" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">End-of-Regimen Outcome</text>
+
+  <rect x="10" y="224" width="150" height="46" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="85" y="244" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">CURED</text>
+  <text x="85" y="260" text-anchor="middle" font-size="9" fill="#3c4043">Sputum neg</text>
+
+  <rect x="170" y="224" width="150" height="46" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="245" y="244" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">COMPLETED</text>
+  <text x="245" y="260" text-anchor="middle" font-size="9" fill="#3c4043">Full course</text>
+
+  <rect x="330" y="224" width="150" height="46" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="405" y="244" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">FAILED</text>
+  <text x="405" y="260" text-anchor="middle" font-size="9" fill="#3c4043">Regimen switch</text>
+
+  <rect x="490" y="224" width="150" height="46" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="565" y="244" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">DIED</text>
+  <text x="565" y="260" text-anchor="middle" font-size="9" fill="#3c4043">Mortality audit</text>
+
+  <rect x="650" y="224" width="230" height="46" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="765" y="244" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">LOST TO FOLLOW-UP</text>
+  <text x="765" y="260" text-anchor="middle" font-size="9" fill="#3c4043">CHP task created</text>
+
+  <!-- Auto link to post-TB -->
+  <line x1="85" y1="270" x2="85" y2="300" stroke="#34a853" stroke-width="1.5" marker-end="url(#h-arr-green)"/>
+  <rect x="10" y="304" width="200" height="40" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="110" y="322" text-anchor="middle" font-size="10" font-weight="600" fill="#2e7d32">Auto-link to Post-TB</text>
+  <text x="110" y="336" text-anchor="middle" font-size="9" fill="#3c4043">Lung Health Flow (5.8)</text>
+</svg>
+<p class="diagram-caption">Figure 5.6 &mdash; TB Treatment: Monthly cycle repeats for the full regimen; outcome determines next-step flow.</p>
+</div>
+
+<h4>Flow Summary</h4>
+<ul>
+  <li><strong>Need:</strong> Patient enrolled in treatment (usually auto-linked from TB Screening positive outcome).</li>
+  <li><strong>Search / Select / Confirm:</strong> Monthly visit scheduled at the treatment facility; patient confirms via WhatsApp.</li>
+  <li><strong>Deliver:</strong> Drug dispensing at pharmacy; sputum conversion check at 2 months; daily adherence reminder via WhatsApp template.</li>
+  <li><strong>Record:</strong> Each monthly visit generates a record in TIBU DSTB / DRTB / TPT register via patient UUID. ADRs captured through a structured WhatsApp form.</li>
+  <li><strong>Outcome:</strong> At end of regimen &mdash; <code>CURED</code>, <code>COMPLETED</code>, <code>FAILED</code>, <code>DIED</code>, <code>LOST_TO_FOLLOWUP</code>. <code>CURED</code> auto-creates a Post-TB Lung Health flow at the 6-month follow-up mark.</li>
+</ul>
+
+<!-- ── 5.7 TB Supervision ─────────────────────────────── -->
+<h3 id="s5-7">5.7 TB Supervision Flow <span class="domain-pill domain-health">Health</span></h3>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">TB Supervision &mdash; Coordinator Flow</text>
+
+  <rect x="10" y="60" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="85" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">SCTLC / CTLC</text>
+  <text x="85" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Opens web / WhatsApp</text>
+  <line x1="160" y1="83" x2="188" y2="83" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="190" y="60" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="265" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">DISCOVER</text>
+  <text x="265" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Facilities due / low-perf</text>
+  <line x1="340" y1="83" x2="368" y2="83" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="370" y="60" width="150" height="46" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="445" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#e65100">SELECT + CONFIRM</text>
+  <text x="445" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Schedule visit date</text>
+  <line x1="520" y1="83" x2="548" y2="83" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="550" y="60" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="625" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">DELIVER</text>
+  <text x="625" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Conduct supervision</text>
+  <line x1="700" y1="83" x2="728" y2="83" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="730" y="60" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="805" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">RECORD</text>
+  <text x="805" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Checklist submitted</text>
+
+  <line x1="805" y1="106" x2="805" y2="140" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="650" y="144" width="230" height="46" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="765" y="164" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">OUTCOME</text>
+  <text x="765" y="180" text-anchor="middle" font-size="9" fill="#3c4043">Mentorship + payment claim</text>
+
+  <text x="445" y="225" text-anchor="middle" font-size="10" font-style="italic" fill="#5f6368">SCTLC appears as Seeker; facility appears as Provider; mentorship becomes a payment claim to NTLD-P.</text>
+</svg>
+<p class="diagram-caption">Figure 5.7 &mdash; TB Supervision: the same 7-step engine with Coordinator as Seeker and Facility as Provider.</p>
+</div>
+
+<!-- ── 5.8 Post-TB ────────────────────────────────────── -->
+<h3 id="s5-8">5.8 Post-TB Lung Health Flow <span class="domain-pill domain-health">Health</span></h3>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Post-TB Lung Health &mdash; 6-Month Follow-Up</text>
+
+  <rect x="10" y="60" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="85" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">CURED PATIENT</text>
+  <text x="85" y="96" text-anchor="middle" font-size="9" fill="#3c4043">From Treatment flow</text>
+  <line x1="160" y1="83" x2="188" y2="83" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="190" y="60" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="265" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">REMINDER</text>
+  <text x="265" y="96" text-anchor="middle" font-size="9" fill="#3c4043">WhatsApp nudge</text>
+  <line x1="340" y1="83" x2="368" y2="83" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="370" y="60" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="445" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">DISCOVER CLINIC</text>
+  <text x="445" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Spirometry capable</text>
+  <line x1="520" y1="83" x2="548" y2="83" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="550" y="60" width="150" height="46" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="625" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">SPIROMETRY</text>
+  <text x="625" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Lung function test</text>
+  <line x1="700" y1="83" x2="728" y2="83" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#h-arr-blue)"/>
+
+  <rect x="730" y="60" width="150" height="46" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="805" y="80" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">OUTCOME</text>
+  <text x="805" y="96" text-anchor="middle" font-size="9" fill="#3c4043">PTLD / Normal / Refer</text>
+
+  <rect x="10" y="140" width="870" height="28" rx="4" fill="#f3e5f5"/>
+  <text x="445" y="159" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6a1b9a">First national-scale platform for longitudinal post-TB lung disease (PTLD) surveillance.</text>
+</svg>
+<p class="diagram-caption">Figure 5.8 &mdash; Post-TB Lung Health: cured TB patients routed into long-term lung function surveillance.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     6. DATA MODEL
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s6">6. Data Model</h2>
+
+<h3 id="s6-1">6.1 Farmer Profile <span class="domain-pill domain-local">Local</span></h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Required</th></tr></thead>
+  <tbody>
+    <tr><td><code>farmer_name</code></td><td>string</td><td>WhatsApp registration</td><td>Yes</td></tr>
+    <tr><td><code>phone_number</code></td><td>string</td><td>Auto from WhatsApp (<code>wa_id</code>)</td><td>Yes</td></tr>
+    <tr><td><code>village</code> / <code>ward</code> / <code>county</code> / <code>sub_county</code></td><td>string</td><td>Captured once</td><td>County+Sub-County required</td></tr>
+    <tr><td><code>gps_latitude</code> / <code>gps_longitude</code></td><td>decimal</td><td>Optional live location</td><td>No</td></tr>
+    <tr><td><code>primary_enterprise</code></td><td>string</td><td>Optional</td><td>No</td></tr>
+    <tr><td><code>preferred_language</code></td><td>string</td><td>ISO 639-1</td><td>No</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s6-2">6.2 Provider Profile <span class="domain-pill domain-local">Local</span></h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Required</th></tr></thead>
+  <tbody>
+    <tr><td><code>provider_name</code></td><td>string</td><td>Registration / onboarding</td><td>Yes</td></tr>
+    <tr><td><code>phone_number</code></td><td>string</td><td>Auto from WhatsApp</td><td>Yes</td></tr>
+    <tr><td><code>provider_type</code></td><td>string</td><td>vet, agrovet, aggregator, trainer, etc.</td><td>Yes</td></tr>
+    <tr><td><code>services_offered</code></td><td>relation</td><td>Links to catalog items</td><td>Yes</td></tr>
+    <tr><td><code>price_list</code></td><td>relation</td><td>Links to offers per service</td><td>Yes</td></tr>
+    <tr><td><code>service_areas</code></td><td>relation</td><td>Counties + Sub-Counties served</td><td>Yes</td></tr>
+    <tr><td><code>capacity</code> / <code>availability</code></td><td>object</td><td>Per-service</td><td>No</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s6-3">6.3 Patient Profile <span class="domain-pill domain-health">Health</span> (One-time Fields)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Required</th></tr></thead>
+  <tbody>
+    <tr><td><code>patient_uuid</code></td><td>string (UUID)</td><td>System-generated; links to TIBU registers</td><td>Yes</td></tr>
+    <tr><td><code>name</code></td><td>string</td><td>WhatsApp onboarding</td><td>Yes</td></tr>
+    <tr><td><code>phone_number</code></td><td>string</td><td>Auto from WhatsApp</td><td>Yes</td></tr>
+    <tr><td><code>gender</code></td><td>enum (M/F/Other)</td><td>Onboarding</td><td>Yes</td></tr>
+    <tr><td><code>date_of_birth</code></td><td>date</td><td>Onboarding</td><td>Yes</td></tr>
+    <tr><td><code>village</code> / <code>ward</code> / <code>sub_county</code> / <code>county</code></td><td>string</td><td>Captured once</td><td>County+Sub-County required</td></tr>
+    <tr><td><code>next_of_kin</code></td><td>object {name, phone, relation}</td><td>Onboarding</td><td>Recommended</td></tr>
+    <tr><td><code>consent_for_data_sharing</code></td><td>boolean + timestamp</td><td>Explicit DPDP-style consent</td><td>Yes</td></tr>
+    <tr><td><code>preferred_language</code></td><td>string</td><td>ISO 639-1</td><td>No</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s6-4">6.4 Health Facility Profile <span class="domain-pill domain-health">Health</span></h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Required</th></tr></thead>
+  <tbody>
+    <tr><td><code>facility_id</code></td><td>string</td><td>Links to TIBU facility register</td><td>Yes</td></tr>
+    <tr><td><code>facility_name</code></td><td>string</td><td>Registration</td><td>Yes</td></tr>
+    <tr><td><code>facility_type</code></td><td>enum (<code>DISPENSARY</code> | <code>HEALTH_CENTRE</code> | <code>HOSPITAL</code> | <code>LAB</code>)</td><td>Registration</td><td>Yes</td></tr>
+    <tr><td><code>location</code></td><td>object {county, sub_county, ward, gps}</td><td>Registration</td><td>Yes</td></tr>
+    <tr><td><code>capabilities</code></td><td>array of strings</td><td>e.g. [<code>GeneXpert</code>, <code>X-ray</code>, <code>Spirometry</code>, <code>DRTB-certified</code>]</td><td>Yes</td></tr>
+    <tr><td><code>staff_credentials</code></td><td>array of objects</td><td>Credentialed clinical staff</td><td>Recommended</td></tr>
+    <tr><td><code>service_hours</code></td><td>object</td><td>Weekly schedule</td><td>Recommended</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s6-5">6.5 Coordinator Profile <span class="domain-pill domain-health">Health</span> (SCTLC / CTLC)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>coordinator_id</code></td><td>string</td><td>Unique identifier</td></tr>
+    <tr><td><code>name</code></td><td>string</td><td></td></tr>
+    <tr><td><code>level</code></td><td>enum (<code>SUB_COUNTY</code> | <code>COUNTY</code> | <code>NATIONAL</code>)</td><td></td></tr>
+    <tr><td><code>assigned_geography</code></td><td>object</td><td>Counties / Sub-Counties under oversight</td></tr>
+    <tr><td><code>assigned_facilities</code></td><td>array of <code>facility_id</code></td><td>Facilities under supervision</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s6-6">6.6 Transaction Fields &mdash; Seeker Side (all domains)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Captured When</th></tr></thead>
+  <tbody>
+    <tr><td><code>service_needed</code></td><td>string</td><td>Search step</td></tr>
+    <tr><td><code>quantity</code> / <code>details</code></td><td>varies</td><td>Need elaboration</td></tr>
+    <tr><td><code>preferred_date</code></td><td>date</td><td>Search step</td></tr>
+    <tr><td><code>selected_provider</code></td><td>relation</td><td>Select step</td></tr>
+    <tr><td><code>booking_confirmed</code></td><td>boolean</td><td>Confirm step</td></tr>
+    <tr><td><code>order_id</code></td><td>string</td><td>System generated on confirm</td></tr>
+    <tr><td><code>order_status</code></td><td>enum (see &sect; 7)</td><td>Throughout lifecycle</td></tr>
+    <tr><td><code>service_confirmed</code></td><td>boolean</td><td>Deliver step</td></tr>
+    <tr><td><code>payment_method</code></td><td>enum (<code>CASH</code> | <code>MPESA</code>)</td><td>Record step (local)</td></tr>
+    <tr><td><code>payment_status</code></td><td>enum</td><td>Record step</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s6-7">6.7 Transaction Fields &mdash; Provider Side (all domains)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Captured When</th></tr></thead>
+  <tbody>
+    <tr><td><code>request_id</code></td><td>string</td><td>On notification</td></tr>
+    <tr><td><code>service_requested</code></td><td>string</td><td>From order</td></tr>
+    <tr><td><code>seeker_location</code></td><td>object</td><td>From order</td></tr>
+    <tr><td><code>acceptance_status</code></td><td>enum</td><td>Select/Confirm response</td></tr>
+    <tr><td><code>confirmed_visit_time</code></td><td>datetime</td><td>Confirm</td></tr>
+    <tr><td><code>fulfillment_status</code></td><td>enum</td><td>After Deliver</td></tr>
+    <tr><td><code>notes</code></td><td>string</td><td>Record</td></tr>
+    <tr><td><code>follow_up_required</code></td><td>boolean</td><td>Record</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s6-8">6.8 Health Transaction Fields <span class="domain-pill domain-health">Health</span> (per request)</h3>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>transaction_id</code></td><td>string</td><td>Unique per interaction</td></tr>
+    <tr><td><code>flow_template</code></td><td>enum</td><td>e.g. <code>tb-screening</code>, <code>tb-treatment</code>, <code>tb-supervision</code>, <code>post-tb</code></td></tr>
+    <tr><td><code>vertical</code></td><td>string</td><td>e.g. <code>tb</code> &mdash; allows extension to HIV, malaria, etc.</td></tr>
+    <tr><td><code>patient_uuid</code></td><td>string</td><td>Links to TIBU register</td></tr>
+    <tr><td><code>service_status</code></td><td>enum</td><td>Uses unified flow-engine lifecycle (&sect; 7)</td></tr>
+    <tr><td><code>outcome_type</code></td><td>enum</td><td><code>TB_POSITIVE</code> | <code>TB_NEGATIVE</code> | <code>CURED</code> | <code>COMPLETED</code> | <code>FAILED</code> | <code>DIED</code> | <code>LOST_TO_FOLLOWUP</code> | <code>PTLD_DETECTED</code> | <code>NORMAL_LUNG</code></td></tr>
+    <tr><td><code>adverse_events</code></td><td>array of objects</td><td>ADR captures (MedDRA-aligned where possible)</td></tr>
+    <tr><td><code>referral_target</code></td><td>string</td><td>Next facility for escalated care</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     7. SERVICE STATUS LIFECYCLE (UNIFIED)
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s7">7. Service Status Lifecycle (Unified)</h2>
+
+<p>The lifecycle aligns 1:1 with the 7-step Flow Engine. Every flow &mdash; from vaccination bookings to TB treatment &mdash; moves through the same states.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 860 360" xmlns="http://www.w3.org/2000/svg" style="max-width:830px;">
+  <defs>
+    <marker id="u-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3c4043"/></marker>
+    <marker id="u-arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#c62828"/></marker>
+    <marker id="u-arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2e7d32"/></marker>
+  </defs>
+  <text x="430" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Unified Service Status Lifecycle</text>
+
+  <rect x="20" y="60" width="160" height="42" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="100" y="85" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8">NEED_REGISTERED</text>
+  <line x1="180" y1="81" x2="210" y2="81" stroke="#3c4043" stroke-width="1.8" marker-end="url(#u-arr)"/>
+
+  <rect x="212" y="60" width="120" height="42" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="272" y="85" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8">SEARCHED</text>
+  <line x1="332" y1="81" x2="362" y2="81" stroke="#3c4043" stroke-width="1.8" marker-end="url(#u-arr)"/>
+
+  <rect x="364" y="60" width="120" height="42" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="424" y="85" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8">SELECTED</text>
+  <line x1="484" y1="81" x2="514" y2="81" stroke="#3c4043" stroke-width="1.8" marker-end="url(#u-arr)"/>
+
+  <rect x="516" y="60" width="130" height="42" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="581" y="85" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">CONFIRMED</text>
+  <line x1="646" y1="81" x2="676" y2="81" stroke="#3c4043" stroke-width="1.8" marker-end="url(#u-arr)"/>
+
+  <rect x="678" y="60" width="150" height="42" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="753" y="85" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">DELIVERED</text>
+
+  <line x1="753" y1="102" x2="753" y2="140" stroke="#3c4043" stroke-width="1.8" marker-end="url(#u-arr)"/>
+
+  <rect x="678" y="142" width="150" height="42" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="753" y="167" text-anchor="middle" font-size="11" font-weight="700" fill="#34a853">RECORDED</text>
+  <line x1="678" y1="163" x2="496" y2="163" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#u-arr-green)"/>
+
+  <rect x="330" y="142" width="165" height="42" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="412" y="167" text-anchor="middle" font-size="11" font-weight="700" fill="#34a853">OUTCOME_RECORDED</text>
+  <line x1="330" y1="163" x2="185" y2="163" stroke="#2e7d32" stroke-width="1.8" marker-end="url(#u-arr-green)"/>
+
+  <rect x="20" y="142" width="160" height="42" rx="10" fill="#f1f3f4" stroke="#5f6368" stroke-width="2.5"/>
+  <text x="100" y="167" text-anchor="middle" font-size="13" font-weight="700" fill="#3c4043">CLOSED</text>
+
+  <!-- LOST_TO_FOLLOWUP branch -->
+  <rect x="516" y="220" width="200" height="42" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="616" y="245" text-anchor="middle" font-size="11" font-weight="700" fill="#6a1b9a">LOST_TO_FOLLOWUP</text>
+  <text x="616" y="280" text-anchor="middle" font-size="9.5" fill="#6a1b9a" font-style="italic">Health domain: triggers CHP follow-up</text>
+  <line x1="581" y1="102" x2="616" y2="215" stroke="#6a1b9a" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#u-arr-red)"/>
+
+  <!-- CANCELLED -->
+  <rect x="220" y="220" width="160" height="42" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="300" y="245" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">CANCELLED</text>
+  <text x="300" y="280" text-anchor="middle" font-size="9.5" fill="#c62828" font-style="italic">Any pre-DELIVERED state</text>
+  <line x1="272" y1="102" x2="272" y2="215" stroke="#c62828" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#u-arr-red)"/>
+  <line x1="220" y1="241" x2="180" y2="180" stroke="#5f6368" stroke-width="1.5"/>
+
+  <text x="430" y="330" text-anchor="middle" font-size="10" fill="#5f6368" font-style="italic">Green = happy path. Red dashed = exception paths. Both domains share the same machine.</text>
+</svg>
+<p class="diagram-caption">Figure 7.1 &mdash; Unified service status lifecycle aligned to the 7-step Flow Engine.</p>
+</div>
+
+<h3>State Definitions</h3>
+<table>
+  <thead><tr><th>State</th><th>Description</th><th>Maps to Flow Step</th></tr></thead>
+  <tbody>
+    <tr><td><code>NEED_REGISTERED</code></td><td>Seeker initiates a flow; need captured</td><td>1. Need</td></tr>
+    <tr><td><code>SEARCHED</code></td><td>Discovery completed; candidates returned</td><td>2. Search</td></tr>
+    <tr><td><code>SELECTED</code></td><td>Seeker picked a provider/facility; quote issued</td><td>3. Select</td></tr>
+    <tr><td><code>CONFIRMED</code></td><td>Both sides agree &mdash; binding contract</td><td>4. Confirm</td></tr>
+    <tr><td><code>DELIVERED</code></td><td>Service rendered</td><td>5. Deliver</td></tr>
+    <tr><td><code>RECORDED</code></td><td>Clinical / operational data written</td><td>6. Record</td></tr>
+    <tr><td><code>OUTCOME_RECORDED</code></td><td>Final outcome logged (rating, cure, etc.)</td><td>7. Outcome</td></tr>
+    <tr><td><code>CLOSED</code></td><td>Terminal state</td><td>&mdash;</td></tr>
+    <tr><td><code>CANCELLED</code></td><td>Either party cancelled before DELIVERED</td><td>&mdash;</td></tr>
+    <tr><td><code>LOST_TO_FOLLOWUP</code> <span class="domain-pill domain-health">Health</span></td><td>Patient did not return for scheduled step</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+
+<h3>Backward Compatibility &mdash; Local Services State Mapping</h3>
+<p>Existing Local Services implementations that use the legacy state names continue to work via this mapping:</p>
+<table>
+  <thead><tr><th>Legacy (Local)</th><th>Unified</th></tr></thead>
+  <tbody>
+    <tr><td><code>ORDER_PLACED</code></td><td><code>CONFIRMED</code></td></tr>
+    <tr><td><code>PROVIDER_ACCEPTED</code></td><td><code>CONFIRMED</code> (with provider-ack sub-status)</td></tr>
+    <tr><td><code>PROVIDER_REJECTED</code></td><td><code>CANCELLED</code></td></tr>
+    <tr><td><code>IN_PROGRESS</code></td><td><code>DELIVERED</code> (sub-status: in-progress)</td></tr>
+    <tr><td><code>COMPLETED</code></td><td><code>DELIVERED</code></td></tr>
+    <tr><td><code>FARMER_CONFIRMED</code></td><td><code>OUTCOME_RECORDED</code></td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     8. DOMAIN DETECTION & USER ROUTING
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s8">8. Domain Detection &amp; User Routing</h2>
+
+<p>Both domains share a single WhatsApp entry point but route to domain-specific handlers. The platform determines which domain a seeker belongs to and which menu to show.</p>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 860 260" xmlns="http://www.w3.org/2000/svg" style="max-width:830px;">
+  <defs>
+    <marker id="dr-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#1a73e8"/></marker>
+  </defs>
+  <text x="430" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Domain Detection &amp; Routing</text>
+
+  <rect x="20" y="100" width="130" height="50" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="85" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">User</text>
+  <text x="85" y="138" text-anchor="middle" font-size="9" fill="#3c4043">WhatsApp</text>
+  <line x1="150" y1="125" x2="190" y2="125" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#dr-arr)"/>
+
+  <rect x="195" y="100" width="170" height="50" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="280" y="120" text-anchor="middle" font-size="10" font-weight="700" fill="#1a73e8">webhook.php</text>
+  <text x="280" y="136" text-anchor="middle" font-size="9" fill="#3c4043">Shared entry point</text>
+  <line x1="365" y1="125" x2="400" y2="125" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#dr-arr)"/>
+
+  <rect x="405" y="100" width="200" height="50" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="505" y="120" text-anchor="middle" font-size="10" font-weight="700" fill="#e65100">Domain Router</text>
+  <text x="505" y="136" text-anchor="middle" font-size="9" fill="#3c4043">Role lookup + trigger words</text>
+
+  <line x1="505" y1="150" x2="280" y2="185" stroke="#34a853" stroke-width="1.8" marker-end="url(#dr-arr)"/>
+  <line x1="505" y1="150" x2="730" y2="185" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#dr-arr)"/>
+
+  <rect x="195" y="190" width="180" height="50" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="285" y="212" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">local_services_handler.php</text>
+  <text x="285" y="228" text-anchor="middle" font-size="9" fill="#3c4043">Agri / rural seekers</text>
+
+  <rect x="640" y="190" width="180" height="50" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="730" y="212" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">health_services_handler.php</text>
+  <text x="730" y="228" text-anchor="middle" font-size="9" fill="#3c4043">Patients, CHPs, coordinators</text>
+</svg>
+<p class="diagram-caption">Figure 8.1 &mdash; A single webhook; a lightweight router dispatches to the correct domain handler.</p>
+</div>
+
+<h3>Routing Strategy</h3>
+<ol>
+  <li><strong>Role lookup:</strong> If the WhatsApp <code>wa_id</code> is already registered with a domain, route directly to that handler. A user can be registered with more than one domain; in that case, the last-used domain is default.</li>
+  <li><strong>Trigger words:</strong> First-time or ambiguous messages can carry a trigger &mdash; <em>"screen me", "cough", "TB"</em> &rarr; health; <em>"vaccine", "eggs", "school fees"</em> &rarr; local.</li>
+  <li><strong>Menu-driven disambiguation:</strong> If role and triggers are absent, the system shows a top-level domain menu: <em>"Are you looking for: (a) Rural services (b) Health services"</em>.</li>
+  <li><strong>Cross-domain re-entry:</strong> A user can switch domains mid-conversation by typing <em>"menu"</em> or via a persistent footer button.</li>
+</ol>
+
+<h3>Example &mdash; Two Users, Two Domains</h3>
+<div class="callout callout-info">
+  <p><strong>Farmer Mary</strong> sends "Hi" &rarr; router finds <code>role=FARMER</code> &rarr; <code>local_services_handler.php</code> &rarr; <em>"Welcome. What do you need help with?"</em> [Livelihood] [Household] [Market] [Advisory]</p>
+</div>
+<div class="callout callout-health">
+  <p><strong>Patient Joseph</strong> sends "Hi" &rarr; router finds <code>role=PATIENT</code> &rarr; <code>health_services_handler.php</code> &rarr; <em>"Welcome. How can we help?"</em> [Get Screened] [Treatment Help] [Find Facility] [Health Info]</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     9. WHATSAPP MESSAGE FORMATS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s9">9. WhatsApp Message Formats</h2>
+
+<table>
+  <thead><tr><th>Format</th><th>When Used</th><th>Constraints</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Interactive Buttons</strong></td><td>Binary or small choices (Yes/No, Confirm/Cancel, top-level domain menu)</td><td>Max 3 buttons, 20 chars each</td></tr>
+    <tr><td><strong>Numbered Text List</strong></td><td>Lists with more than 3 items: sub-categories, providers, facilities</td><td><code>1. Option A\n2. Option B</code>. User replies with number.</td></tr>
+    <tr><td><strong>Free Text Input</strong></td><td>Quantities, locations, symptoms, feedback</td><td>Validated by engine; re-prompt on invalid input</td></tr>
+    <tr><td><strong>Media Messages</strong></td><td>Advisory content, patient education videos, referral slip PDFs</td><td>Supported: MP4, MP3, PDF, JPEG/PNG</td></tr>
+    <tr><td><strong>Template Messages</strong></td><td>Outbound notifications, adherence reminders, supervision alerts</td><td>Pre-approved WhatsApp Business templates; required parameters</td></tr>
+    <tr><td><strong>Structured Forms</strong></td><td>ADR capture, symptom checklists, supervision checklists</td><td>WhatsApp Flows (form UI); responses normalised server-side</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     10. LOCATION & MATCHING
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s10">10. Location &amp; Matching</h2>
+
+<h3>Location Capture</h3>
+<ul>
+  <li>Seeker provides location as <strong>free text</strong> (village/ward/county) or <strong>GPS live location</strong>.</li>
+  <li><strong>Google AI normalises</strong> free text to structured <code>County + Sub-County</code>.</li>
+  <li>System confirms normalised location with seeker before proceeding.</li>
+</ul>
+
+<h3>Provider / Facility Matching</h3>
+<ul>
+  <li>Providers register <strong>explicit service areas</strong> (County + Sub-County combinations).</li>
+  <li>Health facilities additionally have <strong>capability filters</strong> (e.g., <code>GeneXpert</code>, <code>Spirometry</code>, <code>DRTB-certified</code>).</li>
+  <li><strong>Match logic:</strong> seeker's <code>county + sub_county</code> must exist in provider's registered service areas AND the provider must advertise the required capability.</li>
+</ul>
+
+<h3>Kenya Geography</h3>
+<ul>
+  <li><strong>47 Counties</strong>, each with multiple Sub-Counties.</li>
+  <li>Pilot will start with selected counties and expand.</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════
+     11. PAYMENT MODEL
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s11">11. Payment Model</h2>
+
+<div class="callout callout-warning">
+  <p class="callout-label">Pilot Constraint</p>
+  <p>All seeker payments are <strong>offline and self-reported</strong>. There is no online payment processing in the pilot.</p>
+</div>
+
+<table>
+  <thead><tr><th>Aspect</th><th>Local Services</th><th>Health Services</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Payment methods</strong></td><td>Cash, M-Pesa</td><td>Public services are free to the patient; supervision mentorship and CHP stipends are paid via M-Pesa claims to NTLD-P</td></tr>
+    <tr><td><strong>Direction</strong></td><td>Seeker &rarr; Provider (Market flow reversed)</td><td>Sponsor (NTLD-P / Global Fund) &rarr; Facility / CHP (claims-based)</td></tr>
+    <tr><td><strong>Reporting</strong></td><td>Self-reported by both parties</td><td>Structured claim events written to Record step; anomaly detection in Horizon 1 analytics</td></tr>
+    <tr><td><strong>Reconciliation</strong></td><td>No automated reconciliation in pilot</td><td>Claim-verification workflow tied to Coordinator role</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     12. PROVIDER ONBOARDING
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s12">12. Provider Onboarding &amp; Catalog Management</h2>
+
+<h3>Existing Agripreneurs <span class="domain-pill domain-local">Local</span></h3>
+<p>Already in Kuza Platform <code>user</code> table; supplement with service offerings, pricing, service areas.</p>
+
+<h3>New Provider Onboarding <span class="domain-pill domain-local">Local</span></h3>
+<ol>
+  <li><strong>Registration</strong> &mdash; name, phone, provider type</li>
+  <li><strong>Service area setup</strong> &mdash; Counties + Sub-Counties</li>
+  <li><strong>Catalog creation</strong> &mdash; category, sub-category, pricing, capacity</li>
+  <li><strong>Price list management</strong></li>
+</ol>
+
+<h3>Health Facility Onboarding <span class="domain-pill domain-health">Health</span></h3>
+<ol>
+  <li><strong>Link to TIBU facility register</strong> &mdash; existing Kenya MoH facility record is the source of truth.</li>
+  <li><strong>Capability registration</strong> &mdash; GeneXpert, X-ray, Spirometry, DRTB, etc.</li>
+  <li><strong>Staff onboarding</strong> &mdash; credentialed clinical staff linked to the facility.</li>
+  <li><strong>Coordinator assignment</strong> &mdash; each facility has an SCTLC / CTLC responsible for supervision.</li>
+  <li><strong>Service hours &amp; contact</strong>.</li>
+</ol>
+
+<p>All management through the <strong>Kuza Web App</strong>. Catalog published to the Beckn network via <code>BPP &rarr; ONIX &rarr; Catalog Service</code>.</p>
+
+<!-- ════════════════════════════════════════════════════════
+     13. INTEGRATION POINTS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s13">13. Integration Points</h2>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 860 360" xmlns="http://www.w3.org/2000/svg" style="max-width:830px;">
+  <defs>
+    <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#1a73e8"/></marker>
+  </defs>
+  <text x="430" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">Unified System Architecture</text>
+
+  <rect x="10" y="130" width="120" height="70" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="70" y="160" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Seeker</text>
+  <text x="70" y="178" text-anchor="middle" font-size="9.5" fill="#3c4043">(Farmer / Patient)</text>
+
+  <rect x="160" y="115" width="130" height="100" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="225" y="150" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">WhatsApp + Router</text>
+  <text x="225" y="168" text-anchor="middle" font-size="8.5" fill="#5f6368">webhook.php</text>
+  <text x="225" y="182" text-anchor="middle" font-size="8.5" fill="#5f6368">local / health handlers</text>
+  <line x1="130" y1="165" x2="155" y2="165" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#arr2)"/>
+
+  <rect x="330" y="50" width="120" height="70" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="390" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">BAP</text>
+  <text x="390" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Seeker-side adapter</text>
+  <line x1="290" y1="140" x2="330" y2="100" stroke="#1a73e8" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <rect x="490" y="115" width="140" height="90" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="560" y="145" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">Beckn Network</text>
+  <text x="560" y="163" text-anchor="middle" font-size="9" fill="#3c4043">local-services +</text>
+  <text x="560" y="176" text-anchor="middle" font-size="9" fill="#3c4043">health-services</text>
+  <text x="560" y="193" text-anchor="middle" font-size="9" fill="#3c4043">DeDi + ONIX</text>
+  <line x1="450" y1="85" x2="490" y2="135" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <rect x="330" y="215" width="120" height="70" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="390" y="245" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">BPP</text>
+  <text x="390" y="261" text-anchor="middle" font-size="9" fill="#3c4043">Provider-side adapter</text>
+  <line x1="490" y1="185" x2="450" y2="235" stroke="#c62828" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <rect x="160" y="240" width="130" height="70" rx="10" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="225" y="270" text-anchor="middle" font-size="10" font-weight="600" fill="#7b1fa2">Kuza Platform</text>
+  <text x="225" y="288" text-anchor="middle" font-size="9" fill="#3c4043">MySQL + Web App</text>
+  <line x1="290" y1="275" x2="325" y2="260" stroke="#7b1fa2" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <rect x="670" y="50" width="140" height="70" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="740" y="78" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">Google AI + Content</text>
+  <text x="740" y="96" text-anchor="middle" font-size="9" fill="#3c4043">Location + advisory + triage</text>
+  <line x1="630" y1="140" x2="670" y2="100" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr2)"/>
+
+  <rect x="670" y="215" width="140" height="70" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
+  <text x="740" y="243" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">TIBU / DHIS2 / FHIR</text>
+  <text x="740" y="261" text-anchor="middle" font-size="9" fill="#3c4043">Health data exchange</text>
+  <line x1="630" y1="185" x2="670" y2="235" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+  <rect x="690" y="300" width="140" height="50" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="760" y="322" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Provider / Facility</text>
+  <text x="760" y="338" text-anchor="middle" font-size="9" fill="#3c4043">WhatsApp + Web</text>
+  <line x1="630" y1="250" x2="685" y2="310" stroke="#34a853" stroke-width="1.5" marker-end="url(#arr2)"/>
+</svg>
+<p class="diagram-caption">Figure 13.1 &mdash; Unified architecture: one stack, two Beckn domains, pluggable integrations.</p>
+</div>
+
+<h3 id="s13-1">13.1 WhatsApp Cloud API</h3>
+<table>
+  <thead><tr><th>Direction</th><th>Mechanism</th><th>Details</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Inbound</strong></td><td><code>webhook.php</code></td><td>Receives all WhatsApp messages; router dispatches to <code>local_services_handler.php</code> or <code>health_services_handler.php</code></td></tr>
+    <tr><td><strong>Outbound to seeker</strong></td><td>Domain handlers</td><td>Interactive messages, text, media, forms</td></tr>
+    <tr><td><strong>Outbound to provider/facility</strong></td><td>Messaging queue / cron</td><td>Pre-approved template messages with action buttons</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s13-2">13.2 Beckn Network</h3>
+<ul>
+  <li><strong>BAP &amp; BPP</strong> registered with DeDi Registry, each handling <strong>both</strong> <code>local-services</code> and <code>health-services</code> domain codes.</li>
+  <li><strong>ONIX adapters</strong> deployed on GCP; schema extensions per domain.</li>
+  <li>Catalog and Discovery Services are shared; domain acts as a filter.</li>
+  <li>Transactions (<code>select</code> / <code>init</code> / <code>confirm</code> / <code>status</code> / <code>update</code> / <code>rate</code>) routed directly BAP &harr; BPP via DeDi Registry.</li>
+</ul>
+
+<h3 id="s13-3">13.3 Google Cloud Services</h3>
+
+<h4>13.3.1 Google Cloud Platform (GCP)</h4>
+<ul>
+  <li>Hosts the entire Kuza-built stack: WhatsApp Handler, BAP, BPP, Web App, ONIX adapters, MySQL database.</li>
+  <li>Networking, TLS termination, load balancing, public endpoints for BAP / BPP callbacks.</li>
+</ul>
+
+<h4>13.3.2 Google Content APIs</h4>
+<ul>
+  <li><strong>Domains:</strong> agri, health, market, finance, education &mdash; each with its own curated knowledge base.</li>
+  <li><strong>Primary consumer:</strong> Advisory flow (local) and Health Info flow (health).</li>
+  <li><strong>Secondary consumers:</strong> any flow may surface supplementary content (e.g., "What to expect during GeneXpert testing" attached to a TB screening referral).</li>
+</ul>
+
+<h4>13.3.3 Google AI Interfaces</h4>
+<ul>
+  <li><strong>Location normalisation</strong> (all flows)</li>
+  <li><strong>Advisory content tailoring</strong> (personalisation, summarisation, translation)</li>
+  <li><strong>Clinical triage assist</strong> <span class="domain-pill domain-health">Health</span> &mdash; suggest presumptive TB score from symptoms</li>
+  <li><strong>Translation</strong> (English &harr; Swahili; future local languages)</li>
+  <li><strong>Intent extraction</strong> (future)</li>
+</ul>
+
+<h3 id="s13-4">13.4 Kuza Platform</h3>
+<ul>
+  <li>BAP and BPP connect to MySQL for all data operations</li>
+  <li>Provider and facility catalogs, orders, payments, feedback, conversation state &mdash; all persisted in MySQL</li>
+</ul>
+
+<h3 id="s13-5">13.5 Health-System Integrations</h3>
+<table>
+  <thead><tr><th>System</th><th>Purpose</th><th>Mechanism</th></tr></thead>
+  <tbody>
+    <tr><td><strong>TIBU Registers</strong></td><td>Read/write to existing NTLD-P registers (DSTB, DRTB, TPT, ACF, PTLD, plus ~18 others)</td><td>Patient UUID linkage; bidirectional sync per Record step</td></tr>
+    <tr><td><strong>DHIS2</strong></td><td>Aggregated health indicators for national reporting</td><td>Scheduled export (monthly) of aggregated counts; no patient-level data</td></tr>
+    <tr><td><strong>Global Fund / TaifaCare</strong></td><td>Outcome reporting for funder visibility</td><td>Claim &amp; outcome events emitted on Record + Outcome steps</td></tr>
+    <tr><td><strong>WHO / CDC</strong></td><td>Aggregated surveillance intelligence</td><td>Aggregated only; no patient data leaves Kenya</td></tr>
+    <tr><td><strong>FHIR R4</strong> (optional)</td><td>Health data exchange standard for cross-system interop</td><td>FHIR resources on demand (Patient, Observation, DiagnosticReport, MedicationDispense)</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     14. ANALYTICS & INTELLIGENCE
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s14">14. Analytics &amp; Intelligence (Three Horizons)</h2>
+
+<p>The unified platform inherits a three-horizon analytics roadmap, applying equally to both domains.</p>
+
+<h3>14.1 Horizon 1 &mdash; Analytics on Existing Data (Months 1&ndash;6)</h3>
+<table>
+  <thead><tr><th>Domain</th><th>Dashboards &amp; Analyses</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="domain-pill domain-local">Local</span></td>
+      <td>Provider performance, geographic service-availability heatmaps, conversion funnels (discover &rarr; select &rarr; confirm &rarr; deliver), seasonal demand patterns, cross-category provider utilisation.</td>
+    </tr>
+    <tr>
+      <td><span class="domain-pill domain-health">Health</span></td>
+      <td>Facility performance (presumptive-to-confirmed ratio), screening cascade analysis, supervision-visit coverage gaps, treatment success rates by facility/county, financial anomaly detection on mentorship claims, CHP productivity.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>14.2 Horizon 2 &mdash; Predictive ML (Months 6&ndash;18)</h3>
+<table>
+  <thead><tr><th>Domain</th><th>Models</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="domain-pill domain-local">Local</span></td>
+      <td>Demand forecasting, provider-matching optimisation, seeker churn prediction, price-signal detection for market produce.</td>
+    </tr>
+    <tr>
+      <td><span class="domain-pill domain-health">Health</span></td>
+      <td>Patient risk stratification (treatment failure, loss-to-follow-up), contact-investigation prioritisation, mortality-prevention signals (NLP on death audits), ADR early warning.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>14.3 Horizon 3 &mdash; Pioneering Surveillance (Months 12&ndash;36)</h3>
+<ul>
+  <li><span class="domain-pill domain-health">Health</span> <strong>Longitudinal PTLD surveillance</strong> &mdash; first national-scale dataset on post-TB lung disease trajectories.</li>
+  <li><span class="domain-pill domain-health">Health</span> <strong>Multi-disease platform</strong> &mdash; extend to HIV, malaria, cholera using the same flow engine and taxonomy.</li>
+  <li><span class="domain-pill domain-local">Local</span> <strong>Cross-domain network effects</strong> &mdash; seekers who use Local Services AND Health Services show materially different retention and outcome profiles.</li>
+  <li><span class="domain-pill domain-local">Local</span> <strong>Multi-vertical seeker journeys</strong> &mdash; e.g. a TB patient who also accesses livelihood support during treatment.</li>
+</ul>
+
+<!-- ════════════════════════════════════════════════════════
+     15. SOVEREIGN DATA & COMPLIANCE
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s15">15. Sovereign Data &amp; Compliance</h2>
+
+<div class="callout callout-health">
+  <p class="callout-label">Data Sovereignty</p>
+  <p>All seeker and patient data is stored <strong>in country (Kenya)</strong>. No patient-identifiable data leaves Kenya. External reporting to WHO / CDC / Global Fund uses aggregated, de-identified indicators only.</p>
+</div>
+
+<table>
+  <thead><tr><th>Area</th><th>Controls</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Consent</strong></td><td>DPDP-style explicit consent captured before any data is shared with a provider / facility; consent revocable at any time.</td></tr>
+    <tr><td><strong>Health privacy</strong></td><td>HIPAA-equivalent privacy controls; role-based access; facility-scoped visibility; PHI encryption at rest and in transit.</td></tr>
+    <tr><td><strong>Clinical alignment</strong></td><td>All health flows aligned to Kenya Ministry of Health guidelines and the NTLD-P programme protocols.</td></tr>
+    <tr><td><strong>Funder compliance</strong></td><td>Outcome reporting structured to Global Fund M&amp;E requirements.</td></tr>
+    <tr><td><strong>Audit trail</strong></td><td>Immutable log of every clinical and financial event, signed and time-stamped, retained per national records policy.</td></tr>
+    <tr><td><strong>Right-to-erasure</strong></td><td>Seekers can request erasure; statutorily retained clinical records are redacted rather than deleted.</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     16. NON-FUNCTIONAL REQUIREMENTS
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s16">16. Non-Functional Requirements</h2>
+
+<table>
+  <thead><tr><th>Requirement</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td><strong>No shopping cart</strong></td><td>Each order is a single service/product transaction. No multi-item baskets.</td></tr>
+    <tr><td><strong>No shipping</strong></td><td>Services delivered on-site, at provider location, or at facility.</td></tr>
+    <tr><td><strong>No online patient payments</strong></td><td>Local-services payments offline. Health-services are free to patients.</td></tr>
+    <tr><td><strong>No app installation</strong></td><td>Seekers on WhatsApp only. Providers / facilities / coordinators use WhatsApp + browser web app.</td></tr>
+    <tr><td><strong>Offline-friendly</strong></td><td>Critical flows work on low bandwidth. Minimal data transfer per interaction.</td></tr>
+    <tr><td><strong>Multilingual</strong></td><td>English + Swahili at minimum; additional local languages in future.</td></tr>
+    <tr><td><strong>Data privacy</strong></td><td>See &sect; 15. Seeker PII minimised; health PHI encrypted; cross-border transfer prohibited.</td></tr>
+    <tr><td><strong>Availability</strong></td><td>99% uptime during pilot; WhatsApp webhook (Meta) SLA.</td></tr>
+    <tr><td><strong>Response time</strong></td><td>WhatsApp replies within 5 seconds; provider/facility discovery within 10 seconds.</td></tr>
+    <tr><td><strong>Clinical safety</strong></td><td>Health flows have human-in-the-loop gates &mdash; AI triage never issues clinical diagnoses; all results delivered by credentialed clinicians.</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════════════════════════════════════════
+     17. PILOT SCOPE & FUTURE
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s17">17. Pilot Scope &amp; Future Extensions</h2>
+
+<h3>In Scope for Pilot</h3>
+<table>
+  <thead><tr><th>#</th><th>Feature</th><th>Domain</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>All four local-services flows (Livelihood, Household, Market, Advisory)</td><td><span class="domain-pill domain-local">Local</span></td><td>Required</td></tr>
+    <tr><td>2</td><td>All four health-services flows (TB Screening, Treatment, Supervision, Post-TB)</td><td><span class="domain-pill domain-health">Health</span></td><td>Required</td></tr>
+    <tr><td>3</td><td>Unified 7-step Flow Engine</td><td>Both</td><td>Required</td></tr>
+    <tr><td>4</td><td>Domain detection and routing</td><td>Both</td><td>Required</td></tr>
+    <tr><td>5</td><td>Provider / facility onboarding and catalog management via web app</td><td>Both</td><td>Required</td></tr>
+    <tr><td>6</td><td>Full lifecycle for transactional flows</td><td>Both</td><td>Required</td></tr>
+    <tr><td>7</td><td>Advisory + Health Info content delivery</td><td>Both</td><td>Required</td></tr>
+    <tr><td>8</td><td>Multi-channel access: WhatsApp + browser web app (SMS/USSD optional)</td><td>Both</td><td>Required</td></tr>
+    <tr><td>9</td><td>Location-based matching with capability filters</td><td>Both</td><td>Required</td></tr>
+    <tr><td>10</td><td>TIBU register integration</td><td><span class="domain-pill domain-health">Health</span></td><td>Required</td></tr>
+    <tr><td>11</td><td>Horizon 1 multi-domain analytics</td><td>Both</td><td>Required</td></tr>
+    <tr><td>12</td><td>Kenya deployment (counties, KES, M-Pesa)</td><td>Both</td><td>Required</td></tr>
+  </tbody>
+</table>
+
+<h3>Future Extensions (NOT in Pilot)</h3>
+<table>
+  <thead><tr><th>Extension</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>Additional health verticals</td><td>HIV, malaria, maternal/child health, NCDs &mdash; same flow engine, new schemas.</td></tr>
+    <tr><td>Additional local-services categories</td><td>Financial services, legal, government schemes.</td></tr>
+    <tr><td>Cross-domain seeker journeys</td><td>Unified view of a seeker who uses both local and health services (with consent).</td></tr>
+    <tr><td>Horizon 2 ML models</td><td>Risk stratification, treatment failure prediction, demand forecasting.</td></tr>
+    <tr><td>Horizon 3 longitudinal surveillance</td><td>PTLD registry, multi-disease platform, cross-domain network analytics.</td></tr>
+    <tr><td>Buyer-initiated Market discovery</td><td>External buyers seeking produce via aggregators.</td></tr>
+    <tr><td>Online M-Pesa payment processing</td><td>Integrated payment gateway with real-time confirmation.</td></tr>
+    <tr><td>Provider / Coordinator WhatsApp conversational menu</td><td>Catalog and supervision management via WhatsApp (no web app needed).</td></tr>
+    <tr><td>FHIR R4 full conformance</td><td>Complete FHIR resource surface for external EMR interop.</td></tr>
+    <tr><td>Multi-language AI advisory</td><td>AI-powered content delivery in additional local languages.</td></tr>
+  </tbody>
+</table>
+
+<!-- ── Footer ──────────────────────────────────────────── -->
+<hr style="margin-top:3rem; border:none; border-top:2px solid #e8eaed;">
+<p style="text-align:center; font-size:.82rem; color:#80868b; margin-top:1.5rem;">
+  NFH-Kuza-Google &mdash; Unified Multi-Domain Specification v2.0 &mdash; 10 April 2026<br>
+  This document is the primary requirements specification. All development must conform to these specifications.
+</p>
+
+</div><!-- .page-wrap -->
+</body>
+</html>
