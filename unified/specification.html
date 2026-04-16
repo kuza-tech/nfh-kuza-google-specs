@@ -157,12 +157,12 @@
         <li><a href="#s5-2">Household Services Flow (Local)</a></li>
         <li><a href="#s5-3">Market Produce Flow (Local)</a></li>
         <li><a href="#s5-4">Advisory Content Flow (Local)</a></li>
-        <li><a href="#s5-5">TB Screening Flow (Health)</a></li>
-        <li><a href="#s5-6">TB Treatment &amp; Adherence Flow (Health)</a></li>
-        <li><a href="#s5-7">TB Supervision Flow (Health)</a></li>
-        <li><a href="#s5-8">Post-TB Lung Health Flow (Health)</a></li>
-        <li><a href="#s5-9">Active Case Finding &mdash; CHP Outreach (Health)</a></li>
-        <li><a href="#s5-10">Contact Tracing (Health, cascade)</a></li>
+        <li><a href="#s5-5">TB Screening &mdash; Patient Self-Presentation (Health, <code>SEEKER_INITIATED</code>)</a></li>
+        <li><a href="#s5-6">TB Treatment &amp; Adherence (Health, cascaded from screening)</a></li>
+        <li><a href="#s5-7">TB Supervision (Health, <code>PROVIDER_INITIATED</code>)</a></li>
+        <li><a href="#s5-8">Post-TB Lung Health (Health, <code>SYSTEM_INITIATED</code>)</a></li>
+        <li><a href="#s5-9">Active Case Finding &mdash; CHP Outreach (Health, <code>PROVIDER_INITIATED</code>, batched)</a></li>
+        <li><a href="#s5-10">Contact Tracing (Health, <code>SYSTEM_INITIATED</code> cascade)</a></li>
       </ol>
     </li>
     <li><a href="#s6">Data Model</a>
@@ -882,9 +882,18 @@
 <p><strong>Beckn mapping:</strong> <code>discover</code> / <code>on_discover</code>. The BPP calls Google Content APIs during <code>on_discover</code> processing and optionally tailors output through Google AI Interfaces before returning the composed advisory.</p>
 
 <!-- ── 5.5 TB Screening ───────────────────────────────── -->
-<h3 id="s5-5">5.5 TB Screening Flow <span class="domain-pill domain-health">Health</span></h3>
+<h3 id="s5-5">5.5 TB Screening Flow &mdash; Patient Self-Presentation <span class="domain-pill domain-health">Health</span></h3>
 
-<p><strong>Example:</strong> Joseph in Kisumu has been coughing for 3 weeks.</p>
+<div class="callout callout-info">
+  <strong>Initiation mode:</strong> <code>SEEKER_INITIATED</code> &mdash; patient with symptoms approaches the chatbot directly. This is <em>one of three</em> entry paths into TB screening. See also:
+  <ul style="margin-top:0.5rem;">
+    <li><a href="#s5-9">&sect;5.9 Active Case Finding</a> &mdash; <code>PROVIDER_INITIATED</code>: CHP conducts community-outreach screening without the seeker asking.</li>
+    <li><a href="#s5-10">&sect;5.10 Contact Tracing</a> &mdash; <code>SYSTEM_INITIATED</code>: screening flows auto-cascaded from a positive-outcome index case.</li>
+  </ul>
+  All three paths converge on the same <em>Deliver &rarr; Record &rarr; Outcome</em> stages and write to the same disease-programme register. The <code>initiationMode</code> attribute on <code>ServiceOrderAttributes</code> distinguishes them.
+</div>
+
+<p><strong>Example:</strong> Joseph in Kisumu has been coughing for 3 weeks. He knows about TB and self-presents via the chatbot. (Compare with Katolo-village residents in &sect;5.9 who didn't self-present &mdash; CHP Shwetha came to them.)</p>
 
 <div class="diagram-wrap">
 <svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
@@ -1010,8 +1019,12 @@
   <li>Sample sent to GeneXpert; Validator (lab) returns result</li>
   <li>Clinician records result in web app (Record) &mdash; writes back to the disease-programme register via patient UUID</li>
   <li>System notifies Joseph: <em>"Your test result is ready. Please call the clinic."</em> (clinical result delivered by clinician, not bot)</li>
-  <li>Outcome: If POSITIVE &rarr; system auto-creates a TB Treatment flow linked to Joseph's UUID. If NEGATIVE &rarr; follow-up advice, flow CLOSED. If patient does not appear within 7 days &rarr; flow marked LOST and CHP receives follow-up task.</li>
+  <li>Outcome: If POSITIVE &rarr; system cascades TWO flows &mdash; (a) a TB Treatment flow for Joseph (<code>SYSTEM_INITIATED</code>, <code>triggerReason: OUTCOME_FOLLOW_ON</code>) and (b) a batch of Contact Tracing screening flows for Joseph's identified contacts (see &sect;5.10, each with <code>triggerReason: CONTACT_OF_POSITIVE</code>). If NEGATIVE &rarr; follow-up advice, flow CLOSED. If patient does not appear within 7 days &rarr; flow marked <code>LOST_TO_FOLLOWUP</code> and a CHP receives a follow-up task.</li>
 </ol>
+
+<div class="callout callout-success">
+  <strong>Cascade summary:</strong> A single positive screening outcome in this flow can fan out into many new flows &mdash; one treatment flow plus N contact-screening flows. Each new flow records <code>triggerFlowId</code> = Joseph's screening flow ID, preserving the surveillance lineage.
+</div>
 
 <h4>Schema Example &mdash; <code>discover</code> Catalog Item</h4>
 <p>The TB screening referral uses the generic <code>ServiceItemAttributes</code> schema; the vertical-specific data lives in <code>verticalAttributes</code>:</p>
@@ -1032,6 +1045,10 @@
 
 <!-- ── 5.6 TB Treatment ───────────────────────────────── -->
 <h3 id="s5-6">5.6 TB Treatment &amp; Adherence Flow <span class="domain-pill domain-health">Health</span></h3>
+
+<div class="callout callout-info">
+  <strong>Initiation mode:</strong> usually <code>SYSTEM_INITIATED</code> &mdash; auto-cascaded from the <code>TB_POSITIVE</code> outcome of a screening flow (&sect;5.5 self-presentation, &sect;5.9 CHP outreach, or &sect;5.10 contact tracing). Occasionally <code>SEEKER_INITIATED</code> when a patient transfers in with an external diagnosis. Either way, <code>triggerFlowId</code> is set to the screening flow when available.
+</div>
 
 <div class="diagram-wrap">
 <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
@@ -1114,6 +1131,10 @@
 <!-- ── 5.7 TB Supervision ─────────────────────────────── -->
 <h3 id="s5-7">5.7 TB Supervision Flow <span class="domain-pill domain-health">Health</span></h3>
 
+<div class="callout callout-info">
+  <strong>Initiation mode:</strong> <code>PROVIDER_INITIATED</code> (coordinator-initiated) &mdash; the SCTLC / CTLC opens their dashboard and starts a supervision cycle. Can also be <code>SYSTEM_INITIATED</code> when a facility's quality indicators cross a threshold and the engine auto-schedules a supervision visit (<code>triggerReason: QUALITY_INDICATOR_BREACH</code>). A quarterly supervision round typically creates a <code>COMMUNITY_VISIT</code>-style batch covering all facilities in the coordinator's catchment.
+</div>
+
 <div class="diagram-wrap">
 <svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
   <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">TB Supervision &mdash; Coordinator Flow</text>
@@ -1155,6 +1176,10 @@
 
 <!-- ── 5.8 Post-TB ────────────────────────────────────── -->
 <h3 id="s5-8">5.8 Post-TB Lung Health Flow <span class="domain-pill domain-health">Health</span></h3>
+
+<div class="callout callout-info">
+  <strong>Initiation mode:</strong> <code>SYSTEM_INITIATED</code> &mdash; cascaded automatically from a TB treatment flow whose outcome is <code>CURED</code> or <code>TREATMENT_COMPLETED</code>. <code>triggerFlowId</code> points back to the treatment flow, <code>triggerReason: SCHEDULED_FOLLOWUP</code>. The patient is notified via WhatsApp and invited to the first post-TB visit.
+</div>
 
 <div class="diagram-wrap">
 <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
