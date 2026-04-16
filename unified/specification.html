@@ -119,13 +119,13 @@
      ════════════════════════════════════════════════════════ -->
 <header class="cover">
   <h1>NFH-Kuza-Google &mdash; Unified Multi-Domain Specification</h1>
-  <p class="subtitle">Single platform serving Local Services (Agri/Rural) and Health Services (TIBU/NTLD-P)</p>
+  <p class="subtitle">Single platform serving Local Services (Agri/Rural) and Health Services</p>
   <p class="subtitle" style="font-size:.95rem;color:#3c4043;">One Flow Engine. Multiple Domains. Shared Infrastructure.</p>
   <div class="partner-logos">
     <span class="partner-badge kuza">Kuza &mdash; Platform</span>
     <span class="partner-badge google">Google &mdash; Cloud &amp; AI</span>
     <span class="partner-badge beckn">Beckn &mdash; Open Network</span>
-    <span class="partner-badge ntld">NTLD-P &mdash; Health Partner</span>
+    <span class="partner-badge ntld">National Disease Programme &mdash; Health Partner</span>
   </div>
   <p class="meta">
     <span>Version 2.0</span>
@@ -187,7 +187,7 @@
         <li><a href="#s13-2">Beckn Network</a></li>
         <li><a href="#s13-3">Google Cloud Services</a></li>
         <li><a href="#s13-4">Kuza Platform</a></li>
-        <li><a href="#s13-5">Health-System Integrations (TIBU / DHIS2 / FHIR)</a></li>
+        <li><a href="#s13-5">Health-System Integrations (registers / DHIS2 / FHIR)</a></li>
       </ol>
     </li>
     <li><a href="#s14">Sovereign Data &amp; Compliance</a></li>
@@ -216,9 +216,9 @@
       <td>Livelihood, Household, Market, Advisory</td>
     </tr>
     <tr>
-      <td><span class="domain-pill domain-health">Health Services</span> TB / NTLD-P</td>
+      <td><span class="domain-pill domain-health">Health Services</span> TB / National Disease Programme</td>
       <td><code>health-services</code></td>
-      <td>NTLD-P, Ministry of Health (Kenya), Global Fund, county health systems</td>
+      <td>National Disease Programme, Ministry of Health (Kenya), Global Fund, county health systems</td>
       <td>TB Screening, TB Treatment, TB Supervision, Post-TB Lung Health</td>
     </tr>
   </tbody>
@@ -229,7 +229,7 @@
   <p><strong>Kuza</strong> &mdash; Platform technology, seeker &amp; provider networks, field operations, domain expertise (agri + health).<br>
   <strong>Google</strong> &mdash; Cloud infrastructure (GCP) hosting the unified stack; Content APIs serving curated domain content (agri, health, market, finance); AI interfaces (location normalisation, content tailoring, triage assist, translation, generation).<br>
   <strong>Beckn</strong> &mdash; Open network protocol, DeDi Registry, ONIX adapters, Catalog &amp; Discovery Services &mdash; one network, two domain codes.<br>
-  <strong>NTLD-P</strong> &mdash; Kenya National TB &amp; Leprosy Programme &mdash; health-domain partner, clinical guidelines, TIBU register alignment, Global Fund compliance.</p>
+  <strong>National Disease Programme</strong> &mdash; Kenya National TB &amp; Leprosy Programme &mdash; health-domain partner, clinical guidelines, disease-programme register alignment, Global Fund compliance.</p>
 </div>
 
 <h3>Key Characteristics</h3>
@@ -386,7 +386,7 @@
   <li><strong>Extension Officers</strong> <span class="domain-pill domain-local">Local</span> &mdash; area-level agri coordination.</li>
   <li><strong>SCTLCs</strong> <span class="domain-pill domain-health">Health</span> &mdash; Sub-County TB &amp; Leprosy Coordinators.</li>
   <li><strong>CTLCs</strong> <span class="domain-pill domain-health">Health</span> &mdash; County TB &amp; Leprosy Coordinators.</li>
-  <li><strong>NTLD-P Director</strong> <span class="domain-pill domain-health">Health</span> &mdash; national programme leadership with oversight across all counties.</li>
+  <li><strong>National Disease Programme Director</strong> <span class="domain-pill domain-health">Health</span> &mdash; national programme leadership with oversight across all counties.</li>
   <li>In the platform, Coordinators appear as Seekers when consuming supervision flows, and as Validators when signing off on visits.</li>
 </ul>
 
@@ -963,7 +963,7 @@
   <li>Facility receives WhatsApp notification; clinician sees queued referral in web app</li>
   <li>Joseph visits facility; sputum collected (Deliver)</li>
   <li>Sample sent to GeneXpert; Validator (lab) returns result</li>
-  <li>Clinician records result in web app (Record) &mdash; writes back to TIBU register via patient UUID</li>
+  <li>Clinician records result in web app (Record) &mdash; writes back to the disease-programme register via patient UUID</li>
   <li>System notifies Joseph: <em>"Your test result is ready. Please call the clinic."</em> (clinical result delivered by clinician, not bot)</li>
   <li>Outcome: If POSITIVE &rarr; system auto-creates a TB Treatment flow linked to Joseph's UUID. If NEGATIVE &rarr; follow-up advice, flow CLOSED. If patient does not appear within 7 days &rarr; flow marked LOST and CHP receives follow-up task.</li>
 </ol>
@@ -1062,7 +1062,7 @@
   <li><strong>Need:</strong> Patient enrolled in treatment (usually auto-linked from TB Screening positive outcome).</li>
   <li><strong>Search / Select / Confirm:</strong> Monthly visit scheduled at the treatment facility; patient confirms via WhatsApp.</li>
   <li><strong>Deliver:</strong> Drug dispensing at pharmacy; sputum conversion check at 2 months; daily adherence reminder via WhatsApp template.</li>
-  <li><strong>Record:</strong> Each monthly visit generates a record in TIBU DSTB / DRTB / TPT register via patient UUID. ADRs captured through a structured WhatsApp form.</li>
+  <li><strong>Record:</strong> Each monthly visit generates a record in disease-programme registers (e.g., DSTB / DRTB / TPT for TB) via patient UUID. ADRs captured through a structured WhatsApp form.</li>
   <li><strong>Outcome:</strong> At end of regimen &mdash; <code>CURED</code>, <code>COMPLETED</code>, <code>FAILED</code>, <code>DIED</code>, <code>LOST_TO_FOLLOWUP</code>. <code>CURED</code> auto-creates a Post-TB Lung Health flow at the 6-month follow-up mark.</li>
 </ul>
 
@@ -1103,7 +1103,7 @@
   <text x="765" y="164" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">OUTCOME</text>
   <text x="765" y="180" text-anchor="middle" font-size="9" fill="#3c4043">Mentorship + payment claim</text>
 
-  <text x="445" y="225" text-anchor="middle" font-size="10" font-style="italic" fill="#5f6368">SCTLC appears as Seeker; facility appears as Provider; mentorship becomes a payment claim to NTLD-P.</text>
+  <text x="445" y="225" text-anchor="middle" font-size="10" font-style="italic" fill="#5f6368">SCTLC appears as Seeker; facility appears as Provider; mentorship becomes a payment claim to National Disease Programme.</text>
 </svg>
 <p class="diagram-caption">Figure 5.7 &mdash; TB Supervision: the same 7-step engine with Coordinator as Seeker and Facility as Provider.</p>
 </div>
@@ -1181,7 +1181,7 @@
 <table>
   <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Required</th></tr></thead>
   <tbody>
-    <tr><td><code>patient_uuid</code></td><td>string (UUID)</td><td>System-generated; links to TIBU registers</td><td>Yes</td></tr>
+    <tr><td><code>patient_uuid</code></td><td>string (UUID)</td><td>System-generated; links to disease-programme registers</td><td>Yes</td></tr>
     <tr><td><code>name</code></td><td>string</td><td>WhatsApp onboarding</td><td>Yes</td></tr>
     <tr><td><code>phone_number</code></td><td>string</td><td>Auto from WhatsApp</td><td>Yes</td></tr>
     <tr><td><code>gender</code></td><td>enum (M/F/Other)</td><td>Onboarding</td><td>Yes</td></tr>
@@ -1197,7 +1197,7 @@
 <table>
   <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Required</th></tr></thead>
   <tbody>
-    <tr><td><code>facility_id</code></td><td>string</td><td>Links to TIBU facility register</td><td>Yes</td></tr>
+    <tr><td><code>facility_id</code></td><td>string</td><td>Links to the health-facility register</td><td>Yes</td></tr>
     <tr><td><code>facility_name</code></td><td>string</td><td>Registration</td><td>Yes</td></tr>
     <tr><td><code>facility_type</code></td><td>enum (<code>DISPENSARY</code> | <code>HEALTH_CENTRE</code> | <code>HOSPITAL</code> | <code>LAB</code>)</td><td>Registration</td><td>Yes</td></tr>
     <tr><td><code>location</code></td><td>object {county, sub_county, ward, gps}</td><td>Registration</td><td>Yes</td></tr>
@@ -1258,7 +1258,7 @@
     <tr><td><code>transaction_id</code></td><td>string</td><td>Unique per interaction</td></tr>
     <tr><td><code>flow_template</code></td><td>enum</td><td>e.g. <code>tb-screening</code>, <code>tb-treatment</code>, <code>tb-supervision</code>, <code>post-tb</code></td></tr>
     <tr><td><code>vertical</code></td><td>string</td><td>e.g. <code>tb</code> &mdash; allows extension to HIV, malaria, etc.</td></tr>
-    <tr><td><code>patient_uuid</code></td><td>string</td><td>Links to TIBU register</td></tr>
+    <tr><td><code>patient_uuid</code></td><td>string</td><td>Links to disease-programme register</td></tr>
     <tr><td><code>service_status</code></td><td>enum</td><td>Uses unified flow-engine lifecycle (&sect; 7)</td></tr>
     <tr><td><code>outcome_type</code></td><td>enum</td><td><code>TB_POSITIVE</code> | <code>TB_NEGATIVE</code> | <code>CURED</code> | <code>COMPLETED</code> | <code>FAILED</code> | <code>DIED</code> | <code>LOST_TO_FOLLOWUP</code> | <code>PTLD_DETECTED</code> | <code>NORMAL_LUNG</code></td></tr>
     <tr><td><code>adverse_events</code></td><td>array of objects</td><td>ADR captures (MedDRA-aligned where possible)</td></tr>
@@ -1383,7 +1383,7 @@
   <line x1="150" y1="125" x2="190" y2="125" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#dr-arr)"/>
 
   <rect x="195" y="100" width="170" height="50" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
-  <text x="280" y="120" text-anchor="middle" font-size="10" font-weight="700" fill="#1a73e8">webhook.php</text>
+  <text x="280" y="120" text-anchor="middle" font-size="10" font-weight="700" fill="#1a73e8">Channel Webhook</text>
   <text x="280" y="136" text-anchor="middle" font-size="9" fill="#3c4043">Shared entry point</text>
   <line x1="365" y1="125" x2="400" y2="125" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#dr-arr)"/>
 
@@ -1395,11 +1395,11 @@
   <line x1="505" y1="150" x2="730" y2="185" stroke="#6a1b9a" stroke-width="1.8" marker-end="url(#dr-arr)"/>
 
   <rect x="195" y="190" width="180" height="50" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
-  <text x="285" y="212" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">local_services_handler.php</text>
+  <text x="285" y="212" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">Local Services Domain Flow Handler</text>
   <text x="285" y="228" text-anchor="middle" font-size="9" fill="#3c4043">Agri / rural seekers</text>
 
   <rect x="640" y="190" width="180" height="50" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
-  <text x="730" y="212" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">health_services_handler.php</text>
+  <text x="730" y="212" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">Health Domain Flow Handler</text>
   <text x="730" y="228" text-anchor="middle" font-size="9" fill="#3c4043">Patients, CHPs, coordinators</text>
 </svg>
 <p class="diagram-caption">Figure 8.1 &mdash; A single webhook; a lightweight router dispatches to the correct domain handler.</p>
@@ -1415,10 +1415,10 @@
 
 <h3>Example &mdash; Two Users, Two Domains</h3>
 <div class="callout callout-info">
-  <p><strong>Farmer Mary</strong> sends "Hi" &rarr; router finds <code>role=FARMER</code> &rarr; <code>local_services_handler.php</code> &rarr; <em>"Welcome. What do you need help with?"</em> [Livelihood] [Household] [Market] [Advisory]</p>
+  <p><strong>Farmer Mary</strong> sends "Hi" &rarr; router finds <code>role=FARMER</code> &rarr; Local Services Domain Flow Handler &rarr; <em>"Welcome. What do you need help with?"</em> [Livelihood] [Household] [Market] [Advisory]</p>
 </div>
 <div class="callout callout-health">
-  <p><strong>Patient Joseph</strong> sends "Hi" &rarr; router finds <code>role=PATIENT</code> &rarr; <code>health_services_handler.php</code> &rarr; <em>"Welcome. How can we help?"</em> [Get Screened] [Treatment Help] [Find Facility] [Health Info]</p>
+  <p><strong>Patient Joseph</strong> sends "Hi" &rarr; router finds <code>role=PATIENT</code> &rarr; Health Domain Flow Handler &rarr; <em>"Welcome. How can we help?"</em> [Get Screened] [Treatment Help] [Find Facility] [Health Info]</p>
 </div>
 
 <!-- ════════════════════════════════════════════════════════
@@ -1476,8 +1476,8 @@
 <table>
   <thead><tr><th>Aspect</th><th>Local Services</th><th>Health Services</th></tr></thead>
   <tbody>
-    <tr><td><strong>Payment methods</strong></td><td>Cash, M-Pesa</td><td>Public services are free to the patient; supervision mentorship and CHP stipends are paid via M-Pesa claims to NTLD-P</td></tr>
-    <tr><td><strong>Direction</strong></td><td>Seeker &rarr; Provider (Market flow reversed)</td><td>Sponsor (NTLD-P / Global Fund) &rarr; Facility / CHP (claims-based)</td></tr>
+    <tr><td><strong>Payment methods</strong></td><td>Cash, M-Pesa</td><td>Public services are free to the patient; supervision mentorship and CHP stipends are paid via M-Pesa claims to National Disease Programme</td></tr>
+    <tr><td><strong>Direction</strong></td><td>Seeker &rarr; Provider (Market flow reversed)</td><td>Sponsor (National Disease Programme / Global Fund) &rarr; Facility / CHP (claims-based)</td></tr>
     <tr><td><strong>Reporting</strong></td><td>Self-reported by both parties</td><td>Structured claim events written to Record step; anomaly detection in Phase 1 analytics (see Appendix)</td></tr>
     <tr><td><strong>Reconciliation</strong></td><td>No automated reconciliation in pilot</td><td>Claim-verification workflow tied to Coordinator role</td></tr>
   </tbody>
@@ -1501,7 +1501,7 @@
 
 <h3>Health Facility Onboarding <span class="domain-pill domain-health">Health</span></h3>
 <ol>
-  <li><strong>Link to TIBU facility register</strong> &mdash; existing Kenya MoH facility record is the source of truth.</li>
+  <li><strong>Link to health-facility register</strong> &mdash; existing national facility record (e.g., Kenya MoH register) is the source of truth.</li>
   <li><strong>Capability registration</strong> &mdash; GeneXpert, X-ray, Spirometry, DRTB, etc.</li>
   <li><strong>Staff onboarding</strong> &mdash; credentialed clinical staff linked to the facility.</li>
   <li><strong>Coordinator assignment</strong> &mdash; each facility has an SCTLC / CTLC responsible for supervision.</li>
@@ -1528,7 +1528,7 @@
 
   <rect x="160" y="115" width="130" height="100" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
   <text x="225" y="150" text-anchor="middle" font-size="10" font-weight="600" fill="#1a73e8">WhatsApp + Router</text>
-  <text x="225" y="168" text-anchor="middle" font-size="8.5" fill="#5f6368">webhook.php</text>
+  <text x="225" y="168" text-anchor="middle" font-size="8.5" fill="#5f6368">Channel Webhook</text>
   <text x="225" y="182" text-anchor="middle" font-size="8.5" fill="#5f6368">local / health handlers</text>
   <line x1="130" y1="165" x2="155" y2="165" stroke="#1a73e8" stroke-width="1.8" marker-end="url(#arr2)"/>
 
@@ -1560,7 +1560,7 @@
   <line x1="630" y1="140" x2="670" y2="100" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr2)"/>
 
   <rect x="670" y="215" width="140" height="70" rx="10" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2"/>
-  <text x="740" y="243" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">TIBU / DHIS2 / FHIR</text>
+  <text x="740" y="243" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">Registers / DHIS2 / FHIR</text>
   <text x="740" y="261" text-anchor="middle" font-size="9" fill="#3c4043">Health data exchange</text>
   <line x1="630" y1="185" x2="670" y2="235" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#arr2)"/>
 
@@ -1576,7 +1576,7 @@
 <table>
   <thead><tr><th>Direction</th><th>Mechanism</th><th>Details</th></tr></thead>
   <tbody>
-    <tr><td><strong>Inbound</strong></td><td><code>webhook.php</code></td><td>Receives all WhatsApp messages; router dispatches to <code>local_services_handler.php</code> or <code>health_services_handler.php</code></td></tr>
+    <tr><td><strong>Inbound</strong></td><td>Channel Webhook Endpoint</td><td>Receives all WhatsApp messages; router dispatches to Local Services Domain Flow Handler or Health Domain Flow Handler</td></tr>
     <tr><td><strong>Outbound to seeker</strong></td><td>Domain handlers</td><td>Interactive messages, text, media, forms</td></tr>
     <tr><td><strong>Outbound to provider/facility</strong></td><td>Messaging queue / cron</td><td>Pre-approved template messages with action buttons</td></tr>
   </tbody>
@@ -1624,7 +1624,7 @@
 <table>
   <thead><tr><th>System</th><th>Purpose</th><th>Mechanism</th></tr></thead>
   <tbody>
-    <tr><td><strong>TIBU Registers</strong></td><td>Read/write to existing NTLD-P registers (DSTB, DRTB, TPT, ACF, PTLD, plus ~18 others)</td><td>Patient UUID linkage; bidirectional sync per Record step</td></tr>
+    <tr><td><strong>Disease-Programme Registers</strong> (e.g., Kenya National TB Programme)</td><td>Read/write to existing registers (for the TB vertical: DSTB, DRTB, TPT, ACF, PTLD and related)</td><td>Patient UUID linkage; bidirectional sync per Record step</td></tr>
     <tr><td><strong>DHIS2</strong></td><td>Aggregated health indicators for national reporting</td><td>Scheduled export (monthly) of aggregated counts; no patient-level data</td></tr>
     <tr><td><strong>Global Fund / TaifaCare</strong></td><td>Outcome reporting for funder visibility</td><td>Claim &amp; outcome events emitted on Record + Outcome steps</td></tr>
     <tr><td><strong>WHO / CDC</strong></td><td>Aggregated surveillance intelligence</td><td>Aggregated only; no patient data leaves Kenya</td></tr>
@@ -1647,7 +1647,7 @@
   <tbody>
     <tr><td><strong>Consent</strong></td><td>DPDP-style explicit consent captured before any data is shared with a provider / facility; consent revocable at any time.</td></tr>
     <tr><td><strong>Health privacy</strong></td><td>HIPAA-equivalent privacy controls; role-based access; facility-scoped visibility; PHI encryption at rest and in transit.</td></tr>
-    <tr><td><strong>Clinical alignment</strong></td><td>All health flows aligned to Kenya Ministry of Health guidelines and the NTLD-P programme protocols.</td></tr>
+    <tr><td><strong>Clinical alignment</strong></td><td>All health flows aligned to Kenya Ministry of Health guidelines and the National Disease Programme protocols.</td></tr>
     <tr><td><strong>Funder compliance</strong></td><td>Outcome reporting structured to Global Fund M&amp;E requirements.</td></tr>
     <tr><td><strong>Audit trail</strong></td><td>Immutable log of every clinical and financial event, signed and time-stamped, retained per national records policy.</td></tr>
     <tr><td><strong>Right-to-erasure</strong></td><td>Seekers can request erasure; statutorily retained clinical records are redacted rather than deleted.</td></tr>
@@ -1693,7 +1693,7 @@
     <tr><td>7</td><td>Advisory + Health Info content delivery</td><td>Both</td><td>Required</td></tr>
     <tr><td>8</td><td>Multi-channel access: WhatsApp + browser web app (SMS/USSD optional)</td><td>Both</td><td>Required</td></tr>
     <tr><td>9</td><td>Location-based matching with capability filters</td><td>Both</td><td>Required</td></tr>
-    <tr><td>10</td><td>TIBU register integration</td><td><span class="domain-pill domain-health">Health</span></td><td>Required</td></tr>
+    <tr><td>10</td><td>Disease-programme register integration</td><td><span class="domain-pill domain-health">Health</span></td><td>Required</td></tr>
     <tr><td>11</td><td>Phase 1 multi-domain analytics dashboards (see Appendix)</td><td>Both</td><td>Required</td></tr>
     <tr><td>12</td><td>Kenya deployment (counties, KES, M-Pesa)</td><td>Both</td><td>Required</td></tr>
   </tbody>

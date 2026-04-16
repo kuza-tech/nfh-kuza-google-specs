@@ -500,7 +500,7 @@
     </tr>
     <tr>
       <td><code>health-services</code></td>
-      <td>TB programme (TIBU integration): screening, treatment, supervision, post-TB care</td>
+      <td>TB vertical (disease-programme register integration): screening, treatment, supervision, post-TB care</td>
       <td>health-tb-screening, health-tb-treatment, health-tb-supervision, advisory-health-tb</td>
     </tr>
   </tbody>
@@ -1045,7 +1045,7 @@
 
 <p><em>Example 2 &mdash; TB screening outcome:</em></p>
 <pre>{
-  <span class="key">"seekerUuid"</span>: <span class="string">"TIBU-PAT-554321"</span>,
+  <span class="key">"seekerUuid"</span>: <span class="string">"HLTH-PAT-554321"</span>,
   <span class="key">"providerCredentialId"</span>: <span class="string">"KMPDC-CO-4412"</span>,
   <span class="key">"recordReference"</span>: <span class="string">"fhir:DiagnosticReport/tb-554321-001"</span>,
   <span class="key">"seekerPaymentMethod"</span>: <span class="enum-val">"NONE"</span>,
@@ -1062,7 +1062,7 @@
 
 <p><em>Example 3 &mdash; TB treatment with adverse event:</em></p>
 <pre>{
-  <span class="key">"seekerUuid"</span>: <span class="string">"TIBU-PAT-554321"</span>,
+  <span class="key">"seekerUuid"</span>: <span class="string">"HLTH-PAT-554321"</span>,
   <span class="key">"outcomeRecorded"</span>: <span class="bool">true</span>,
   <span class="key">"outcomeType"</span>: <span class="string">"TREATMENT_COMPLETED"</span>,
   <span class="key">"outcomeDate"</span>: <span class="string">"2026-10-12"</span>,
@@ -1440,7 +1440,7 @@
   },
   <span class="key">"offerAttributes"</span>: { <span class="key">"priceAmount"</span>: <span class="number">0</span>, <span class="key">"pricingModel"</span>: <span class="enum-val">"FREE"</span>, <span class="key">"isFreeAtPointOfCare"</span>: <span class="bool">true</span>, <span class="key">"coveredBy"</span>: <span class="enum-val">"GLOBAL_FUND"</span> },
   <span class="key">"fulfillmentAttributes"</span>: { <span class="key">"seekerLocation"</span>: { <span class="key">"county"</span>: <span class="string">"Nairobi"</span>, <span class="key">"subCounty"</span>: <span class="string">"Kibra"</span> }, <span class="key">"facilityType"</span>: <span class="string">"Health Centre"</span>, <span class="key">"providerCredentialRequired"</span>: <span class="string">"Clinical Officer"</span>, <span class="key">"deliveryMode"</span>: <span class="enum-val">"COLLECTION_POINT"</span>, <span class="key">"serviceStatus"</span>: <span class="enum-val">"DELIVERED"</span> },
-  <span class="key">"orderAttributes"</span>: { <span class="key">"seekerUuid"</span>: <span class="string">"TIBU-PAT-554321"</span>, <span class="key">"recordReference"</span>: <span class="string">"fhir:DiagnosticReport/tb-554321-001"</span>, <span class="key">"outcomeRecorded"</span>: <span class="bool">true</span>, <span class="key">"outcomeType"</span>: <span class="string">"TB_POSITIVE"</span>, <span class="key">"consentGiven"</span>: <span class="bool">true</span> }
+  <span class="key">"orderAttributes"</span>: { <span class="key">"seekerUuid"</span>: <span class="string">"HLTH-PAT-554321"</span>, <span class="key">"recordReference"</span>: <span class="string">"fhir:DiagnosticReport/tb-554321-001"</span>, <span class="key">"outcomeRecorded"</span>: <span class="bool">true</span>, <span class="key">"outcomeType"</span>: <span class="string">"TB_POSITIVE"</span>, <span class="key">"consentGiven"</span>: <span class="bool">true</span> }
 }</pre>
 </div>
 
@@ -1473,7 +1473,7 @@
   },
   <span class="key">"offerAttributes"</span>: { <span class="key">"priceAmount"</span>: <span class="number">0</span>, <span class="key">"pricingModel"</span>: <span class="enum-val">"FREE"</span>, <span class="key">"isFreeAtPointOfCare"</span>: <span class="bool">true</span>, <span class="key">"coveredBy"</span>: <span class="enum-val">"GOVERNMENT_PROGRAM</span>" },
   <span class="key">"fulfillmentAttributes"</span>: { <span class="key">"seekerLocation"</span>: { <span class="key">"county"</span>: <span class="string">"Nairobi"</span>, <span class="key">"subCounty"</span>: <span class="string">"Kibra"</span> }, <span class="key">"providerCredentialRequired"</span>: <span class="string">"Clinical Officer"</span>, <span class="key">"deliveryMode"</span>: <span class="enum-val">"FACILITY_VISIT"</span>, <span class="key">"serviceStatus"</span>: <span class="enum-val">"RECORDED"</span>, <span class="key">"followUpRequired"</span>: <span class="bool">true</span> },
-  <span class="key">"orderAttributes"</span>: { <span class="key">"seekerUuid"</span>: <span class="string">"TIBU-PAT-554321"</span>, <span class="key">"outcomeRecorded"</span>: <span class="bool">true</span>, <span class="key">"outcomeType"</span>: <span class="string">"TREATMENT_COMPLETED"</span>, <span class="key">"adverseEventReported"</span>: <span class="bool">true</span>, <span class="key">"adverseEventDetails"</span>: { <span class="key">"eventType"</span>: <span class="string">"Hepatotoxicity"</span>, <span class="key">"severity"</span>: <span class="string">"MODERATE"</span>, <span class="key">"action"</span>: <span class="string">"Regimen modified"</span>, <span class="key">"outcome"</span>: <span class="string">"Resolved"</span> } }
+  <span class="key">"orderAttributes"</span>: { <span class="key">"seekerUuid"</span>: <span class="string">"HLTH-PAT-554321"</span>, <span class="key">"outcomeRecorded"</span>: <span class="bool">true</span>, <span class="key">"outcomeType"</span>: <span class="string">"TREATMENT_COMPLETED"</span>, <span class="key">"adverseEventReported"</span>: <span class="bool">true</span>, <span class="key">"adverseEventDetails"</span>: { <span class="key">"eventType"</span>: <span class="string">"Hepatotoxicity"</span>, <span class="key">"severity"</span>: <span class="string">"MODERATE"</span>, <span class="key">"action"</span>: <span class="string">"Regimen modified"</span>, <span class="key">"outcome"</span>: <span class="string">"Resolved"</span> } }
 }</pre>
 </div>
 
