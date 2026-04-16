@@ -394,6 +394,8 @@
       <li><a href="#vert-market" class="nav-sub">market-livestock-products</a></li>
       <li><a href="#vert-advisory-agri" class="nav-sub">advisory-agri</a></li>
       <li><a href="#vert-tb-screening" class="nav-sub">health-tb-screening</a></li>
+      <li><a href="#vert-tb-acf" class="nav-sub">health-tb-acf <em>(CHP outreach)</em></a></li>
+      <li><a href="#vert-tb-contact-tracing" class="nav-sub">health-tb-contact-tracing</a></li>
       <li><a href="#vert-tb-treatment" class="nav-sub">health-tb-treatment</a></li>
       <li><a href="#vert-tb-supervision" class="nav-sub">health-tb-supervision</a></li>
       <li><a href="#vert-advisory-tb" class="nav-sub">advisory-health-tb</a></li>
@@ -477,7 +479,9 @@
   <div class="category-card"><div class="cat-code">household-health</div><div class="cat-flow">local-services</div><div class="cat-desc">Household checkups, clinic visits</div></div>
   <div class="category-card"><div class="cat-code">market-livestock-products</div><div class="cat-flow">local-services</div><div class="cat-desc">Egg / produce aggregation and sale</div></div>
   <div class="category-card"><div class="cat-code">advisory-agri</div><div class="cat-flow">local-services</div><div class="cat-desc">Agri advisory content / training</div></div>
-  <div class="category-card"><div class="cat-code">health-tb-screening</div><div class="cat-flow">health-services</div><div class="cat-desc">TB symptom screening, GeneXpert, X-ray</div></div>
+  <div class="category-card"><div class="cat-code">health-tb-screening</div><div class="cat-flow">health-services</div><div class="cat-desc">TB symptom screening, GeneXpert, X-ray (seeker-initiated)</div></div>
+  <div class="category-card"><div class="cat-code">health-tb-acf</div><div class="cat-flow">health-services</div><div class="cat-desc">Active Case Finding &mdash; CHP community outreach (provider-initiated, batched)</div></div>
+  <div class="category-card"><div class="cat-code">health-tb-contact-tracing</div><div class="cat-flow">health-services</div><div class="cat-desc">Contact investigation (system-initiated cascade)</div></div>
   <div class="category-card"><div class="cat-code">health-tb-treatment</div><div class="cat-flow">health-services</div><div class="cat-desc">DSTB / DRTB / TPT regimens</div></div>
   <div class="category-card"><div class="cat-code">health-tb-supervision</div><div class="cat-flow">health-services</div><div class="cat-desc">SCTLC / CTLC supervision visits</div></div>
   <div class="category-card"><div class="cat-code">advisory-health-tb</div><div class="cat-flow">health-services</div><div class="cat-desc">TB awareness &amp; adherence content</div></div>
@@ -952,6 +956,11 @@
   <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
   <tbody>
     <tr><td><code>seekerUuid</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Generic unique ID &mdash; farmer ID / patient UUID / household ID</td></tr>
+    <tr><td><code>initiationMode</code></td><td><code>enum</code></td><td><span class="badge badge-optional">Optional</span></td><td><span class="badge badge-enum">SEEKER_INITIATED</span> <span class="badge badge-enum">PROVIDER_INITIATED</span> <span class="badge badge-enum">SYSTEM_INITIATED</span> &mdash; defaults to <code>SEEKER_INITIATED</code></td></tr>
+    <tr><td><code>triggerFlowId</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Reference to the parent flow that spawned this one (for cascades &mdash; contact tracing, outbreak response, scheduled follow-up). Absent for root flows.</td></tr>
+    <tr><td><code>triggerReason</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Why this flow was cascaded (e.g. <code>"CONTACT_OF_POSITIVE"</code>, <code>"OUTBREAK_QUARANTINE"</code>, <code>"SCHEDULED_FOLLOWUP"</code>, <code>"ROUTINE_RECALL"</code>)</td></tr>
+    <tr><td><code>batchId</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Groups individual flows into a shared session (e.g. one CHP's village-visit covering 40 screenings). UUID.</td></tr>
+    <tr><td><code>batchType</code></td><td><code>enum</code></td><td><span class="badge badge-optional">Optional</span></td><td><span class="badge badge-enum">CAMPAIGN</span> <span class="badge badge-enum">COMMUNITY_VISIT</span> <span class="badge badge-enum">CONTACT_TRACING_SESSION</span> <span class="badge badge-enum">OUTBREAK_RESPONSE</span></td></tr>
     <tr><td><code>providerCredentialId</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Provider's professional or business credential ID</td></tr>
     <tr><td><code>recordReference</code></td><td><code>string</code></td><td><span class="badge badge-optional">Optional</span></td><td>Reference to clinical / business record (e.g. FHIR resource URL)</td></tr>
     <tr><td><code>seekerPaymentMethod</code></td><td><code>enum</code></td><td><span class="badge badge-optional">Optional</span></td><td><span class="badge badge-enum">CASH</span> <span class="badge badge-enum">MPESA</span> <span class="badge badge-enum">INSURANCE_CLAIM</span> <span class="badge badge-enum">NONE</span></td></tr>
@@ -983,6 +992,16 @@
   <span class="key">type</span>: <span class="string">object</span>
   <span class="key">properties</span>:
     <span class="key">seekerUuid</span>: { <span class="key">type</span>: <span class="string">string</span> }
+    <span class="key">initiationMode</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">SEEKER_INITIATED</span>, <span class="enum-val">PROVIDER_INITIATED</span>, <span class="enum-val">SYSTEM_INITIATED</span>]
+      <span class="key">default</span>: <span class="string">SEEKER_INITIATED</span>
+    <span class="key">triggerFlowId</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">description</span>: <span class="string">"Parent flow that spawned this cascade"</span> }
+    <span class="key">triggerReason</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">description</span>: <span class="string">"e.g. CONTACT_OF_POSITIVE, OUTBREAK_QUARANTINE, SCHEDULED_FOLLOWUP"</span> }
+    <span class="key">batchId</span>: { <span class="key">type</span>: <span class="string">string</span>, <span class="key">description</span>: <span class="string">"UUID grouping individual flows into a shared session"</span> }
+    <span class="key">batchType</span>:
+      <span class="key">type</span>: <span class="string">string</span>
+      <span class="key">enum</span>: [<span class="enum-val">CAMPAIGN</span>, <span class="enum-val">COMMUNITY_VISIT</span>, <span class="enum-val">CONTACT_TRACING_SESSION</span>, <span class="enum-val">OUTBREAK_RESPONSE</span>]
     <span class="key">providerCredentialId</span>: { <span class="key">type</span>: <span class="string">string</span> }
     <span class="key">recordReference</span>: { <span class="key">type</span>: <span class="string">string</span> }
     <span class="key">seekerPaymentMethod</span>:
@@ -1444,6 +1463,81 @@
 }</pre>
 </div>
 
+<!-- ---- health-tb-acf (CHP Active Case Finding) ---- -->
+<div class="vertical-card" id="vert-tb-acf">
+  <div class="vert-header">
+    <span class="vert-domain">health-services</span>
+    <span class="vert-name">health-tb-acf</span>
+  </div>
+  <p>Active Case Finding &mdash; CHP-initiated community screening. One CHP visits a village and screens many people in one session. This is <code>PROVIDER_INITIATED</code> with a shared <code>batchId</code>.</p>
+  <h4>verticalAttributes shape (per individual flow in the batch)</h4>
+  <pre>{
+  <span class="key">"vertical"</span>: <span class="string">"health-tb-acf"</span>,
+  <span class="key">"screeningType"</span>: <span class="string">"SYMPTOM_SCREENING"</span>,
+  <span class="key">"diseaseTarget"</span>: <span class="string">"Tuberculosis"</span>,
+  <span class="key">"outreachType"</span>: <span class="string">"COMMUNITY_VISIT"</span>,
+  <span class="key">"referralIfPositive"</span>: { <span class="key">"to"</span>: <span class="string">"GeneXpert Collection Point"</span>, <span class="key">"urgency"</span>: <span class="string">"ROUTINE"</span> }
+}</pre>
+  <h4>Full Beckn message (one of 40 screenings in the session)</h4>
+  <pre>{
+  <span class="key">"context"</span>: { <span class="key">"domain"</span>: <span class="string">"health-services"</span>, <span class="key">"action"</span>: <span class="string">"on_confirm"</span> },
+  <span class="key">"itemAttributes"</span>: {
+    <span class="key">"subCategory"</span>: { <span class="key">"code"</span>: <span class="string">"tb-screening"</span>, <span class="key">"name"</span>: <span class="string">"TB Screening"</span> },
+    <span class="key">"serviceName"</span>: <span class="string">"TB Symptom Screening (Outreach)"</span>, <span class="key">"serviceMode"</span>: <span class="enum-val">"ON_SITE_VISIT"</span>,
+    <span class="key">"verticalAttributes"</span>: { <span class="key">"vertical"</span>: <span class="string">"health-tb-acf"</span>, <span class="key">"screeningType"</span>: <span class="string">"SYMPTOM_SCREENING"</span>, <span class="key">"outreachType"</span>: <span class="string">"COMMUNITY_VISIT"</span> }
+  },
+  <span class="key">"offerAttributes"</span>: { <span class="key">"priceAmount"</span>: <span class="number">0</span>, <span class="key">"pricingModel"</span>: <span class="enum-val">"FREE"</span>, <span class="key">"isFreeAtPointOfCare"</span>: <span class="bool">true</span> },
+  <span class="key">"fulfillmentAttributes"</span>: { <span class="key">"seekerLocation"</span>: { <span class="key">"county"</span>: <span class="string">"Kisumu"</span>, <span class="key">"subCounty"</span>: <span class="string">"Nyakach"</span>, <span class="key">"village"</span>: <span class="string">"Katolo"</span> }, <span class="key">"providerCredentialRequired"</span>: <span class="string">"CHP"</span>, <span class="key">"deliveryMode"</span>: <span class="enum-val">"ON_SITE"</span>, <span class="key">"serviceStatus"</span>: <span class="enum-val">"DELIVERED"</span> },
+  <span class="key">"orderAttributes"</span>: {
+    <span class="key">"seekerUuid"</span>: <span class="string">"HLTH-PAT-778891"</span>,
+    <span class="key">"initiationMode"</span>: <span class="enum-val">"PROVIDER_INITIATED"</span>,
+    <span class="key">"batchId"</span>: <span class="string">"b4f1c8d6-2025-11-15-nyakach-chp-visit"</span>,
+    <span class="key">"batchType"</span>: <span class="enum-val">"COMMUNITY_VISIT"</span>,
+    <span class="key">"providerCredentialId"</span>: <span class="string">"CHP-KSM-4421"</span>,
+    <span class="key">"outcomeRecorded"</span>: <span class="bool">true</span>, <span class="key">"outcomeType"</span>: <span class="string">"SYMPTOMATIC_REFERRED"</span>, <span class="key">"followUpRequired"</span>: <span class="bool">true</span>
+  }
+}</pre>
+</div>
+
+<!-- ---- health-tb-contact-tracing ---- -->
+<div class="vertical-card" id="vert-tb-contact-tracing">
+  <div class="vert-header">
+    <span class="vert-domain">health-services</span>
+    <span class="vert-name">health-tb-contact-tracing</span>
+  </div>
+  <p>Contact investigation &mdash; when a patient is confirmed TB-positive, the Flow Engine auto-creates screening flows for each identified contact. This is <code>SYSTEM_INITIATED</code> with <code>triggerFlowId</code> pointing to the index patient's flow and <code>triggerReason = CONTACT_OF_POSITIVE</code>.</p>
+  <h4>verticalAttributes shape</h4>
+  <pre>{
+  <span class="key">"vertical"</span>: <span class="string">"health-tb-contact-tracing"</span>,
+  <span class="key">"screeningType"</span>: <span class="string">"CONTACT_SCREENING"</span>,
+  <span class="key">"diseaseTarget"</span>: <span class="string">"Tuberculosis"</span>,
+  <span class="key">"contactRelationship"</span>: <span class="string">"HOUSEHOLD"</span>,      <span class="comment">// HOUSEHOLD | COWORKER | CLASSMATE | FRIEND | NEIGHBOR | OTHER</span>
+  <span class="key">"contactLocation"</span>: <span class="string">"Same household, Kibra"</span>,
+  <span class="key">"indexPatientUuid"</span>: <span class="string">"HLTH-PAT-554321"</span>,
+  <span class="key">"exposureWindow"</span>: { <span class="key">"startDate"</span>: <span class="string">"2026-03-15"</span>, <span class="key">"endDate"</span>: <span class="string">"2026-04-10"</span> }
+}</pre>
+  <h4>Full Beckn message (one of several cascaded flows)</h4>
+  <pre>{
+  <span class="key">"context"</span>: { <span class="key">"domain"</span>: <span class="string">"health-services"</span>, <span class="key">"action"</span>: <span class="string">"on_confirm"</span> },
+  <span class="key">"itemAttributes"</span>: {
+    <span class="key">"subCategory"</span>: { <span class="key">"code"</span>: <span class="string">"tb-screening"</span>, <span class="key">"name"</span>: <span class="string">"TB Contact Screening"</span> },
+    <span class="key">"serviceName"</span>: <span class="string">"Contact Screening &mdash; Household Exposure"</span>, <span class="key">"serviceMode"</span>: <span class="enum-val">"ON_SITE_VISIT"</span>,
+    <span class="key">"verticalAttributes"</span>: { <span class="key">"vertical"</span>: <span class="string">"health-tb-contact-tracing"</span>, <span class="key">"contactRelationship"</span>: <span class="string">"HOUSEHOLD"</span>, <span class="key">"indexPatientUuid"</span>: <span class="string">"HLTH-PAT-554321"</span> }
+  },
+  <span class="key">"offerAttributes"</span>: { <span class="key">"priceAmount"</span>: <span class="number">0</span>, <span class="key">"pricingModel"</span>: <span class="enum-val">"FREE"</span>, <span class="key">"isFreeAtPointOfCare"</span>: <span class="bool">true</span> },
+  <span class="key">"fulfillmentAttributes"</span>: { <span class="key">"seekerLocation"</span>: { <span class="key">"county"</span>: <span class="string">"Nairobi"</span>, <span class="key">"subCounty"</span>: <span class="string">"Kibra"</span> }, <span class="key">"providerCredentialRequired"</span>: <span class="string">"CHP"</span>, <span class="key">"deliveryMode"</span>: <span class="enum-val">"HOME_VISIT"</span>, <span class="key">"serviceStatus"</span>: <span class="enum-val">"CONFIRMED"</span> },
+  <span class="key">"orderAttributes"</span>: {
+    <span class="key">"seekerUuid"</span>: <span class="string">"HLTH-PAT-665543"</span>,
+    <span class="key">"initiationMode"</span>: <span class="enum-val">"SYSTEM_INITIATED"</span>,
+    <span class="key">"triggerFlowId"</span>: <span class="string">"FLW-8829-tb-554321-initial"</span>,
+    <span class="key">"triggerReason"</span>: <span class="string">"CONTACT_OF_POSITIVE"</span>,
+    <span class="key">"batchId"</span>: <span class="string">"b7a3e1f0-kibra-contacts-554321"</span>,
+    <span class="key">"batchType"</span>: <span class="enum-val">"CONTACT_TRACING_SESSION"</span>,
+    <span class="key">"consentGiven"</span>: <span class="bool">true</span>, <span class="key">"consentTimestamp"</span>: <span class="string">"2026-04-14T10:30:00Z"</span>
+  }
+}</pre>
+</div>
+
 <!-- ---- health-tb-treatment ---- -->
 <div class="vertical-card" id="vert-tb-treatment">
   <div class="vert-header">
@@ -1616,6 +1710,8 @@
     <tr><td>Farmer sells eggs to aggregator</td><td><code>local-services</code></td><td><code>market-livestock-products</code></td></tr>
     <tr><td>Farmer receives agri advisory content</td><td><code>local-services</code></td><td><code>advisory-agri</code></td></tr>
     <tr><td>Patient gets TB screening (sputum / GeneXpert)</td><td><code>health-services</code></td><td><code>health-tb-screening</code></td></tr>
+    <tr><td>CHP conducts community screening (Active Case Finding)</td><td><code>health-services</code></td><td><code>health-tb-acf</code></td></tr>
+    <tr><td>Contact of positive patient is screened (cascaded)</td><td><code>health-services</code></td><td><code>health-tb-contact-tracing</code></td></tr>
     <tr><td>Patient on DSTB / DRTB / TPT regimen</td><td><code>health-services</code></td><td><code>health-tb-treatment</code></td></tr>
     <tr><td>SCTLC / CTLC visits facility for supervision</td><td><code>health-services</code></td><td><code>health-tb-supervision</code></td></tr>
     <tr><td>Patient receives TB awareness / adherence content</td><td><code>health-services</code></td><td><code>advisory-health-tb</code></td></tr>

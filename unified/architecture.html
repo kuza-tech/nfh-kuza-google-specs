@@ -341,6 +341,9 @@
     <nav>
       <a href="#overview">1. Project Overview</a>
       <a href="#flow-engine">1.5 Unified Flow Engine</a>
+      <a href="#flow-initiation" class="sub">&nbsp;&nbsp; Initiation Modes</a>
+      <a href="#flow-cascading" class="sub">&nbsp;&nbsp; Cascading / Linked Flows</a>
+      <a href="#flow-batch" class="sub">&nbsp;&nbsp; Batch &amp; Campaign Flows</a>
       <a href="#architecture-diagram">2. Architecture Diagrams</a>
       <a href="#diagram-a-stack" class="sub">2.1 Layered Stack</a>
       <a href="#diagram-b-flow" class="sub">2.2 Request Flow</a>
@@ -466,6 +469,77 @@
       <li><strong>Health outcomes</strong>: cure confirmed, treatment success, prevented mortality, PTLD detected.</li>
       <li>Outcomes can be captured <em>immediately</em> (feedback at close) or <em>longitudinally</em> (months later), feeding back into analytics workloads for ML training.</li>
     </ul>
+
+    <h3 id="flow-initiation">Flow Initiation Modes</h3>
+    <p>Not every flow starts with a seeker asking a WhatsApp bot. The Flow Engine supports three initiation modes &mdash; each with the same 7 steps, only the trigger differs.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Mode</th>
+          <th>Who triggers</th>
+          <th>Health example</th>
+          <th>Agri example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong><code>SEEKER_INITIATED</code></strong></td>
+          <td>Seeker (farmer / patient / household) via chatbot</td>
+          <td>Patient with cough asks for screening</td>
+          <td>Farmer requests vaccination for poultry</td>
+        </tr>
+        <tr>
+          <td><strong><code>PROVIDER_INITIATED</code></strong></td>
+          <td>Provider or Coordinator (CHP / extension officer) &mdash; proactive outreach</td>
+          <td>CHP conducts community screening in a village (Active Case Finding)</td>
+          <td>Extension officer runs mass vaccination campaign</td>
+        </tr>
+        <tr>
+          <td><strong><code>SYSTEM_INITIATED</code></strong></td>
+          <td>Flow Engine itself &mdash; triggered by outcome event, scheduled policy, or cascade</td>
+          <td>Contact tracing: positive patient's outcome triggers screening flows for household / workplace / school contacts</td>
+          <td>Outbreak quarantine: positive disease diagnosis at one farm triggers vaccination flows at neighbours within the quarantine radius</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout info">
+      <div class="callout-title">Same engine, same 7 steps, different trigger</div>
+      <p>Regardless of initiation mode, each flow still progresses through <em>Need &rarr; Search &rarr; Select &rarr; Confirm &rarr; Deliver &rarr; Record &rarr; Outcome</em>. In provider- and system-initiated flows, the "Need" is registered on behalf of a seeker (who becomes a <em>passive participant</em> until they actually meet the provider for delivery).</p>
+    </div>
+
+    <h3 id="flow-cascading">Cascading &amp; Linked Flows</h3>
+    <p>The <strong>Outcome</strong> step of one flow can become the <strong>Need</strong> of one or more new flows. This is how contact tracing, outbreak response, and scheduled follow-up work.</p>
+    <p>Every flow records:</p>
+    <ul>
+      <li><code>triggerFlowId</code> &mdash; optional reference to the parent flow that spawned this one (absent for root flows)</li>
+      <li><code>triggerReason</code> &mdash; why the cascade fired: <code>CONTACT_OF_POSITIVE</code>, <code>OUTBREAK_QUARANTINE</code>, <code>SCHEDULED_FOLLOWUP</code>, <code>ROUTINE_RECALL</code>, etc.</li>
+      <li><code>indexEntityId</code> (vertical-specific) &mdash; the seeker whose outcome initiated the cascade (e.g., index patient UUID in TB contact tracing)</li>
+    </ul>
+    <p><strong>Worked example &mdash; TB contact tracing:</strong></p>
+    <pre><code>Flow F1 (SEEKER_INITIATED)
+  Patient P walks into a clinic, gets screened, tests positive.
+  Outcome: outcomeType = TB_POSITIVE
+
+Flow Engine cascade rule fires:
+  For each identified contact of P (household, workplace, school), create a new flow.
+
+Flow F2, F3, F4, ... (SYSTEM_INITIATED, triggerFlowId = F1, triggerReason = CONTACT_OF_POSITIVE)
+  Each contact flow is a screening flow for that contact.
+  contactRelationship captured per flow: HOUSEHOLD | COWORKER | CLASSMATE | FRIEND | NEIGHBOR
+  Outbound WhatsApp notification sent to contact (or their household head) informing them of exposure and scheduled screening.</code></pre>
+    <p>The linkage (F1 &rarr; F2, F3, F4) is preserved in the data layer, enabling surveillance, completeness reporting, and longitudinal analysis (e.g., "what percentage of contacts of TB-positive patients actually got screened within 2 weeks?").</p>
+
+    <h3 id="flow-batch">Batch &amp; Campaign Flows</h3>
+    <p>A single provider session can produce many individual flows. One CHP visits a village and screens 40 people &mdash; that's <strong>one session, 40 flows</strong>, sharing a common batch identifier.</p>
+    <ul>
+      <li><code>batchId</code> &mdash; groups individual flows into a session (UUID).</li>
+      <li><code>batchType</code> &mdash; <code>CAMPAIGN</code> (mass vaccination / screening), <code>COMMUNITY_VISIT</code> (CHP outreach), <code>CONTACT_TRACING_SESSION</code> (cluster of cascade-triggered flows executed together), <code>OUTBREAK_RESPONSE</code>.</li>
+      <li>Each flow in the batch has its own <code>seeker</code> and independent <code>Outcome</code>; the batch is a reporting / logistics grouping, not a merged flow.</li>
+    </ul>
+    <div class="callout info">
+      <div class="callout-title">Why batches matter operationally</div>
+      <p>CHPs / extension officers claim per-session stipends, not per-person. Supervisors review batch completeness (did all 40 scheduled screenings happen?). Analytics measure campaign efficacy (positive-rate per session). The batch abstraction makes all three possible without polluting the individual flow records.</p>
+    </div>
 
     <!-- 2. Architecture Diagrams -->
     <h2 id="architecture-diagram">2. Architecture Diagrams</h2>

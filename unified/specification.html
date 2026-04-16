@@ -161,6 +161,8 @@
         <li><a href="#s5-6">TB Treatment &amp; Adherence Flow (Health)</a></li>
         <li><a href="#s5-7">TB Supervision Flow (Health)</a></li>
         <li><a href="#s5-8">Post-TB Lung Health Flow (Health)</a></li>
+        <li><a href="#s5-9">Active Case Finding &mdash; CHP Outreach (Health)</a></li>
+        <li><a href="#s5-10">Contact Tracing (Health, cascade)</a></li>
       </ol>
     </li>
     <li><a href="#s6">Data Model</a>
@@ -353,6 +355,46 @@
   <p>A single conversational engine, a single order state machine, a single analytics pipeline, and a single Beckn adapter serve both domains. Adding a new vertical (HIV, malaria, cash-transfer) becomes a schema + taxonomy exercise &mdash; not a new platform.</p>
 </div>
 
+<h3>2.3 Flow Initiation Modes</h3>
+<p>Not every flow starts with a seeker asking the chatbot. The engine supports three initiation modes &mdash; same 7 steps, different trigger:</p>
+<table>
+  <thead><tr><th>Mode</th><th>Who triggers</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>SEEKER_INITIATED</code></td>
+      <td>Seeker via WhatsApp</td>
+      <td>Farmer requests vaccination; patient with cough asks for screening</td>
+    </tr>
+    <tr>
+      <td><code>PROVIDER_INITIATED</code></td>
+      <td>Provider / Coordinator proactively (batch or single)</td>
+      <td>CHP conducts Active Case Finding in a village (see &sect;5.9); extension officer runs mass vaccination campaign</td>
+    </tr>
+    <tr>
+      <td><code>SYSTEM_INITIATED</code></td>
+      <td>Flow Engine itself &mdash; triggered by an outcome event, scheduled policy, or cascade rule</td>
+      <td>Contact tracing: positive TB diagnosis auto-creates screening flows for household/workplace/school contacts (see &sect;5.10); outbreak quarantine triggers vaccination flows for neighbouring farms</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>2.4 Cascading &amp; Linked Flows</h3>
+<p>A flow's <em>Outcome</em> step can become the <em>Need</em> step of one or more new flows. Every flow records:</p>
+<ul>
+  <li><code>triggerFlowId</code> &mdash; reference to the parent flow that spawned this one (absent for root flows)</li>
+  <li><code>triggerReason</code> &mdash; <code>CONTACT_OF_POSITIVE</code>, <code>OUTBREAK_QUARANTINE</code>, <code>SCHEDULED_FOLLOWUP</code>, <code>ROUTINE_RECALL</code>, etc.</li>
+  <li><code>indexEntityId</code> (vertical-specific) &mdash; the seeker whose outcome initiated the cascade (index patient UUID for TB contact tracing)</li>
+</ul>
+<p>The parent/child linkage is preserved in the data layer, enabling surveillance (what % of contacts got screened?), yield analysis (how many new positives per index case?), and longitudinal outcome tracking.</p>
+
+<h3>2.5 Batch / Campaign Flows</h3>
+<p>One provider session can produce many flows. A CHP visits a village, screens 40 people &mdash; one session, 40 flows, sharing a <code>batchId</code>. The batch is a grouping for logistics, stipend payment, and reporting &mdash; each individual flow still has its own seeker, its own Record step, and its own Outcome.</p>
+<ul>
+  <li><code>batchId</code> (UUID) &mdash; groups flows into a session</li>
+  <li><code>batchType</code> &mdash; <code>CAMPAIGN</code>, <code>COMMUNITY_VISIT</code>, <code>CONTACT_TRACING_SESSION</code>, <code>OUTBREAK_RESPONSE</code></li>
+</ul>
+<p>Why batches matter: CHPs claim stipends per session, supervisors review batch completeness, analytics measure per-session yield.</p>
+
 <!-- ════════════════════════════════════════════════════════
      3. ACTORS
      ════════════════════════════════════════════════════════ -->
@@ -361,23 +403,25 @@
 <p>Rather than hard-coding "Farmer" and "Provider", the platform models five <strong>abstract roles</strong>. A single individual can occupy different roles in different flows.</p>
 
 <h3>3.1 Seeker</h3>
-<p>An individual or household with a need that can be served by the network.</p>
+<p>An individual or household with a need that can be served by the network. A seeker may be <strong>active</strong> (they start the flow themselves) or <strong>passive</strong> (the flow is started on their behalf by a provider or by the system).</p>
 <ul>
-  <li><strong>Farmer / Rural Household</strong> <span class="domain-pill domain-local">Local</span> &mdash; discovers and books rural services; sells produce.</li>
-  <li><strong>Patient / Family</strong> <span class="domain-pill domain-health">Health</span> &mdash; discovers TB screening, treatment, post-TB follow-up.</li>
-  <li><strong>Household contact</strong> <span class="domain-pill domain-health">Health</span> &mdash; needs preventive screening after a household TB case.</li>
-  <li><strong>Primary interface:</strong> WhatsApp.</li>
+  <li><strong>Farmer / Rural Household</strong> <span class="domain-pill domain-local">Local</span> &mdash; discovers and books rural services; sells produce. Usually active.</li>
+  <li><strong>Patient / Family</strong> <span class="domain-pill domain-health">Health</span> &mdash; discovers TB screening, treatment, post-TB follow-up. Active when self-presenting.</li>
+  <li><strong>Household contact</strong> <span class="domain-pill domain-health">Health</span> &mdash; needs preventive screening after a household TB case. Usually <em>passive</em> &mdash; the flow is triggered by the index patient's positive outcome (see &sect;5.10 Contact Tracing).</li>
+  <li><strong>Community member under ACF outreach</strong> <span class="domain-pill domain-health">Health</span> &mdash; screened during a CHP community visit. <em>Passive</em> &mdash; CHP initiates the flow, seeker consents to participate (see &sect;5.9 ACF).</li>
+  <li><strong>Primary interface:</strong> WhatsApp for active seekers; outbound WhatsApp / SMS notification for passive seekers (informing them of a scheduled visit or requested consent).</li>
   <li><strong>Profile captured once:</strong> name, phone, location (village/ward/county), optional GPS, preferred language, domain-specific attributes (enterprise for farmer; gender/DOB/consent for patient).</li>
 </ul>
 
 <h3>3.2 Provider</h3>
-<p>An entity that delivers the service.</p>
+<p>An entity that delivers the service. Providers can also <em>initiate</em> flows proactively (see Flow Initiation Modes in &sect;2) &mdash; for example, a CHP conducting a community screening session doesn't wait for patients to walk in; the CHP starts the flow.</p>
 <ul>
   <li><strong>Agripreneurs / Service Providers</strong> <span class="domain-pill domain-local">Local</span> &mdash; vets, agro-vets, aggregators, trainers, tradespeople.</li>
   <li><strong>Health Facilities</strong> <span class="domain-pill domain-health">Health</span> &mdash; dispensaries, health centres, sub-county hospitals, county referral hospitals, labs (GeneXpert, culture).</li>
   <li><strong>Clinical staff</strong> <span class="domain-pill domain-health">Health</span> &mdash; clinicians, nurses, lab technicians, pharmacy staff (linked to a facility).</li>
   <li><strong>Primary interface:</strong> WhatsApp notifications + browser-based Web App for detailed management.</li>
   <li>A single provider/facility can offer services across multiple categories within its domain.</li>
+  <li><strong>Provider-initiated flows:</strong> outreach screening, campaign vaccination, scheduled community visits &mdash; the provider is both trigger and fulfiller.</li>
 </ul>
 
 <h3>3.3 Coordinator</h3>
@@ -408,9 +452,10 @@
 <h3>3.6 Cross-Cutting Role &mdash; CHV / CHP</h3>
 <p>Community Health Volunteers / Community Health Promoters are particularly important because they simultaneously play <strong>multiple roles</strong>:</p>
 <ul>
-  <li>As a <strong>Provider</strong>: they actively screen household contacts and refer suspected cases.</li>
-  <li>As a <strong>Seeker</strong>: they need supervision, payment claims, mentorship.</li>
-  <li>The platform supports this by allowing a single user record to be attached to multiple role-profiles.</li>
+  <li>As a <strong>Provider who initiates flows</strong>: CHPs proactively visit communities, households, schools, or workplaces and conduct screening sessions. Each visit is a provider-initiated batch of individual flows (see &sect;5.9 Active Case Finding).</li>
+  <li>As a <strong>Provider who responds to cascades</strong>: when a patient tests positive, the Flow Engine creates screening flows for contacts; CHPs are typically assigned to visit those contacts and conduct the screening (see &sect;5.10 Contact Tracing).</li>
+  <li>As a <strong>Seeker</strong>: they need supervision, payment claims, mentorship, training.</li>
+  <li>The platform supports this by allowing a single user record to be attached to multiple role-profiles; context (which flow, which domain) determines which role is active.</li>
 </ul>
 
 <!-- ════════════════════════════════════════════════════════
@@ -1144,6 +1189,114 @@
 </svg>
 <p class="diagram-caption">Figure 5.8 &mdash; Post-TB Lung Health: cured TB patients routed into long-term lung function surveillance.</p>
 </div>
+
+<!-- ─── 5.9 Active Case Finding (CHP-initiated) ─────────────────── -->
+<h3 id="s5-9">5.9 Active Case Finding &mdash; CHP Community Outreach <span class="domain-pill domain-health">Health</span></h3>
+<p>Not every health flow begins with a patient walking in. <strong>Active Case Finding (ACF)</strong> is provider-initiated: a Community Health Promoter (CHP) proactively visits communities, households, schools, or workplaces to screen people for TB. The same flow engine orchestrates this &mdash; with <code>initiationMode = PROVIDER_INITIATED</code> and a shared <code>batchId</code> grouping the session's screenings.</p>
+
+<div class="callout callout-health">
+  <strong>Why ACF matters:</strong> The WHO estimates that roughly one third of TB cases worldwide go undiagnosed each year because symptomatic patients never present to a facility. ACF closes that gap. Evidence from Kenya's National TB Programme shows ACF finds more than twice as many TB cases per CHP-hour compared with passive screening at facilities.
+</div>
+
+<h4>5.9.1 Example Scenario</h4>
+<p>CHP Shwetha is assigned to Katolo village in Nyakach Sub-County, Kisumu County. Today she conducts a routine community-screening visit.</p>
+
+<ol>
+  <li>Shwetha opens the CHP app (launched from a WhatsApp link). App pulls her assigned list for today.</li>
+  <li>App prompts: <em>"Start community screening session for Katolo village?"</em> [Start]</li>
+  <li>Flow Engine creates a <strong>batch</strong> (<code>batchType: COMMUNITY_VISIT</code>, <code>batchId: b4f1c8d6-2025-11-15-nyakach-chp-visit</code>).</li>
+  <li>Shwetha visits each household. For every person she screens, the app creates a new flow (<code>initiationMode: PROVIDER_INITIATED</code>, linked to the batch).</li>
+  <li>Each flow captures: person's identity (with consent), screening symptoms (cough duration, weight loss, fever, night sweats), CHP's clinical judgement, and referral decision.</li>
+  <li>For symptomatic persons, the flow's <code>outcomeType</code> is <code>SYMPTOMATIC_REFERRED</code> with <code>followUpRequired = true</code>; the app can schedule a sputum-collection appointment and optionally trigger a new flow (<code>health-tb-screening</code> vertical) linked via <code>triggerFlowId</code>.</li>
+  <li>At end of day, Shwetha closes the batch. All 40 individual flows are in <code>RECORDED</code> or <code>OUTCOME_RECORDED</code> state. Her supervisor (SCTLC) can review the batch-level dashboard: 40 screenings, 4 symptomatic referrals, 2 sputum appointments scheduled.</li>
+</ol>
+
+<h4>5.9.2 Key Flow Attributes</h4>
+<table>
+  <thead><tr><th>Attribute</th><th>Value for ACF</th></tr></thead>
+  <tbody>
+    <tr><td><code>initiationMode</code></td><td><code>PROVIDER_INITIATED</code></td></tr>
+    <tr><td><code>batchType</code></td><td><code>COMMUNITY_VISIT</code></td></tr>
+    <tr><td><code>verticalAttributes.vertical</code></td><td><code>health-tb-acf</code></td></tr>
+    <tr><td>Seeker (per flow)</td><td>Person being screened; role is <strong>passive participant</strong> &mdash; they didn't initiate, but they consent to be screened</td></tr>
+    <tr><td>Provider</td><td>CHP conducting the screening (with <code>providerCredentialId</code>)</td></tr>
+    <tr><td>Cascading</td><td>Positive screens can spawn a follow-on <code>health-tb-screening</code> flow via <code>triggerFlowId</code></td></tr>
+  </tbody>
+</table>
+
+<h4>5.9.3 Operational Value</h4>
+<ul>
+  <li><strong>CHP stipends</strong> paid per session (batch), not per individual screening &mdash; the batch abstraction enables this directly.</li>
+  <li><strong>Supervision</strong>: SCTLC reviews batch completeness and positive-rate; high positive rates may trigger a hotspot response.</li>
+  <li><strong>Analytics</strong>: positive-yield per CHP / per village / per season informs future outreach planning.</li>
+</ul>
+
+<!-- ─── 5.10 Contact Tracing ─────────────────────────────────── -->
+<h3 id="s5-10">5.10 Contact Tracing &mdash; System-Initiated Cascade <span class="domain-pill domain-health">Health</span></h3>
+<p>Tuberculosis is airborne and communicable. When a patient tests positive, everyone in prolonged close contact with them during the infectious period must also be screened. The Flow Engine automates this: a positive outcome on one flow triggers a fan-out of new screening flows, one per identified contact, each linked via <code>triggerFlowId</code> and marked <code>initiationMode = SYSTEM_INITIATED</code>.</p>
+
+<h4>5.10.1 Contact Identification</h4>
+<p>During the index patient's interview (part of <code>RECORD</code> step), the clinician / CHP enumerates contacts:</p>
+<ul>
+  <li><strong>Household contacts</strong> &mdash; everyone living in the same residence</li>
+  <li><strong>Workplace colleagues</strong> &mdash; for patients in enclosed workplaces (offices, factories, transport)</li>
+  <li><strong>School classmates and teachers</strong> &mdash; for student or teacher patients</li>
+  <li><strong>Social / close friends</strong> &mdash; individuals reported as spending significant time with the patient</li>
+  <li><strong>Neighbours</strong> &mdash; for densely populated informal settlements</li>
+</ul>
+
+<h4>5.10.2 Cascade Mechanism</h4>
+<pre><code>Index Flow F1 (SEEKER_INITIATED or PROVIDER_INITIATED)
+    Patient Mary presents with cough. Screened, tested, diagnosed.
+    outcomeType: TB_POSITIVE
+
+Flow Engine rule fires: "positive TB diagnosis triggers contact tracing"
+
+For each contact identified during F1.RECORD step:
+    New Flow Fi created with:
+        initiationMode: SYSTEM_INITIATED
+        triggerFlowId: F1
+        triggerReason: CONTACT_OF_POSITIVE
+        batchId: (shared across all contacts of this index case)
+        batchType: CONTACT_TRACING_SESSION
+        verticalAttributes.vertical: health-tb-contact-tracing
+        verticalAttributes.contactRelationship: HOUSEHOLD | COWORKER | CLASSMATE | ...
+        verticalAttributes.indexPatientUuid: (Mary's UUID)
+        verticalAttributes.exposureWindow: { startDate, endDate }
+
+Each Fi then progresses independently through:
+    Need (auto-registered) → Search → Select (CHP home visit) → Confirm → Deliver → Record → Outcome</code></pre>
+
+<h4>5.10.3 Outbound Notifications</h4>
+<p>Contact-traced individuals are <strong>passive participants</strong> &mdash; they didn't start the flow. The Flow Engine proactively reaches them via WhatsApp (or SMS if WhatsApp unavailable):</p>
+
+<div class="callout callout-info">
+  <strong>Example WhatsApp notification to contact:</strong>
+  <pre style="background:#fff; padding:0.75rem; border-radius:4px; font-size:0.9em;">Habari. You have been identified as a contact of someone recently diagnosed with TB. Don't worry &mdash; TB is treatable, and early screening protects you and your family.
+
+A Community Health Promoter will visit your home on [date] at [time] for a free screening. Reply [YES] to confirm, or [RESCHEDULE] if the time does not work.
+
+This is a private, confidential communication. We do not share the name of the index patient.</pre>
+</div>
+
+<p>The notification is non-identifying (never names the index patient) and respects consent. If the contact declines or cannot be reached, the flow transitions to <code>LOST_TO_FOLLOWUP</code> for surveillance reporting.</p>
+
+<h4>5.10.4 Clinical and Ethical Safeguards</h4>
+<ul>
+  <li><strong>Consent required</strong>: index patient must consent to share contacts; each contact must consent to screening. Both recorded with timestamps.</li>
+  <li><strong>No identifying disclosure</strong>: index patient's identity is never revealed to contacts.</li>
+  <li><strong>Data minimisation</strong>: only contact-tracing-relevant data flows to the cascaded flows (exposure window, relationship type, geographic overlap) &mdash; not the index patient's full clinical record.</li>
+  <li><strong>Stigma mitigation</strong>: outbound messaging is framed positively (treatable, free, protective) per WHO guidance.</li>
+</ul>
+
+<h4>5.10.5 Analytics Value</h4>
+<p>Linkage (<code>triggerFlowId</code> chain) enables surveillance metrics that are otherwise impossible:</p>
+<ul>
+  <li>Contact-investigation completeness: what % of identified contacts of a positive case are actually screened within 2 weeks?</li>
+  <li>Yield: how many new cases are found per index case, by relationship type (household vs workplace vs school)?</li>
+  <li>Cluster detection: are positive cases clustering around specific index patients, locations, or time windows?</li>
+  <li>Longitudinal impact: post-TB outcomes for the cohort of index+contacts over months / years.</li>
+</ul>
 
 <!-- ════════════════════════════════════════════════════════
      6. DATA MODEL
