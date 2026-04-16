@@ -438,14 +438,26 @@
     </ul>
 
     <h3>Generalized Actor Model</h3>
-    <p>Specific titles (farmer, patient, agripreneur, clinician) are expressions of four abstract roles. A single individual may play multiple roles across different flows &mdash; a CHP is a <em>Provider</em> for screening but a <em>Seeker</em> for supervision.</p>
-    <ul>
-      <li><strong>Seeker</strong> &mdash; any individual or household needing service (farmer, patient, household, CHV, CHP).</li>
-      <li><strong>Provider</strong> &mdash; anyone delivering service (agripreneur, vet, clinician, lab, agro-vet, training facility).</li>
-      <li><strong>Coordinator</strong> &mdash; supervisors / oversight (SCTLC, CTLC, extension officer, area manager).</li>
-      <li><strong>Validator</strong> &mdash; lab, audit, quality assurance.</li>
-      <li><strong>Sponsor</strong> &mdash; funders, partners, government, NGOs.</li>
-    </ul>
+    <p>Specific titles (farmer, patient, CHP, agripreneur, clinician) are expressions of six abstract roles. A single individual may play multiple roles across different flows &mdash; a CHP is a <em>Facilitator</em> when conducting household screening but a <em>Seeker</em> when claiming supervision.</p>
+
+    <table>
+      <thead>
+        <tr><th>Role</th><th>Health examples</th><th>Local / Agri examples</th><th>What they do</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Seeker</strong></td><td>Household / patient</td><td>Household / farmer</td><td>Has the need. May be <em>active</em> (self-presents) or <em>passive</em> (flow initiated on their behalf by a Facilitator or the system).</td></tr>
+        <tr><td><strong>Facilitator</strong></td><td>CHP / CHV</td><td>Agent / agripreneur (in facilitation role)</td><td>Community-level worker who initiates flows on the seeker's behalf, captures consent, performs first-touch service (screening, needs assessment), and refers to Providers.</td></tr>
+        <tr><td><strong>Provider</strong></td><td>Facility / clinician / nurse / lab</td><td>Vet / input supplier / buyer / content provider</td><td>Delivers the definitive service, product, or content.</td></tr>
+        <tr><td><strong>Coordinator</strong></td><td>SCTLC / CTLC</td><td>Area coordinator / extension coordinator</td><td>Supervises Facilitators and Providers across a geography; signs off on supervision flows.</td></tr>
+        <tr><td><strong>Validator</strong></td><td>Lab / mortality auditor</td><td>Input-auditor</td><td>Provides confirmatory or certifying output required to close a flow.</td></tr>
+        <tr><td><strong>Sponsor</strong></td><td>MoH / Global Fund</td><td>Government programme / donor</td><td>Funds, commissions, or benefits from aggregate outcomes.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <div class="callout-title">Why Facilitator is a distinct role (not a kind of Provider)</div>
+      <p>In rural health and agri, the <em>last mile</em> is community-based workers (CHPs, agents) who <em>enable</em> the service but do not produce the definitive output. A CHP does symptom screening; the facility confirms TB. An agent helps a farmer pick a vet; the vet does the vaccination. Treating Facilitators and Providers as distinct roles gives clarity in provider-matching (<code>discover</code>), payment flows (stipends vs fees), accountability (clinical vs first-touch outcomes), and analytics (Facilitator productivity vs Provider throughput).</p>
+    </div>
 
     <h3>Domain &amp; Vertical Hierarchy</h3>
     <pre><code>Platform (Kuza Flow Engine)

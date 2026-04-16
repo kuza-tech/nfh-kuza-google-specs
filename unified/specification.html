@@ -157,11 +157,12 @@
         <li><a href="#s5-2">Household Services Flow (Local)</a></li>
         <li><a href="#s5-3">Market Produce Flow (Local)</a></li>
         <li><a href="#s5-4">Advisory Content Flow (Local)</a></li>
-        <li><a href="#s5-5">TB Screening &mdash; Patient Self-Presentation (Health, <code>SEEKER_INITIATED</code>)</a></li>
+        <li><a href="#s5-5">TB Screening &mdash; CHP-Facilitated (Health, primary path)</a>
+          <ul><li><a href="#s5-5b">5.5b Alternative &mdash; Patient Self-Presentation</a></li></ul></li>
         <li><a href="#s5-6">TB Treatment &amp; Adherence (Health, cascaded from screening)</a></li>
         <li><a href="#s5-7">TB Supervision (Health, <code>PROVIDER_INITIATED</code>)</a></li>
         <li><a href="#s5-8">Post-TB Lung Health (Health, <code>SYSTEM_INITIATED</code>)</a></li>
-        <li><a href="#s5-9">Active Case Finding &mdash; CHP Outreach (Health, <code>PROVIDER_INITIATED</code>, batched)</a></li>
+        <li><a href="#s5-9">Active Case Finding &mdash; Campaign Style (Health, planned multi-day batch)</a></li>
         <li><a href="#s5-10">Contact Tracing (Health, <code>SYSTEM_INITIATED</code> cascade)</a></li>
       </ol>
     </li>
@@ -413,28 +414,43 @@
   <li><strong>Profile captured once:</strong> name, phone, location (village/ward/county), optional GPS, preferred language, domain-specific attributes (enterprise for farmer; gender/DOB/consent for patient).</li>
 </ul>
 
-<h3>3.2 Provider</h3>
-<p>An entity that delivers the service. Providers can also <em>initiate</em> flows proactively (see Flow Initiation Modes in &sect;2) &mdash; for example, a CHP conducting a community screening session doesn't wait for patients to walk in; the CHP starts the flow.</p>
+<h3>3.2 Facilitator <span class="domain-pill domain-local">Local</span> <span class="domain-pill domain-health">Health</span></h3>
+<p>An intermediary &mdash; typically a <strong>community-level worker</strong> &mdash; who initiates flows on behalf of seekers, captures consent, performs the initial service interaction (symptom screening, input-need assessment), and bridges seekers to providers. The Facilitator is the "last mile" of service delivery: they operate in the community (not in a facility or shop) and know the households they serve personally.</p>
 <ul>
-  <li><strong>Agripreneurs / Service Providers</strong> <span class="domain-pill domain-local">Local</span> &mdash; vets, agro-vets, aggregators, trainers, tradespeople.</li>
-  <li><strong>Health Facilities</strong> <span class="domain-pill domain-health">Health</span> &mdash; dispensaries, health centres, sub-county hospitals, county referral hospitals, labs (GeneXpert, culture).</li>
+  <li><strong>CHP / CHV</strong> <span class="domain-pill domain-health">Health</span> &mdash; Community Health Promoter / Volunteer. Conducts door-to-door symptom screening, contact tracing, post-TB follow-up visits. Refers suspected cases to facilities for diagnostic testing.</li>
+  <li><strong>Agent / Agripreneur (in facilitation role)</strong> <span class="domain-pill domain-local">Local</span> &mdash; rural agents and field-based agripreneurs who help farmers identify needs, discover the right provider, and complete transactions. Also deliver training and advisory at the household.</li>
+  <li><strong>Extension Agent (field role)</strong> <span class="domain-pill domain-local">Local</span> &mdash; field officers conducting on-site visits (distinct from the Coordinator role which is supervisory).</li>
+  <li><strong>Primary interface:</strong> WhatsApp for quick actions + Web App (opened from WhatsApp link) for catalog / history / batch management.</li>
+  <li><strong>Typical flow role:</strong> initiates <code>PROVIDER_INITIATED</code> flows on behalf of seekers (e.g. CHP conducting village screening); handles <code>SYSTEM_INITIATED</code> cascade flows (e.g. contact-tracing visits assigned by the engine).</li>
+</ul>
+<div class="callout callout-info">
+  <strong>Facilitator vs. Provider &mdash; why the distinction matters.</strong> A Facilitator <em>enables</em> the service; the Provider <em>delivers</em> the definitive service. A CHP does the initial symptom screening but the facility confirms TB. An agent helps a farmer find a vet but the vet administers vaccination. The distinction shapes provider-matching in <code>discover</code>, payment flows (stipends for facilitators vs fees for providers), and accountability for clinical outcomes.
+</div>
+
+<h3>3.3 Provider</h3>
+<p>An entity that <em>delivers</em> the definitive service, product, or content. Providers are typically located at a fixed address (facility, shop, warehouse) or provide the final professional / clinical output even if mobile.</p>
+<ul>
+  <li><strong>Service providers</strong> <span class="domain-pill domain-local">Local</span> &mdash; vets, agro-vets, mechanisation operators, tradespeople who deliver the final service.</li>
+  <li><strong>Input / Goods suppliers</strong> <span class="domain-pill domain-local">Local</span> &mdash; feed stores, seed suppliers, household goods shops.</li>
+  <li><strong>Buyers / Aggregators</strong> <span class="domain-pill domain-local">Local</span> &mdash; produce buyers in the Market-Produce flow (inverted economics).</li>
+  <li><strong>Content providers</strong> <span class="domain-pill domain-local">Local</span> <span class="domain-pill domain-health">Health</span> &mdash; advisory content sources (e.g. Google Content APIs per domain).</li>
+  <li><strong>Health Facilities</strong> <span class="domain-pill domain-health">Health</span> &mdash; dispensaries, health centres, sub-county and county referral hospitals, labs (GeneXpert, culture, X-ray).</li>
   <li><strong>Clinical staff</strong> <span class="domain-pill domain-health">Health</span> &mdash; clinicians, nurses, lab technicians, pharmacy staff (linked to a facility).</li>
   <li><strong>Primary interface:</strong> WhatsApp notifications + browser-based Web App for detailed management.</li>
-  <li>A single provider/facility can offer services across multiple categories within its domain.</li>
-  <li><strong>Provider-initiated flows:</strong> outreach screening, campaign vaccination, scheduled community visits &mdash; the provider is both trigger and fulfiller.</li>
+  <li>Agripreneurs sometimes play the Provider role (as direct seller / aggregator) and sometimes the Facilitator role (introducing farmer to another provider). Context determines which applies.</li>
 </ul>
 
-<h3>3.3 Coordinator</h3>
-<p>Supervisory or oversight roles that operate across many providers.</p>
+<h3>3.4 Coordinator</h3>
+<p>Supervisory or oversight roles that operate across many Facilitators and Providers.</p>
 <ul>
-  <li><strong>Extension Officers</strong> <span class="domain-pill domain-local">Local</span> &mdash; area-level agri coordination.</li>
+  <li><strong>Area / County-level agri coordinators</strong> <span class="domain-pill domain-local">Local</span> &mdash; supervise agents, extension officers, field teams.</li>
   <li><strong>SCTLCs</strong> <span class="domain-pill domain-health">Health</span> &mdash; Sub-County TB &amp; Leprosy Coordinators.</li>
   <li><strong>CTLCs</strong> <span class="domain-pill domain-health">Health</span> &mdash; County TB &amp; Leprosy Coordinators.</li>
   <li><strong>National Disease Programme Director</strong> <span class="domain-pill domain-health">Health</span> &mdash; national programme leadership with oversight across all counties.</li>
   <li>In the platform, Coordinators appear as Seekers when consuming supervision flows, and as Validators when signing off on visits.</li>
 </ul>
 
-<h3>3.4 Validator</h3>
+<h3>3.5 Validator</h3>
 <p>Labs, auditors, QA reviewers &mdash; parties whose confirmation is required to close a flow.</p>
 <ul>
   <li><strong>Labs</strong> <span class="domain-pill domain-health">Health</span> &mdash; return GeneXpert / culture / DST results.</li>
@@ -442,21 +458,31 @@
   <li><strong>Agri-input auditors</strong> <span class="domain-pill domain-local">Local</span> &mdash; optional QA on input provenance.</li>
 </ul>
 
-<h3>3.5 Sponsor</h3>
+<h3>3.6 Sponsor</h3>
 <p>Entities that fund, commission, or benefit from aggregate outcomes.</p>
 <ul>
   <li>Ministry of Health, Global Fund, TaifaCare <span class="domain-pill domain-health">Health</span></li>
   <li>Donors, NGOs, government programmes <span class="domain-pill domain-local">Local</span> <span class="domain-pill domain-health">Health</span></li>
 </ul>
 
-<h3>3.6 Cross-Cutting Role &mdash; CHV / CHP</h3>
-<p>Community Health Volunteers / Community Health Promoters are particularly important because they simultaneously play <strong>multiple roles</strong>:</p>
-<ul>
-  <li>As a <strong>Provider who initiates flows</strong>: CHPs proactively visit communities, households, schools, or workplaces and conduct screening sessions. Each visit is a provider-initiated batch of individual flows (see &sect;5.9 Active Case Finding).</li>
-  <li>As a <strong>Provider who responds to cascades</strong>: when a patient tests positive, the Flow Engine creates screening flows for contacts; CHPs are typically assigned to visit those contacts and conduct the screening (see &sect;5.10 Contact Tracing).</li>
-  <li>As a <strong>Seeker</strong>: they need supervision, payment claims, mentorship, training.</li>
-  <li>The platform supports this by allowing a single user record to be attached to multiple role-profiles; context (which flow, which domain) determines which role is active.</li>
-</ul>
+<h3>3.7 Role Summary Table</h3>
+<table>
+  <thead>
+    <tr><th>Role</th><th>Health</th><th>Local Services / Agri</th><th>Typical Flow Responsibility</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Seeker</strong></td><td>Household / Patient</td><td>Household / Farmer</td><td>Has the need; may be active (self-presents) or passive (facilitator or system initiates on their behalf)</td></tr>
+    <tr><td><strong>Facilitator</strong></td><td>CHP / CHV</td><td>Agent / Agripreneur (in facilitator role)</td><td>Initiates flows in the community; performs first-touch service (screening, needs assessment); refers to Provider</td></tr>
+    <tr><td><strong>Provider</strong></td><td>Facility / Clinician / Nurse / Lab</td><td>Vet / Input Supplier / Buyer / Content Provider</td><td>Delivers the definitive service or product at the end of the flow</td></tr>
+    <tr><td><strong>Coordinator</strong></td><td>SCTLC / CTLC / National Director</td><td>Area / County Coordinator</td><td>Supervises Facilitators and Providers; signs off on supervision flows</td></tr>
+    <tr><td><strong>Validator</strong></td><td>Lab / Mortality auditor / Data-quality auditor</td><td>Input-auditor</td><td>Provides confirmatory / certifying output</td></tr>
+    <tr><td><strong>Sponsor</strong></td><td>MoH / Global Fund / Donor</td><td>Government programme / Donor / NGO</td><td>Funds; consumes aggregate outcomes</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-info">
+  <strong>One person, multiple roles.</strong> Role assignments are per-flow, not per-person. A CHP is a Facilitator when screening a household, a Seeker when claiming a stipend, and a Validator when countersigning another CHP's contact-tracing record. The platform stores multiple role-profiles against a single user record and activates the appropriate one based on flow context.
+</div>
 
 <!-- ════════════════════════════════════════════════════════
      4. SERVICE CATEGORIES & TAXONOMY
@@ -882,166 +908,234 @@
 <p><strong>Beckn mapping:</strong> <code>discover</code> / <code>on_discover</code>. The BPP calls Google Content APIs during <code>on_discover</code> processing and optionally tailors output through Google AI Interfaces before returning the composed advisory.</p>
 
 <!-- ── 5.5 TB Screening ───────────────────────────────── -->
-<h3 id="s5-5">5.5 TB Screening Flow &mdash; Patient Self-Presentation <span class="domain-pill domain-health">Health</span></h3>
+<h3 id="s5-5">5.5 TB Screening Flow &mdash; CHP-Facilitated (Primary Path) <span class="domain-pill domain-health">Health</span></h3>
 
 <div class="callout callout-info">
-  <strong>Initiation mode:</strong> <code>SEEKER_INITIATED</code> &mdash; patient with symptoms approaches the chatbot directly. This is <em>one of three</em> entry paths into TB screening. See also:
+  <strong>In health, screening is primarily done by CHPs &mdash; not by patients self-presenting.</strong> The CHP is the <em>Facilitator</em> who goes to households and communities, conducts symptom-based screening, captures consent, and refers suspected cases to the <em>Provider</em> (facility / lab / clinician) for definitive diagnostic tests.
   <ul style="margin-top:0.5rem;">
-    <li><a href="#s5-9">&sect;5.9 Active Case Finding</a> &mdash; <code>PROVIDER_INITIATED</code>: CHP conducts community-outreach screening without the seeker asking.</li>
-    <li><a href="#s5-10">&sect;5.10 Contact Tracing</a> &mdash; <code>SYSTEM_INITIATED</code>: screening flows auto-cascaded from a positive-outcome index case.</li>
+    <li><strong>Initiation mode:</strong> <code>PROVIDER_INITIATED</code> (by Facilitator)</li>
+    <li><strong>Seeker</strong> = household / patient (passive &mdash; did not request the visit)</li>
+    <li><strong>Facilitator</strong> = CHP / CHV (conducts visit, symptom screening, referral)</li>
+    <li><strong>Provider</strong> = Health Facility (GeneXpert, clinician confirms diagnosis)</li>
   </ul>
-  All three paths converge on the same <em>Deliver &rarr; Record &rarr; Outcome</em> stages and write to the same disease-programme register. The <code>initiationMode</code> attribute on <code>ServiceOrderAttributes</code> distinguishes them.
+  Other entry paths into the same screening lifecycle are documented separately:
+  <ul style="margin-top:0.5rem;">
+    <li><a href="#s5-5b">&sect;5.5b Patient Self-Presentation</a> &mdash; <code>SEEKER_INITIATED</code> variant (less common in rural contexts)</li>
+    <li><a href="#s5-9">&sect;5.9 Active Case Finding (campaign-style)</a> &mdash; same facilitator pattern but planned as a multi-day batch event (<code>batchType: CAMPAIGN</code>)</li>
+    <li><a href="#s5-10">&sect;5.10 Contact Tracing</a> &mdash; <code>SYSTEM_INITIATED</code> cascades from a positive-outcome index case, often assigned to CHPs for household visits</li>
+  </ul>
 </div>
 
-<p><strong>Example:</strong> Joseph in Kisumu has been coughing for 3 weeks. He knows about TB and self-presents via the chatbot. (Compare with Katolo-village residents in &sect;5.9 who didn't self-present &mdash; CHP Shwetha came to them.)</p>
+<p><strong>Example:</strong> CHP Grace is assigned to Katolo village in Nyakach Sub-County, Kisumu County. She does routine household-by-household screening. At one house, Joseph mentions a 3-week cough.</p>
 
 <div class="diagram-wrap">
-<svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
+<svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" style="max-width:860px;">
   <defs>
     <marker id="h-arr-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#6a1b9a"/></marker>
     <marker id="h-arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2e7d32"/></marker>
+    <marker id="h-arr-teal" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#00897b"/></marker>
   </defs>
-  <text x="450" y="24" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">TB Screening &mdash; Patient WhatsApp Flow</text>
+  <text x="450" y="22" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a2e">TB Screening &mdash; CHP-Facilitated Flow (Primary Path)</text>
 
-  <rect x="10" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="77" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">1-2</text>
-  <text x="77" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Patient says "Hi"</text>
-  <line x1="145" y1="62" x2="168" y2="62" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <!-- Row A: Facilitator side (CHP) -->
+  <rect x="10" y="42" width="780" height="24" rx="4" fill="#e0f2f1"/>
+  <text x="400" y="59" text-anchor="middle" font-size="11" font-weight="700" fill="#00695c">Facilitator Side &mdash; CHP (Seeker is passive participant)</text>
 
-  <rect x="170" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="237" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">3</text>
-  <text x="237" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Select [Get Screened]</text>
-  <line x1="305" y1="62" x2="328" y2="62" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <rect x="10" y="76" width="145" height="46" rx="8" fill="#e0f2f1" stroke="#00897b" stroke-width="1.5"/>
+  <text x="83" y="94" text-anchor="middle" font-size="10" font-weight="700" fill="#00695c">1</text>
+  <text x="83" y="110" text-anchor="middle" font-size="10" fill="#1a1a2e">CHP opens app; pulls</text>
+  <text x="83" y="122" text-anchor="middle" font-size="10" fill="#1a1a2e">village visit list</text>
+  <line x1="155" y1="99" x2="178" y2="99" stroke="#00897b" stroke-width="1.5" marker-end="url(#h-arr-teal)"/>
 
-  <rect x="330" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="397" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">4-6</text>
-  <text x="397" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Symptom screening</text>
-  <line x1="465" y1="62" x2="488" y2="62" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <rect x="180" y="76" width="145" height="46" rx="8" fill="#e0f2f1" stroke="#00897b" stroke-width="1.5"/>
+  <text x="253" y="94" text-anchor="middle" font-size="10" font-weight="700" fill="#00695c">2</text>
+  <text x="253" y="110" text-anchor="middle" font-size="10" fill="#1a1a2e">Start batch</text>
+  <text x="253" y="122" text-anchor="middle" font-size="9" fill="#1a1a2e">(COMMUNITY_VISIT)</text>
+  <line x1="325" y1="99" x2="348" y2="99" stroke="#00897b" stroke-width="1.5" marker-end="url(#h-arr-teal)"/>
 
-  <rect x="490" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="557" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">7-8</text>
-  <text x="557" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Triage + consent</text>
-  <line x1="625" y1="62" x2="648" y2="62" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <rect x="350" y="76" width="145" height="46" rx="8" fill="#e0f2f1" stroke="#00897b" stroke-width="1.5"/>
+  <text x="423" y="94" text-anchor="middle" font-size="10" font-weight="700" fill="#00695c">3&ndash;4</text>
+  <text x="423" y="110" text-anchor="middle" font-size="10" fill="#1a1a2e">Visit household;</text>
+  <text x="423" y="122" text-anchor="middle" font-size="10" fill="#1a1a2e">introduce + consent</text>
+  <line x1="495" y1="99" x2="518" y2="99" stroke="#00897b" stroke-width="1.5" marker-end="url(#h-arr-teal)"/>
 
-  <rect x="650" y="40" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="717" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">9-10</text>
-  <text x="717" y="73" text-anchor="middle" font-size="10" fill="#1a1a2e">Share location</text>
+  <rect x="520" y="76" width="145" height="46" rx="8" fill="#e0f2f1" stroke="#00897b" stroke-width="1.5"/>
+  <text x="593" y="94" text-anchor="middle" font-size="10" font-weight="700" fill="#00695c">5&ndash;6</text>
+  <text x="593" y="110" text-anchor="middle" font-size="10" fill="#1a1a2e">Symptom screening</text>
+  <text x="593" y="122" text-anchor="middle" font-size="9" fill="#1a1a2e">cough, fever, weight loss</text>
+  <line x1="665" y1="99" x2="688" y2="99" stroke="#00897b" stroke-width="1.5" marker-end="url(#h-arr-teal)"/>
 
-  <line x1="717" y1="84" x2="717" y2="110" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <rect x="690" y="76" width="145" height="46" rx="8" fill="#e0f2f1" stroke="#00897b" stroke-width="1.5"/>
+  <text x="763" y="94" text-anchor="middle" font-size="10" font-weight="700" fill="#00695c">7</text>
+  <text x="763" y="110" text-anchor="middle" font-size="10" fill="#1a1a2e">Presumptive?</text>
+  <text x="763" y="122" text-anchor="middle" font-size="9" font-style="italic" fill="#1a1a2e">decision point</text>
 
-  <rect x="650" y="112" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="717" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">11-12</text>
-  <text x="717" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Discover facilities</text>
-  <line x1="650" y1="134" x2="625" y2="134" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <!-- Branch: not presumptive -->
+  <line x1="763" y1="122" x2="763" y2="150" stroke="#34a853" stroke-width="1.5" marker-end="url(#h-arr-green)"/>
+  <rect x="690" y="152" width="145" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
+  <text x="763" y="170" text-anchor="middle" font-size="10" font-weight="700" fill="#2e7d32">8a (No)</text>
+  <text x="763" y="184" text-anchor="middle" font-size="9" fill="#1a1a2e">Record screening;</text>
+  <text x="763" y="194" text-anchor="middle" font-size="9" fill="#1a1a2e">health advice; CLOSE</text>
 
-  <rect x="490" y="112" width="135" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="557" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">13</text>
-  <text x="557" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Select facility</text>
-  <line x1="490" y1="134" x2="465" y2="134" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <!-- Branch: presumptive -> refer -->
+  <line x1="690" y1="99" x2="690" y2="215" stroke="#e65100" stroke-width="0" />
+  <path d="M690 122 Q 640 140 500 160" stroke="#e65100" stroke-width="1.5" fill="none" marker-end="url(#h-arr-blue)"/>
+  <text x="605" y="138" font-size="9" fill="#e65100" font-style="italic">presumptive TB</text>
 
-  <rect x="330" y="112" width="135" height="44" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
-  <text x="397" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#e65100">14-15</text>
-  <text x="397" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Confirm referral</text>
-  <line x1="330" y1="134" x2="305" y2="134" stroke="#e65100" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <rect x="350" y="152" width="145" height="46" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="423" y="170" text-anchor="middle" font-size="10" font-weight="700" fill="#e65100">8b</text>
+  <text x="423" y="186" text-anchor="middle" font-size="10" fill="#1a1a2e">CHP consults app</text>
+  <text x="423" y="196" text-anchor="middle" font-size="9" fill="#1a1a2e">(discover facilities, GeneXpert)</text>
+  <line x1="350" y1="175" x2="327" y2="175" stroke="#e65100" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
 
-  <rect x="170" y="112" width="135" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
-  <text x="237" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">16</text>
-  <text x="237" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Referral slip issued</text>
-  <line x1="170" y1="134" x2="148" y2="134" stroke="#34a853" stroke-width="1.5" marker-end="url(#h-arr-green)"/>
+  <rect x="180" y="152" width="145" height="46" rx="8" fill="#fff3e0" stroke="#e65100" stroke-width="1.5"/>
+  <text x="253" y="170" text-anchor="middle" font-size="10" font-weight="700" fill="#e65100">9&ndash;10</text>
+  <text x="253" y="186" text-anchor="middle" font-size="10" fill="#1a1a2e">Issue referral;</text>
+  <text x="253" y="196" text-anchor="middle" font-size="9" fill="#1a1a2e">notify facility + patient</text>
+  <line x1="180" y1="175" x2="157" y2="175" stroke="#e65100" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
 
-  <rect x="10" y="112" width="135" height="44" rx="8" fill="#e8f5e9" stroke="#34a853" stroke-width="1.5"/>
-  <text x="77" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#34a853">17</text>
-  <text x="77" y="145" text-anchor="middle" font-size="10" fill="#1a1a2e">Facility notified</text>
+  <rect x="10" y="152" width="145" height="46" rx="8" fill="#e0f2f1" stroke="#00897b" stroke-width="1.5"/>
+  <text x="83" y="170" text-anchor="middle" font-size="10" font-weight="700" fill="#00695c">11</text>
+  <text x="83" y="186" text-anchor="middle" font-size="10" fill="#1a1a2e">Sputum collected</text>
+  <text x="83" y="196" text-anchor="middle" font-size="9" fill="#1a1a2e">(CHP or facility)</text>
+  <line x1="83" y1="198" x2="83" y2="225" stroke="#00897b" stroke-width="1.5" marker-end="url(#h-arr-teal)"/>
 
-  <rect x="10" y="170" width="775" height="28" rx="4" fill="#f3e5f5"/>
-  <text x="397" y="189" text-anchor="middle" font-size="11" font-weight="700" fill="#6a1b9a">Facility Side (Deliver + Record)</text>
+  <!-- Row B: Provider side (Facility / Lab) -->
+  <rect x="10" y="228" width="780" height="24" rx="4" fill="#f3e5f5"/>
+  <text x="400" y="245" text-anchor="middle" font-size="11" font-weight="700" fill="#6a1b9a">Provider Side &mdash; Facility / Lab (Deliver + Record)</text>
 
-  <rect x="10" y="210" width="155" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="87" y="228" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">18</text>
-  <text x="87" y="243" text-anchor="middle" font-size="10" fill="#1a1a2e">Sputum collected</text>
-  <line x1="165" y1="232" x2="195" y2="232" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <rect x="10" y="262" width="155" height="46" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="87" y="280" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">12</text>
+  <text x="87" y="296" text-anchor="middle" font-size="10" fill="#1a1a2e">Sample received by lab</text>
+  <line x1="165" y1="285" x2="195" y2="285" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
 
-  <rect x="198" y="210" width="155" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="275" y="228" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">19</text>
-  <text x="275" y="243" text-anchor="middle" font-size="10" fill="#1a1a2e">Lab test (GeneXpert)</text>
-  <line x1="353" y1="232" x2="383" y2="232" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <rect x="198" y="262" width="155" height="46" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="275" y="280" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">13</text>
+  <text x="275" y="296" text-anchor="middle" font-size="10" fill="#1a1a2e">Lab test (GeneXpert)</text>
+  <line x1="353" y1="285" x2="383" y2="285" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
 
-  <rect x="386" y="210" width="155" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="463" y="228" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">20</text>
-  <text x="463" y="243" text-anchor="middle" font-size="10" fill="#1a1a2e">Result recorded</text>
-  <line x1="541" y1="232" x2="571" y2="232" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <rect x="386" y="262" width="155" height="46" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="463" y="280" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">14</text>
+  <text x="463" y="296" text-anchor="middle" font-size="10" fill="#1a1a2e">Clinician records result</text>
+  <line x1="541" y1="285" x2="571" y2="285" stroke="#6a1b9a" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
 
-  <rect x="574" y="210" width="155" height="44" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
-  <text x="651" y="228" text-anchor="middle" font-size="10" font-weight="600" fill="#6a1b9a">21</text>
-  <text x="651" y="243" text-anchor="middle" font-size="10" fill="#1a1a2e">Patient notified</text>
+  <rect x="574" y="262" width="155" height="46" rx="8" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="1.5"/>
+  <text x="651" y="280" text-anchor="middle" font-size="10" font-weight="700" fill="#6a1b9a">15</text>
+  <text x="651" y="296" text-anchor="middle" font-size="10" fill="#1a1a2e">CHP + patient notified</text>
 
-  <rect x="10" y="275" width="775" height="28" rx="4" fill="#e8f5e9"/>
-  <text x="397" y="294" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Outcome</text>
+  <!-- Outcome band -->
+  <rect x="10" y="326" width="775" height="24" rx="4" fill="#e8f5e9"/>
+  <text x="400" y="343" text-anchor="middle" font-size="11" font-weight="700" fill="#2e7d32">Outcome</text>
 
-  <rect x="10" y="314" width="250" height="50" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
-  <text x="135" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#34a853">NEGATIVE</text>
-  <text x="135" y="351" text-anchor="middle" font-size="9" fill="#1a1a2e">Follow-up advice; CLOSED</text>
+  <rect x="10" y="360" width="250" height="52" rx="10" fill="#e8f5e9" stroke="#34a853" stroke-width="2"/>
+  <text x="135" y="382" text-anchor="middle" font-size="11" font-weight="700" fill="#34a853">NEGATIVE</text>
+  <text x="135" y="400" text-anchor="middle" font-size="9" fill="#1a1a2e">Follow-up advice; CLOSED</text>
 
-  <rect x="280" y="314" width="250" height="50" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
-  <text x="405" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">POSITIVE</text>
-  <text x="405" y="351" text-anchor="middle" font-size="9" fill="#1a1a2e">Auto-link to TB Treatment flow</text>
+  <rect x="275" y="360" width="250" height="52" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="2"/>
+  <text x="400" y="378" text-anchor="middle" font-size="11" font-weight="700" fill="#e65100">POSITIVE</text>
+  <text x="400" y="394" text-anchor="middle" font-size="9" fill="#1a1a2e">Cascade: Treatment flow +</text>
+  <text x="400" y="406" text-anchor="middle" font-size="9" fill="#1a1a2e">Contact Tracing flows (&sect;5.10)</text>
 
-  <rect x="550" y="314" width="235" height="50" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
-  <text x="667" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">LOST</text>
-  <text x="667" y="351" text-anchor="middle" font-size="9" fill="#1a1a2e">No sputum in 7 days; CHP follow-up</text>
+  <rect x="540" y="360" width="245" height="52" rx="10" fill="#fce4ec" stroke="#c62828" stroke-width="2"/>
+  <text x="662" y="378" text-anchor="middle" font-size="11" font-weight="700" fill="#c62828">LOST_TO_FOLLOWUP</text>
+  <text x="662" y="394" text-anchor="middle" font-size="9" fill="#1a1a2e">Patient / sample didn't arrive;</text>
+  <text x="662" y="406" text-anchor="middle" font-size="9" fill="#1a1a2e">CHP follow-up task created</text>
 
-  <line x1="463" y1="254" x2="405" y2="310" stroke="#e65100" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
-  <line x1="463" y1="254" x2="135" y2="310" stroke="#34a853" stroke-width="1.5" marker-end="url(#h-arr-green)"/>
+  <line x1="463" y1="308" x2="400" y2="355" stroke="#e65100" stroke-width="1.5" marker-end="url(#h-arr-blue)"/>
+  <line x1="463" y1="308" x2="135" y2="355" stroke="#34a853" stroke-width="1.5" marker-end="url(#h-arr-green)"/>
+  <line x1="463" y1="308" x2="662" y2="355" stroke="#c62828" stroke-width="1.3" stroke-dasharray="4,3" marker-end="url(#h-arr-blue)"/>
+
+  <!-- Role legend -->
+  <rect x="10" y="428" width="14" height="14" fill="#e0f2f1" stroke="#00897b"/>
+  <text x="30" y="440" font-size="10" fill="#1a1a2e">Facilitator (CHP)</text>
+  <rect x="140" y="428" width="14" height="14" fill="#f3e5f5" stroke="#6a1b9a"/>
+  <text x="160" y="440" font-size="10" fill="#1a1a2e">Provider (Facility / Lab)</text>
+  <rect x="300" y="428" width="14" height="14" fill="#fff3e0" stroke="#e65100"/>
+  <text x="320" y="440" font-size="10" fill="#1a1a2e">Referral / cross-role handoff</text>
+  <rect x="490" y="428" width="14" height="14" fill="#e8f5e9" stroke="#34a853"/>
+  <text x="510" y="440" font-size="10" fill="#1a1a2e">Outcome</text>
 </svg>
-<p class="diagram-caption">Figure 5.5 &mdash; TB Screening: Symptom &rarr; referral &rarr; sputum &rarr; lab &rarr; outcome. Positive auto-links to treatment.</p>
+<p class="diagram-caption">Figure 5.5 &mdash; CHP-facilitated TB screening. The Seeker (patient/household) is a passive participant throughout the <em>Facilitator</em> row; the Provider (facility / lab) takes over for the diagnostic Deliver+Record stage.</p>
 </div>
 
-<h4>Patient WhatsApp Flow (Step by Step)</h4>
+<h4>CHP-Facilitated Flow (Step by Step)</h4>
 <ol>
-  <li>Joseph sends <strong>"Hi"</strong></li>
-  <li>System detects role (or asks if new): <em>"Welcome. How can we help?"</em> &mdash; Buttons: [Get Screened] [Treatment Help] [Find Facility] [Health Info]</li>
-  <li>Joseph taps <strong>[Get Screened]</strong></li>
-  <li>System: <em>"We'll ask a few quick questions. Have you been coughing for more than 2 weeks?"</em> [Yes] [No]</li>
-  <li>Joseph: [Yes] &rarr; further symptoms (fever, weight loss, night sweats, contact with TB patient)</li>
-  <li>System scores symptoms (presumptive TB if any positive)</li>
-  <li>System: <em>"You may need a TB test. May we share your information with a screening facility?"</em> [Yes, I consent] [No]</li>
-  <li>Joseph consents (DPDP-style consent captured)</li>
-  <li>System: <em>"Please share your location"</em></li>
-  <li>Google AI normalises &rarr; confirms County + Sub-County</li>
-  <li>System calls <code>discover</code> for facilities with capability <code>GeneXpert</code> in that location</li>
-  <li>System: <em>"Nearest facilities:"</em><br><code>1. Kisumu County Hospital (GeneXpert, 2.3 km)</code><br><code>2. Nyalenda Health Centre (Smear + referral, 4.1 km)</code></li>
-  <li>Joseph selects "1"</li>
-  <li>System shows referral summary (facility, service, date, patient ID) &mdash; [Confirm] [Cancel]</li>
-  <li>Joseph taps <strong>[Confirm]</strong></li>
-  <li>System: <em>"Referral sent. Slip ID: REF-20260412-017. Show this at facility."</em></li>
-  <li>Facility receives WhatsApp notification; clinician sees queued referral in web app</li>
-  <li>Joseph visits facility; sputum collected (Deliver)</li>
-  <li>Sample sent to GeneXpert; Validator (lab) returns result</li>
-  <li>Clinician records result in web app (Record) &mdash; writes back to the disease-programme register via patient UUID</li>
-  <li>System notifies Joseph: <em>"Your test result is ready. Please call the clinic."</em> (clinical result delivered by clinician, not bot)</li>
-  <li>Outcome: If POSITIVE &rarr; system cascades TWO flows &mdash; (a) a TB Treatment flow for Joseph (<code>SYSTEM_INITIATED</code>, <code>triggerReason: OUTCOME_FOLLOW_ON</code>) and (b) a batch of Contact Tracing screening flows for Joseph's identified contacts (see &sect;5.10, each with <code>triggerReason: CONTACT_OF_POSITIVE</code>). If NEGATIVE &rarr; follow-up advice, flow CLOSED. If patient does not appear within 7 days &rarr; flow marked <code>LOST_TO_FOLLOWUP</code> and a CHP receives a follow-up task.</li>
+  <li>CHP Grace opens the CHP app (launched from a WhatsApp link). Today's village-visit list loads.</li>
+  <li>Grace taps <strong>[Start Visit]</strong> for Katolo village. Flow Engine creates a batch: <code>batchType: COMMUNITY_VISIT</code>, <code>batchId: b4f1c8d6-katolo-2026-04-14</code>.</li>
+  <li>Grace arrives at Joseph's household. Introduces purpose, captures Joseph's consent (Seeker role activated &mdash; passively, he agrees to participate).</li>
+  <li>Consent recorded with timestamp. A new individual flow is created for Joseph, <code>initiationMode: PROVIDER_INITIATED</code>, linked to the batch.</li>
+  <li>Grace runs structured symptom screening in the app: cough &gt; 2 weeks? fever? weight loss? night sweats? TB contact history?</li>
+  <li>Joseph: "Yes, I've been coughing for 3 weeks."</li>
+  <li>App scores symptoms. Decision: <strong>presumptive TB</strong>.</li>
+  <li>Branch:
+    <ul>
+      <li><strong>If not presumptive</strong> &rarr; Grace records screening, gives health advice, flow moves to <code>OUTCOME_RECORDED</code> with <code>outcomeType: SCREENING_NEGATIVE</code> &rarr; <code>CLOSED</code>.</li>
+      <li><strong>If presumptive</strong> &rarr; continue.</li>
+    </ul>
+  </li>
+  <li>App calls <code>discover</code> for nearby facilities with capability <code>GeneXpert</code>. Grace picks <em>Kisumu County Hospital</em> in the app.</li>
+  <li>Referral generated: slip ID <code>REF-KATOLO-0042</code>. Facility notified via WhatsApp (queued in their Web App). Joseph notified: <em>"Kindly visit Kisumu County Hospital tomorrow with this slip. Grace will assist you."</em></li>
+  <li>Sputum sample collected (in-home if CHP is trained, or at a nearby collection point). Sample transported to lab.</li>
+  <li>Facility / Lab receives the sample. <em>Provider role now active.</em></li>
+  <li>Lab runs GeneXpert; result returned.</li>
+  <li>Clinician records result in the facility Web App &mdash; writes back to the disease-programme register via Joseph's patient UUID.</li>
+  <li>Both Grace (CHP) and Joseph notified via WhatsApp: <em>"Test result is ready. Please come to the clinic to discuss."</em> (clinical result is delivered by a clinician in person, not by the bot.)</li>
+  <li>Outcome:
+    <ul>
+      <li><strong>POSITIVE</strong> &rarr; system cascades TWO flows: a TB Treatment flow for Joseph (<code>SYSTEM_INITIATED</code>, <code>triggerReason: OUTCOME_FOLLOW_ON</code>) and a batch of Contact Tracing screening flows for Joseph's identified contacts (&sect;5.10).</li>
+      <li><strong>NEGATIVE</strong> &rarr; follow-up advice; flow <code>CLOSED</code>.</li>
+      <li><strong>LOST_TO_FOLLOWUP</strong> &rarr; patient or sample didn't arrive within 7 days; Grace receives a follow-up task.</li>
+    </ul>
+  </li>
 </ol>
 
 <div class="callout callout-success">
-  <strong>Cascade summary:</strong> A single positive screening outcome in this flow can fan out into many new flows &mdash; one treatment flow plus N contact-screening flows. Each new flow records <code>triggerFlowId</code> = Joseph's screening flow ID, preserving the surveillance lineage.
+  <strong>Role mapping for this flow:</strong>
+  <table style="margin-top:0.5rem;">
+    <thead><tr><th>Step</th><th>Role Active</th><th>Actor</th></tr></thead>
+    <tbody>
+      <tr><td>1&ndash;2 (open app, start batch)</td><td>Facilitator</td><td>CHP Grace</td></tr>
+      <tr><td>3&ndash;4 (visit, consent)</td><td>Facilitator + Seeker (passive)</td><td>Grace + Joseph</td></tr>
+      <tr><td>5&ndash;8a/8b (screening, decision, referral)</td><td>Facilitator</td><td>Grace (consulting app)</td></tr>
+      <tr><td>9&ndash;11 (referral, sputum)</td><td>Facilitator, handoff to Provider</td><td>Grace + facility staff</td></tr>
+      <tr><td>12&ndash;15 (lab + clinician)</td><td>Provider (+ Validator = lab)</td><td>Facility clinician + lab</td></tr>
+      <tr><td>16 (outcome + cascade)</td><td>System (with Facilitator follow-up)</td><td>Flow Engine + Grace</td></tr>
+    </tbody>
+  </table>
 </div>
 
-<h4>Schema Example &mdash; <code>discover</code> Catalog Item</h4>
-<p>The TB screening referral uses the generic <code>ServiceItemAttributes</code> schema; the vertical-specific data lives in <code>verticalAttributes</code>:</p>
+<h4>Schema Example &mdash; <code>ServiceItemAttributes</code> for this flow</h4>
 <pre><code>{
-  "id": "svc_tb_screening_geneexpert",
-  "descriptor": { "name": "GeneXpert TB screening" },
-  "sia:ServiceItemAttributes": {
-    "serviceCategory": "TB-Screening",
-    "capabilityRequired": "GeneXpert"
+  "id": "svc_tb_screening_chp_home",
+  "descriptor": { "name": "TB symptom screening (CHP home visit)" },
+  "ServiceItemAttributes": {
+    "subCategory": { "code": "tb-screening", "name": "TB Screening" },
+    "serviceName": "TB Symptom Screening (Outreach)",
+    "serviceMode": "ON_SITE_VISIT",
+    "verticalAttributes": {
+      "vertical": "health-tb-acf",
+      "screeningType": "SYMPTOM_SCREENING",
+      "outreachType": "COMMUNITY_VISIT"
+    }
   },
-  "verticalAttributes": {
-    "vertical": "health-tb-screening",
-    "screeningType": "SPUTUM_COLLECTION",
-    "diseaseTarget": "Tuberculosis",
-    "diagnosticMethod": "GeneXpert"
+  "ServiceOrderAttributes": {
+    "initiationMode": "PROVIDER_INITIATED",
+    "batchId": "b4f1c8d6-katolo-2026-04-14",
+    "batchType": "COMMUNITY_VISIT",
+    "providerCredentialId": "CHP-KSM-4421"
   }
 }</code></pre>
+
+<!-- ── 5.5b TB Screening &mdash; Patient Self-Presentation (Secondary) ───── -->
+<h4 id="s5-5b">5.5b Alternative Path &mdash; Patient Self-Presentation (<code>SEEKER_INITIATED</code>)</h4>
+<p>A minority of patients who know about TB may approach the chatbot directly without waiting for a CHP visit. The lifecycle is identical from step <strong>Provider Side</strong> onward (same referral, sample collection, lab processing, outcome handling, cascade). The variant affects only the initial Facilitator stage:</p>
+<ul>
+  <li><strong>Step 1 replaces CHP visit:</strong> Patient sends "Hi" via WhatsApp &rarr; Flow Handler creates a flow with <code>initiationMode: SEEKER_INITIATED</code>.</li>
+  <li><strong>Steps 2&ndash;7 (symptom screening and consent):</strong> conducted via WhatsApp chat instead of a CHP visit. The symptom questions are the same; the app scores presumption the same way.</li>
+  <li><strong>Step 8b (referral):</strong> the patient picks a facility from a list returned by <code>discover</code>.</li>
+  <li><strong>Steps 9&ndash;16:</strong> identical to the primary path. Sample collection, lab, recording, outcome, and cascade behaviour are unchanged.</li>
+</ul>
+<p>For analytics, the two paths are distinguishable by <code>initiationMode</code> and by the absence of a <code>batchId</code> in self-presentation flows. In practice, self-presentation is rare in rural settings &mdash; the overwhelming majority of cases enter via CHP-facilitated screening or contact tracing.</p>
 
 <!-- ── 5.6 TB Treatment ───────────────────────────────── -->
 <h3 id="s5-6">5.6 TB Treatment &amp; Adherence Flow <span class="domain-pill domain-health">Health</span></h3>
@@ -1216,44 +1310,51 @@
 </div>
 
 <!-- ─── 5.9 Active Case Finding (CHP-initiated) ─────────────────── -->
-<h3 id="s5-9">5.9 Active Case Finding &mdash; CHP Community Outreach <span class="domain-pill domain-health">Health</span></h3>
-<p>Not every health flow begins with a patient walking in. <strong>Active Case Finding (ACF)</strong> is provider-initiated: a Community Health Promoter (CHP) proactively visits communities, households, schools, or workplaces to screen people for TB. The same flow engine orchestrates this &mdash; with <code>initiationMode = PROVIDER_INITIATED</code> and a shared <code>batchId</code> grouping the session's screenings.</p>
+<h3 id="s5-9">5.9 Active Case Finding &mdash; Campaign-Style Mass Screening <span class="domain-pill domain-health">Health</span></h3>
 
-<div class="callout callout-health">
-  <strong>Why ACF matters:</strong> The WHO estimates that roughly one third of TB cases worldwide go undiagnosed each year because symptomatic patients never present to a facility. ACF closes that gap. Evidence from Kenya's National TB Programme shows ACF finds more than twice as many TB cases per CHP-hour compared with passive screening at facilities.
+<div class="callout callout-info">
+  <strong>Relationship to &sect;5.5:</strong> routine CHP-facilitated screening (ongoing, household-by-household) is covered in <a href="#s5-5">&sect;5.5</a>. This section describes the <em>campaign</em> variant &mdash; a planned, time-limited, often multi-day mass screening event involving many Facilitators working from a common plan. Shares the same Facilitator/Provider mechanics as 5.5, but is organised as a large <code>batchType: CAMPAIGN</code> with additional logistics.
 </div>
 
-<h4>5.9.1 Example Scenario</h4>
-<p>CHP Shwetha is assigned to Katolo village in Nyakach Sub-County, Kisumu County. Today she conducts a routine community-screening visit.</p>
+<p><strong>When ACF campaigns run:</strong> WHO-driven screening weeks, county response to a TB hotspot, Ministry of Health push, funding-partner-led programmes (e.g. Global Fund grant-funded mass ACF). Typically covers a sub-county or county, involves dozens of CHPs, is planned by a Coordinator (SCTLC/CTLC), and runs for days to weeks.</p>
+
+<div class="callout callout-health">
+  <strong>Why ACF campaigns matter:</strong> WHO estimates roughly one third of TB cases go undiagnosed each year because symptomatic patients never present to a facility. Routine CHP screening catches incremental cases. Campaigns catch many cases quickly in hotspot areas &mdash; evidence from Kenya's National TB Programme shows campaign ACF finds more than twice as many TB cases per CHP-hour compared with passive screening.
+</div>
+
+<h4>5.9.1 Example Scenario &mdash; County-Wide Campaign</h4>
+<p>Kisumu CTLC launches a 2-week campaign covering 6 sub-counties after a surveillance signal shows rising TB notifications. 40 CHPs are activated. Each CHP conducts the same CHP-Facilitated screening flow described in &sect;5.5, but every flow is tagged with the campaign batch.</p>
 
 <ol>
   <li>Shwetha opens the CHP app (launched from a WhatsApp link). App pulls her assigned list for today.</li>
-  <li>App prompts: <em>"Start community screening session for Katolo village?"</em> [Start]</li>
-  <li>Flow Engine creates a <strong>batch</strong> (<code>batchType: COMMUNITY_VISIT</code>, <code>batchId: b4f1c8d6-2025-11-15-nyakach-chp-visit</code>).</li>
-  <li>Shwetha visits each household. For every person she screens, the app creates a new flow (<code>initiationMode: PROVIDER_INITIATED</code>, linked to the batch).</li>
-  <li>Each flow captures: person's identity (with consent), screening symptoms (cough duration, weight loss, fever, night sweats), CHP's clinical judgement, and referral decision.</li>
-  <li>For symptomatic persons, the flow's <code>outcomeType</code> is <code>SYMPTOMATIC_REFERRED</code> with <code>followUpRequired = true</code>; the app can schedule a sputum-collection appointment and optionally trigger a new flow (<code>health-tb-screening</code> vertical) linked via <code>triggerFlowId</code>.</li>
-  <li>At end of day, Shwetha closes the batch. All 40 individual flows are in <code>RECORDED</code> or <code>OUTCOME_RECORDED</code> state. Her supervisor (SCTLC) can review the batch-level dashboard: 40 screenings, 4 symptomatic referrals, 2 sputum appointments scheduled.</li>
+  <li>The CTLC creates a <strong>campaign batch</strong>: <code>batchType: CAMPAIGN</code>, <code>batchId: camp-kisumu-april-2026-acf</code>, validity 2 weeks, target: 6 sub-counties.</li>
+  <li>40 CHPs are enrolled in the campaign. Each CHP's daily screening sessions now roll up under both: their own per-day <code>COMMUNITY_VISIT</code> sub-batch AND the campaign-wide <code>CAMPAIGN</code> batch.</li>
+  <li>During the campaign, each CHP conducts the same household-visit screening flow described in &sect;5.5 (primary path). Every flow created carries <code>batchId: camp-kisumu-april-2026-acf</code>.</li>
+  <li>Positive/presumptive screenings are referred to facilities identically to the routine flow (see &sect;5.5 steps 8b-11).</li>
+  <li>End-of-campaign dashboards aggregate over 40 CHPs &times; 10 days: total screened, total referred, conversion rates, hotspot sub-counties, yield per CHP.</li>
+  <li>After campaign closes, CTLC reviews results; may trigger follow-on surveillance or re-plan based on findings.</li>
 </ol>
 
-<h4>5.9.2 Key Flow Attributes</h4>
+<h4>5.9.2 Key Flow Attributes (delta vs &sect;5.5)</h4>
 <table>
-  <thead><tr><th>Attribute</th><th>Value for ACF</th></tr></thead>
+  <thead><tr><th>Attribute</th><th>Value for Campaign ACF</th></tr></thead>
   <tbody>
-    <tr><td><code>initiationMode</code></td><td><code>PROVIDER_INITIATED</code></td></tr>
-    <tr><td><code>batchType</code></td><td><code>COMMUNITY_VISIT</code></td></tr>
+    <tr><td><code>initiationMode</code></td><td><code>PROVIDER_INITIATED</code> (individual flows) with overarching <code>SYSTEM_INITIATED</code> campaign</td></tr>
+    <tr><td><code>batchType</code></td><td><code>CAMPAIGN</code> (with nested <code>COMMUNITY_VISIT</code> sub-batches)</td></tr>
     <tr><td><code>verticalAttributes.vertical</code></td><td><code>health-tb-acf</code></td></tr>
-    <tr><td>Seeker (per flow)</td><td>Person being screened; role is <strong>passive participant</strong> &mdash; they didn't initiate, but they consent to be screened</td></tr>
-    <tr><td>Provider</td><td>CHP conducting the screening (with <code>providerCredentialId</code>)</td></tr>
-    <tr><td>Cascading</td><td>Positive screens can spawn a follow-on <code>health-tb-screening</code> flow via <code>triggerFlowId</code></td></tr>
+    <tr><td>Facilitator (per flow)</td><td>CHP (same as &sect;5.5)</td></tr>
+    <tr><td>Provider (per flow)</td><td>Facility / Lab (same as &sect;5.5, for confirmatory testing)</td></tr>
+    <tr><td>Cascading</td><td>Positive screens cascade to TB Treatment + Contact Tracing identically to &sect;5.5</td></tr>
+    <tr><td>Coordinator role</td><td>Active &mdash; CTLC/SCTLC plans the campaign, enrols CHPs, monitors progress, signs off on closure</td></tr>
   </tbody>
 </table>
 
-<h4>5.9.3 Operational Value</h4>
+<h4>5.9.3 Operational Value (vs routine &sect;5.5)</h4>
 <ul>
-  <li><strong>CHP stipends</strong> paid per session (batch), not per individual screening &mdash; the batch abstraction enables this directly.</li>
-  <li><strong>Supervision</strong>: SCTLC reviews batch completeness and positive-rate; high positive rates may trigger a hotspot response.</li>
-  <li><strong>Analytics</strong>: positive-yield per CHP / per village / per season informs future outreach planning.</li>
+  <li><strong>Scale:</strong> campaigns compress many weeks of routine screening into days, effective for hotspot response or programme-wide scaling.</li>
+  <li><strong>Funding:</strong> campaigns are often funded by a sponsor (Ministry, Global Fund); the campaign <code>batchId</code> anchors donor reporting and claims.</li>
+  <li><strong>Supervision:</strong> heavier coordinator involvement &mdash; CTLC runs the campaign dashboard, daily progress checks, CHP support.</li>
+  <li><strong>Analytics:</strong> campaign yield benchmarks (positive rate, cost-per-case-found) inform whether to repeat, target differently, or transition back to routine screening.</li>
 </ul>
 
 <!-- ─── 5.10 Contact Tracing ─────────────────────────────────── -->
