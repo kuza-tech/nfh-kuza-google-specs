@@ -190,10 +190,10 @@
         <li><a href="#s13-5">Health-System Integrations (TIBU / DHIS2 / FHIR)</a></li>
       </ol>
     </li>
-    <li><a href="#s14">Analytics &amp; Intelligence (Three Horizons)</a></li>
-    <li><a href="#s15">Sovereign Data &amp; Compliance</a></li>
-    <li><a href="#s16">Non-Functional Requirements</a></li>
-    <li><a href="#s17">Pilot Scope &amp; Future Extensions</a></li>
+    <li><a href="#s14">Sovereign Data &amp; Compliance</a></li>
+    <li><a href="#s15">Non-Functional Requirements</a></li>
+    <li><a href="#s16">Pilot Scope &amp; Future Extensions</a></li>
+    <li><a href="#s17">Appendix &mdash; Phased Analytics Roadmap</a></li>
   </ol>
 </nav>
 
@@ -244,6 +244,21 @@
     <tr><td><strong>Kenya pilot</strong></td><td>47 Counties / Sub-Counties, KES currency, M-Pesa mobile money, alignment with Ministry of Health and Kenya national TB programme.</td></tr>
   </tbody>
 </table>
+
+<div class="callout callout-info">
+  <p class="callout-label">Simplified Schema Model</p>
+  <p>All flows &mdash; across every domain and vertical &mdash; use the <strong>same four generic Beckn extension schemas</strong>. Domain/vertical-specific data lives inside a free-form <code>verticalAttributes</code> object that every payload carries.</p>
+  <table style="margin-top:.6rem;">
+    <thead><tr><th>Schema</th><th>Prefix</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><code>ServiceItemAttributes</code></td><td><code>sia:</code></td><td>Catalog item attributes (every service / product / content item)</td></tr>
+      <tr><td><code>ServiceOfferAttributes</code></td><td><code>soa:</code></td><td>Price / quote / offer attributes</td></tr>
+      <tr><td><code>ServiceFulfillmentAttributes</code></td><td><code>sfa:</code></td><td>Delivery / visit / appointment attributes</td></tr>
+      <tr><td><code>ServiceOrderAttributes</code></td><td><code>sor:</code></td><td>Order / referral / claim attributes</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:.6rem;">Each payload's <code>verticalAttributes</code> carries a required <code>vertical</code> discriminator (e.g., <code>agri-livelihood-poultry</code>, <code>household-education</code>, <code>market-livestock-products</code>, <code>advisory-agri</code>, <code>health-tb-screening</code>, <code>health-tb-treatment</code>, <code>health-tb-supervision</code>, <code>advisory-health-tb</code>) plus any free-form vertical-specific fields.</p>
+</div>
 
 <!-- ════════════════════════════════════════════════════════
      2. UNIFIED FLOW ENGINE
@@ -953,6 +968,23 @@
   <li>Outcome: If POSITIVE &rarr; system auto-creates a TB Treatment flow linked to Joseph's UUID. If NEGATIVE &rarr; follow-up advice, flow CLOSED. If patient does not appear within 7 days &rarr; flow marked LOST and CHP receives follow-up task.</li>
 </ol>
 
+<h4>Schema Example &mdash; <code>discover</code> Catalog Item</h4>
+<p>The TB screening referral uses the generic <code>ServiceItemAttributes</code> schema; the vertical-specific data lives in <code>verticalAttributes</code>:</p>
+<pre><code>{
+  "id": "svc_tb_screening_geneexpert",
+  "descriptor": { "name": "GeneXpert TB screening" },
+  "sia:ServiceItemAttributes": {
+    "serviceCategory": "TB-Screening",
+    "capabilityRequired": "GeneXpert"
+  },
+  "verticalAttributes": {
+    "vertical": "health-tb-screening",
+    "screeningType": "SPUTUM_COLLECTION",
+    "diseaseTarget": "Tuberculosis",
+    "diagnosticMethod": "GeneXpert"
+  }
+}</code></pre>
+
 <!-- ── 5.6 TB Treatment ───────────────────────────────── -->
 <h3 id="s5-6">5.6 TB Treatment &amp; Adherence Flow <span class="domain-pill domain-health">Health</span></h3>
 
@@ -1446,7 +1478,7 @@
   <tbody>
     <tr><td><strong>Payment methods</strong></td><td>Cash, M-Pesa</td><td>Public services are free to the patient; supervision mentorship and CHP stipends are paid via M-Pesa claims to NTLD-P</td></tr>
     <tr><td><strong>Direction</strong></td><td>Seeker &rarr; Provider (Market flow reversed)</td><td>Sponsor (NTLD-P / Global Fund) &rarr; Facility / CHP (claims-based)</td></tr>
-    <tr><td><strong>Reporting</strong></td><td>Self-reported by both parties</td><td>Structured claim events written to Record step; anomaly detection in Horizon 1 analytics</td></tr>
+    <tr><td><strong>Reporting</strong></td><td>Self-reported by both parties</td><td>Structured claim events written to Record step; anomaly detection in Phase 1 analytics (see Appendix)</td></tr>
     <tr><td><strong>Reconciliation</strong></td><td>No automated reconciliation in pilot</td><td>Claim-verification workflow tied to Coordinator role</td></tr>
   </tbody>
 </table>
@@ -1601,54 +1633,9 @@
 </table>
 
 <!-- ════════════════════════════════════════════════════════
-     14. ANALYTICS & INTELLIGENCE
+     14. SOVEREIGN DATA & COMPLIANCE
      ════════════════════════════════════════════════════════ -->
-<h2 id="s14">14. Analytics &amp; Intelligence (Three Horizons)</h2>
-
-<p>The unified platform inherits a three-horizon analytics roadmap, applying equally to both domains.</p>
-
-<h3>14.1 Horizon 1 &mdash; Analytics on Existing Data (Months 1&ndash;6)</h3>
-<table>
-  <thead><tr><th>Domain</th><th>Dashboards &amp; Analyses</th></tr></thead>
-  <tbody>
-    <tr>
-      <td><span class="domain-pill domain-local">Local</span></td>
-      <td>Provider performance, geographic service-availability heatmaps, conversion funnels (discover &rarr; select &rarr; confirm &rarr; deliver), seasonal demand patterns, cross-category provider utilisation.</td>
-    </tr>
-    <tr>
-      <td><span class="domain-pill domain-health">Health</span></td>
-      <td>Facility performance (presumptive-to-confirmed ratio), screening cascade analysis, supervision-visit coverage gaps, treatment success rates by facility/county, financial anomaly detection on mentorship claims, CHP productivity.</td>
-    </tr>
-  </tbody>
-</table>
-
-<h3>14.2 Horizon 2 &mdash; Predictive ML (Months 6&ndash;18)</h3>
-<table>
-  <thead><tr><th>Domain</th><th>Models</th></tr></thead>
-  <tbody>
-    <tr>
-      <td><span class="domain-pill domain-local">Local</span></td>
-      <td>Demand forecasting, provider-matching optimisation, seeker churn prediction, price-signal detection for market produce.</td>
-    </tr>
-    <tr>
-      <td><span class="domain-pill domain-health">Health</span></td>
-      <td>Patient risk stratification (treatment failure, loss-to-follow-up), contact-investigation prioritisation, mortality-prevention signals (NLP on death audits), ADR early warning.</td>
-    </tr>
-  </tbody>
-</table>
-
-<h3>14.3 Horizon 3 &mdash; Pioneering Surveillance (Months 12&ndash;36)</h3>
-<ul>
-  <li><span class="domain-pill domain-health">Health</span> <strong>Longitudinal PTLD surveillance</strong> &mdash; first national-scale dataset on post-TB lung disease trajectories.</li>
-  <li><span class="domain-pill domain-health">Health</span> <strong>Multi-disease platform</strong> &mdash; extend to HIV, malaria, cholera using the same flow engine and taxonomy.</li>
-  <li><span class="domain-pill domain-local">Local</span> <strong>Cross-domain network effects</strong> &mdash; seekers who use Local Services AND Health Services show materially different retention and outcome profiles.</li>
-  <li><span class="domain-pill domain-local">Local</span> <strong>Multi-vertical seeker journeys</strong> &mdash; e.g. a TB patient who also accesses livelihood support during treatment.</li>
-</ul>
-
-<!-- ════════════════════════════════════════════════════════
-     15. SOVEREIGN DATA & COMPLIANCE
-     ════════════════════════════════════════════════════════ -->
-<h2 id="s15">15. Sovereign Data &amp; Compliance</h2>
+<h2 id="s14">14. Sovereign Data &amp; Compliance</h2>
 
 <div class="callout callout-health">
   <p class="callout-label">Data Sovereignty</p>
@@ -1668,9 +1655,9 @@
 </table>
 
 <!-- ════════════════════════════════════════════════════════
-     16. NON-FUNCTIONAL REQUIREMENTS
+     15. NON-FUNCTIONAL REQUIREMENTS
      ════════════════════════════════════════════════════════ -->
-<h2 id="s16">16. Non-Functional Requirements</h2>
+<h2 id="s15">15. Non-Functional Requirements</h2>
 
 <table>
   <thead><tr><th>Requirement</th><th>Specification</th></tr></thead>
@@ -1681,7 +1668,7 @@
     <tr><td><strong>No app installation</strong></td><td>Seekers on WhatsApp only. Providers / facilities / coordinators use WhatsApp + browser web app.</td></tr>
     <tr><td><strong>Offline-friendly</strong></td><td>Critical flows work on low bandwidth. Minimal data transfer per interaction.</td></tr>
     <tr><td><strong>Multilingual</strong></td><td>English + Swahili at minimum; additional local languages in future.</td></tr>
-    <tr><td><strong>Data privacy</strong></td><td>See &sect; 15. Seeker PII minimised; health PHI encrypted; cross-border transfer prohibited.</td></tr>
+    <tr><td><strong>Data privacy</strong></td><td>See &sect; 14. Seeker PII minimised; health PHI encrypted; cross-border transfer prohibited.</td></tr>
     <tr><td><strong>Availability</strong></td><td>99% uptime during pilot; WhatsApp webhook (Meta) SLA.</td></tr>
     <tr><td><strong>Response time</strong></td><td>WhatsApp replies within 5 seconds; provider/facility discovery within 10 seconds.</td></tr>
     <tr><td><strong>Clinical safety</strong></td><td>Health flows have human-in-the-loop gates &mdash; AI triage never issues clinical diagnoses; all results delivered by credentialed clinicians.</td></tr>
@@ -1689,9 +1676,9 @@
 </table>
 
 <!-- ════════════════════════════════════════════════════════
-     17. PILOT SCOPE & FUTURE
+     16. PILOT SCOPE & FUTURE
      ════════════════════════════════════════════════════════ -->
-<h2 id="s17">17. Pilot Scope &amp; Future Extensions</h2>
+<h2 id="s16">16. Pilot Scope &amp; Future Extensions</h2>
 
 <h3>In Scope for Pilot</h3>
 <table>
@@ -1707,7 +1694,7 @@
     <tr><td>8</td><td>Multi-channel access: WhatsApp + browser web app (SMS/USSD optional)</td><td>Both</td><td>Required</td></tr>
     <tr><td>9</td><td>Location-based matching with capability filters</td><td>Both</td><td>Required</td></tr>
     <tr><td>10</td><td>TIBU register integration</td><td><span class="domain-pill domain-health">Health</span></td><td>Required</td></tr>
-    <tr><td>11</td><td>Horizon 1 multi-domain analytics</td><td>Both</td><td>Required</td></tr>
+    <tr><td>11</td><td>Phase 1 multi-domain analytics dashboards (see Appendix)</td><td>Both</td><td>Required</td></tr>
     <tr><td>12</td><td>Kenya deployment (counties, KES, M-Pesa)</td><td>Both</td><td>Required</td></tr>
   </tbody>
 </table>
@@ -1716,11 +1703,11 @@
 <table>
   <thead><tr><th>Extension</th><th>Description</th></tr></thead>
   <tbody>
-    <tr><td>Additional health verticals</td><td>HIV, malaria, maternal/child health, NCDs &mdash; same flow engine, new schemas.</td></tr>
+    <tr><td>Additional health verticals</td><td>HIV, malaria, maternal/child health, NCDs &mdash; same flow engine, same 4 generic schemas, new <code>verticalAttributes.vertical</code> values.</td></tr>
     <tr><td>Additional local-services categories</td><td>Financial services, legal, government schemes.</td></tr>
     <tr><td>Cross-domain seeker journeys</td><td>Unified view of a seeker who uses both local and health services (with consent).</td></tr>
-    <tr><td>Horizon 2 ML models</td><td>Risk stratification, treatment failure prediction, demand forecasting.</td></tr>
-    <tr><td>Horizon 3 longitudinal surveillance</td><td>PTLD registry, multi-disease platform, cross-domain network analytics.</td></tr>
+    <tr><td>Phase 2 predictive ML models</td><td>Risk stratification, treatment failure prediction, demand forecasting (see Appendix).</td></tr>
+    <tr><td>Phase 3 longitudinal surveillance</td><td>PTLD registry, multi-disease platform, cross-domain network analytics (see Appendix).</td></tr>
     <tr><td>Buyer-initiated Market discovery</td><td>External buyers seeking produce via aggregators.</td></tr>
     <tr><td>Online M-Pesa payment processing</td><td>Integrated payment gateway with real-time confirmation.</td></tr>
     <tr><td>Provider / Coordinator WhatsApp conversational menu</td><td>Catalog and supervision management via WhatsApp (no web app needed).</td></tr>
@@ -1728,6 +1715,64 @@
     <tr><td>Multi-language AI advisory</td><td>AI-powered content delivery in additional local languages.</td></tr>
   </tbody>
 </table>
+
+<!-- ════════════════════════════════════════════════════════
+     17. APPENDIX — PHASED ANALYTICS ROADMAP
+     ════════════════════════════════════════════════════════ -->
+<h2 id="s17">17. Appendix &mdash; Phased Analytics Roadmap</h2>
+
+<div class="callout callout-info">
+  <p class="callout-label">Roadmap, Not Architecture</p>
+  <p>This is a <strong>roadmap framework</strong>, not an architectural component. Analytics is implemented as a <strong>logical capability</strong> that consumes data from the platform &mdash; it is not a separate layer of the stack. The architecture has 6 layers plus external integrations; analytics sits on top of them as a consumer.</p>
+</div>
+
+<p>Analytics maturity progresses through three phases regardless of domain. The same phases apply to local services, health services, and any future vertical added to the platform.</p>
+
+<h3>17.1 Phase 1 &mdash; Analytics on Existing Data (Months 1&ndash;6)</h3>
+<p>Use what you already have. No new data collection required &mdash; dashboards and analyses sit on top of the operational data captured by the flow engine.</p>
+<table>
+  <thead><tr><th>Domain</th><th>Illustrative Dashboards &amp; Analyses</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="domain-pill domain-local">Local</span></td>
+      <td>Provider performance dashboards, conversion funnels (discover &rarr; select &rarr; confirm &rarr; deliver), seasonal demand patterns, geographic service-availability heatmaps, cross-category provider utilisation.</td>
+    </tr>
+    <tr>
+      <td><span class="domain-pill domain-health">Health</span></td>
+      <td>Facility performance (presumptive-to-confirmed ratio), screening cascade analysis, supervision-visit coverage gaps, financial anomaly detection on payment claims, CHP productivity.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>17.2 Phase 2 &mdash; Predictive ML (Months 6&ndash;18)</h3>
+<p>Train models on accumulated outcome data once enough longitudinal history has accrued.</p>
+<table>
+  <thead><tr><th>Domain</th><th>Illustrative Models</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="domain-pill domain-local">Local</span></td>
+      <td>Demand forecasting, provider-matching optimisation, seeker churn prediction, price-signal detection.</td>
+    </tr>
+    <tr>
+      <td><span class="domain-pill domain-health">Health</span></td>
+      <td>Patient risk stratification, treatment failure prediction, contact-investigation prioritisation, mortality prevention (NLP on death audits), ADR early warning.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>17.3 Phase 3 &mdash; Pioneering Surveillance (Months 12&ndash;36)</h3>
+<p>Longitudinal, multi-domain, novel intelligence &mdash; the phase that produces datasets and insights not available elsewhere.</p>
+<ul>
+  <li><span class="domain-pill domain-local">Local</span> <strong>Cross-domain network effects</strong> &mdash; seekers active in multiple verticals show materially different retention and outcome profiles.</li>
+  <li><span class="domain-pill domain-local">Local</span> <strong>Multi-vertical seeker journeys</strong> &mdash; unified view across all verticals a seeker participates in.</li>
+  <li><span class="domain-pill domain-health">Health</span> <strong>Longitudinal post-TB lung disease surveillance</strong> &mdash; national-scale dataset on PTLD trajectories.</li>
+  <li><span class="domain-pill domain-health">Health</span> <strong>Multi-disease platform extension</strong> &mdash; HIV, malaria, cholera on the same flow engine and taxonomy.</li>
+</ul>
+
+<div class="callout callout-success">
+  <p class="callout-label">Applies to Any Domain</p>
+  <p>The three-phase progression &mdash; <em>use what you have</em> &rarr; <em>predict</em> &rarr; <em>pioneer</em> &mdash; is domain-agnostic. Every vertical added to the platform (health, agri, finance, education, etc.) inherits the same roadmap. The examples above are illustrative, not prescriptive.</p>
+</div>
 
 <!-- ── Footer ──────────────────────────────────────────── -->
 <hr style="margin-top:3rem; border:none; border-top:2px solid #e8eaed;">
