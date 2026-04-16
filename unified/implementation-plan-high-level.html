@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Kuza Delivery Team" />
+  <title>NFH-Kuza-Google Implementation Plan</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 960px; margin: 40px auto; padding: 0 30px; color: #1a1a1a; line-height: 1.6; }
+    h1 { color: #1E40AF; border-bottom: 3px solid #1E40AF; padding-bottom: 8px; }
+    h2 { color: #1E40AF; border-bottom: 1px solid #DBEAFE; padding-bottom: 4px; margin-top: 40px; }
+    h3 { color: #2563EB; margin-top: 24px; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.92em; }
+    th { background: #EFF6FF; color: #1E40AF; text-align: left; padding: 8px 10px; border: 1px solid #DBEAFE; }
+    td { padding: 8px 10px; border: 1px solid #E5E7EB; vertical-align: top; }
+    code { background: #F3F4F6; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #1E40AF; }
+    ul, ol { margin: 8px 0; padding-left: 28px; }
+    li { margin-bottom: 4px; }
+    hr { border: none; border-top: 1px solid #E5E7EB; margin: 32px 0; }
+    #TOC { background: #F9FAFB; border: 1px solid #E5E7EB; padding: 16px 24px; border-radius: 8px; margin: 24px 0; }
+    #TOC ul { list-style: none; padding-left: 0; }
+    #TOC > ul > li { margin-bottom: 6px; font-weight: 600; }
+    #TOC ul ul li { font-weight: normal; padding-left: 16px; }
+    #TOC a { color: #1E40AF; text-decoration: none; }
+    #TOC a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">NFH-Kuza-Google Implementation Plan</h1>
+<p class="subtitle">Eight phases from mobilisation to pilot
+stabilisation</p>
+<p class="author">Kuza Delivery Team</p>
+<p class="date">April 2026</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#nfh-kuza-google-pilot-high-level-implementation-plan"
+id="toc-nfh-kuza-google-pilot-high-level-implementation-plan">NFH-Kuza-Google
+Pilot — High-Level Implementation Plan</a>
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#phase-summary" id="toc-phase-summary">Phase
+Summary</a></li>
+<li><a href="#phase-0-project-mobilisation"
+id="toc-phase-0-project-mobilisation">Phase 0: Project
+Mobilisation</a></li>
+<li><a href="#phase-1-foundation-data-model-master-data"
+id="toc-phase-1-foundation-data-model-master-data">Phase 1: Foundation —
+Data Model &amp; Master Data</a></li>
+<li><a href="#phase-2-beckn-network-onboarding"
+id="toc-phase-2-beckn-network-onboarding">Phase 2: Beckn Network
+Onboarding</a></li>
+<li><a href="#phase-3-core-platform-services"
+id="toc-phase-3-core-platform-services">Phase 3: Core Platform
+Services</a></li>
+<li><a href="#phase-4-channel-integration-whatsapp-web-app-google-ai"
+id="toc-phase-4-channel-integration-whatsapp-web-app-google-ai">Phase 4:
+Channel Integration — WhatsApp, Web App, Google AI</a></li>
+<li><a href="#phase-5-vertical-rollout-local-services-domain"
+id="toc-phase-5-vertical-rollout-local-services-domain">Phase 5:
+Vertical Rollout — Local Services Domain</a></li>
+<li><a href="#phase-6-vertical-rollout-health-services-domain"
+id="toc-phase-6-vertical-rollout-health-services-domain">Phase 6:
+Vertical Rollout — Health Services Domain</a></li>
+<li><a href="#phase-7-pilot-launch" id="toc-phase-7-pilot-launch">Phase
+7: Pilot Launch</a></li>
+<li><a href="#phase-8-stabilisation-analytics"
+id="toc-phase-8-stabilisation-analytics">Phase 8: Stabilisation &amp;
+Analytics</a></li>
+<li><a href="#critical-path-items"
+id="toc-critical-path-items">Critical-Path Items</a></li>
+<li><a href="#next-steps" id="toc-next-steps">Next Steps</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="nfh-kuza-google-pilot-high-level-implementation-plan">NFH-Kuza-Google
+Pilot — High-Level Implementation Plan</h1>
+<p><strong>Version:</strong> 1.0<br />
+<strong>Date:</strong> April 2026<br />
+<strong>Status:</strong> Draft for review</p>
+<hr />
+<h2 id="introduction">Introduction</h2>
+<p>This document sets out the high-level implementation plan for the
+NFH-Kuza-Google pilot. The pilot delivers a unified, domain-agnostic
+service-orchestration platform for rural households in Kenya. It spans
+two Beckn domains — <code>local-services</code> (agri / rural) and
+<code>health-services</code> — sharing a single Flow Engine, channel
+layer, data foundation, and integrations with Google Cloud services and
+the Beckn network.</p>
+<p>The plan is organised into <strong>eight phases</strong>. Each phase
+has:</p>
+<ul>
+<li>a single <strong>Goal</strong> statement,</li>
+<li>a list of <strong>Inputs Required</strong> — named operational
+artifacts (lists, datasets, content, credentials, decisions) that must
+be provided before the phase can start, with the provider of each
+artifact identified, and</li>
+<li>a set of <strong>Expected Outputs</strong> — concrete deliverables
+produced by the phase.</li>
+</ul>
+<p>The intent of this document is to surface every input that the pilot
+team needs from partners and from internal teams. Once the high-level
+plan is reviewed and approved, a detailed plan per phase will follow,
+breaking each phase into tasks, owners, and durations.</p>
+<hr />
+<h2 id="phase-summary">Phase Summary</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>Phase</th>
+<th>One-line Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Project Mobilisation</td>
+<td>Governance + environments</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Foundation — Data Model &amp; Master Data</td>
+<td>Schema, seeds, data dictionary</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Beckn Network Onboarding</td>
+<td>ONIX running, BAP/BPP registered</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Core Platform Services</td>
+<td>Flow Engine + BAP + BPP running</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Channel Integration</td>
+<td>WhatsApp Flow Handlers, Web App, Google AI live</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Vertical Rollout — Local Services</td>
+<td>4 agri/rural flows live</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Vertical Rollout — Health Services</td>
+<td>6 health flows live, cascades + batches</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Pilot Launch</td>
+<td>Real cohort on the system</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Stabilisation &amp; Analytics</td>
+<td>KPIs, dashboards, feedback loop</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Sequencing notes:</strong></p>
+<ul>
+<li>Phase 0 unblocks everything else.</li>
+<li>Phases 1 and 2 can run in parallel once Phase 0 is complete.</li>
+<li>Phase 3 depends on Phases 1 and 2.</li>
+<li>Phase 4 depends on Phase 3.</li>
+<li>Phases 5 and 6 default to <strong>sequential</strong> (Local
+Services first, then Health Services), though they can parallelise if
+two independent squads are available.</li>
+<li>Phase 7 is gated by Phase 5 <em>and</em> Phase 6 (whichever subset
+is in scope for launch).</li>
+<li>Phase 8 begins with pilot go-live and runs continuously
+thereafter.</li>
+</ul>
+<hr />
+<h2 id="phase-0-project-mobilisation">Phase 0: Project Mobilisation</h2>
+<h3 id="goal">Goal</h3>
+<p>Establish governance, environments, and shared understanding before
+any code is written.</p>
+<h3 id="inputs-required">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pilot Charter (scope, timeline, budget, success criteria)</td>
+<td>Document</td>
+<td>Kuza + Google + Beckn jointly</td>
+</tr>
+<tr>
+<td>Delivery Team Roster (names, roles, time commitments)</td>
+<td>List</td>
+<td>All partners</td>
+</tr>
+<tr>
+<td>Steering Committee Members &amp; Cadence</td>
+<td>List + schedule</td>
+<td>Partners</td>
+</tr>
+<tr>
+<td>GCP Billing Account ID &amp; owner approval</td>
+<td>Credential</td>
+<td>Google / Kuza</td>
+</tr>
+<tr>
+<td>GCP Project Naming Convention (dev / staging / pilot)</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+<tr>
+<td>GitHub Org + Repo Naming Convention</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+<tr>
+<td>WhatsApp Business Account approval</td>
+<td>Account</td>
+<td>Meta (via Kuza)</td>
+</tr>
+<tr>
+<td>Beckn Fabric Testnet subscriber-registration approval</td>
+<td>Account</td>
+<td>Beckn</td>
+</tr>
+<tr>
+<td>Communication tooling (Slack / email channels, doc store)</td>
+<td>Setup</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td>Decision Log Template</td>
+<td>Template</td>
+<td>Kuza</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs">Expected Outputs</h3>
+<ul>
+<li>GCP projects provisioned (dev, staging, pilot)</li>
+<li>Shared Git repositories with branching strategy and CI
+scaffolding</li>
+<li>Secrets management configured (GCP Secret Manager)</li>
+<li>Decision log live for open items (e.g., PostgreSQL migration timing,
+monitoring stack)</li>
+<li>RACI matrix for the delivery team</li>
+</ul>
+<hr />
+<h2 id="phase-1-foundation-data-model-master-data">Phase 1: Foundation —
+Data Model &amp; Master Data</h2>
+<h3 id="goal-1">Goal</h3>
+<p>Lay down the domain-agnostic data foundation that all subsequent work
+depends on.</p>
+<h3 id="inputs-required-1">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kenya Geography Master List (47 Counties × all Sub-Counties × Wards
+× known Villages)</td>
+<td>Dataset (CSV)</td>
+<td>Kuza (existing) or KNBS</td>
+</tr>
+<tr>
+<td>Top-level Category List per domain</td>
+<td>List</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>Sub-category Taxonomy per top-level category</td>
+<td>List per category</td>
+<td>Kuza product team + domain SMEs</td>
+</tr>
+<tr>
+<td>Vertical Catalogue (full list of verticals to support in pilot, with
+<code>vertical</code> codes)</td>
+<td>List</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td><code>verticalAttributes</code> Field Definitions per vertical</td>
+<td>Per-vertical doc</td>
+<td>Domain SMEs</td>
+</tr>
+<tr>
+<td>Outcome-Type Dictionary per vertical (e.g., TB: TB_POSITIVE,
+TB_NEGATIVE, CURED, LOST, DIED)</td>
+<td>List per vertical</td>
+<td>Domain SMEs</td>
+</tr>
+<tr>
+<td>Capability Vocabulary List (GeneXpert, X-ray, Spirometry, Vet,
+Vaccination, Brooding, …)</td>
+<td>List</td>
+<td>Kuza + health partner</td>
+</tr>
+<tr>
+<td>Role Definitions Dictionary (Seeker, Facilitator, Provider,
+Coordinator, Validator, Sponsor + sub-roles)</td>
+<td>List</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td>Service Status Lifecycle Enum (NEED_REGISTERED → CLOSED +
+branches)</td>
+<td>Confirmation</td>
+<td>From <code>/unified</code> spec</td>
+</tr>
+<tr>
+<td>Currency + Language Codes Supported in Pilot</td>
+<td>Decision</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td>Master Data Sign-off Matrix (who approves each list)</td>
+<td>Matrix</td>
+<td>Kuza PM</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs-1">Expected Outputs</h3>
+<ul>
+<li>ERD and DDL for new marketplace tables (seeker profile, facilitator
+profile, provider profile, flow/order, status history, batch, payment,
+feedback, consent, audit)</li>
+<li>Master-data seed scripts (Kenya geography, category / sub-category
+taxonomy, role definitions, outcome-type dictionaries per vertical)</li>
+<li>Migration strategy document (MySQL → future PostgreSQL)</li>
+<li>Data-dictionary site or Confluence page</li>
+<li>No application code yet — schema, seeds, and documentation only</li>
+</ul>
+<hr />
+<h2 id="phase-2-beckn-network-onboarding">Phase 2: Beckn Network
+Onboarding</h2>
+<h3 id="goal-2">Goal</h3>
+<p>Get Kuza recognised as a BAP and a BPP on the Beckn testnet (and
+later production) networks.</p>
+<h3 id="inputs-required-2">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Beckn Testnet Subscriber Registration approval</td>
+<td>Account</td>
+<td>Beckn</td>
+</tr>
+<tr>
+<td>Production-Network Subscriber Registration approval</td>
+<td>Account</td>
+<td>Beckn (later)</td>
+</tr>
+<tr>
+<td>Public Domain Names (e.g., <code>bap-pilot.kuza.one</code>,
+<code>bpp-pilot.kuza.one</code>)</td>
+<td>DNS records</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td>TLS Certificates for above domains</td>
+<td>Certificates</td>
+<td>Kuza (via Let’s Encrypt or GCP-managed)</td>
+</tr>
+<tr>
+<td>Subscriber IDs (one for BAP, one for BPP) — naming approved by
+network</td>
+<td>Decision</td>
+<td>Kuza + Beckn</td>
+</tr>
+<tr>
+<td>Ed25519 Key Pairs for BAP and BPP</td>
+<td>Generated keys</td>
+<td>Kuza (procedure documented)</td>
+</tr>
+<tr>
+<td>Network ID Assignment (e.g.,
+<code>kuza-pilot.beckn.one/testnet</code>)</td>
+<td>Decision</td>
+<td>Beckn</td>
+</tr>
+<tr>
+<td>Schema Hosting URLs for the 4 generic schemas</td>
+<td>URLs</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td>ONIX Adapter Image Version (which release of
+<code>fidedocker/onix-adapter</code> to use)</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+<tr>
+<td>ONIX Routing YAMLs (BAPCaller, BAPReceiver, BPPCaller,
+BPPReceiver)</td>
+<td>Config files</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td>Discovery Service Endpoint URL</td>
+<td>URL</td>
+<td>Beckn Fabric</td>
+</tr>
+<tr>
+<td>Catalog Service Endpoint URL</td>
+<td>URL</td>
+<td>Beckn Fabric</td>
+</tr>
+<tr>
+<td>DeDi Registry Endpoint URL</td>
+<td>URL</td>
+<td>Beckn Fabric</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs-2">Expected Outputs</h3>
+<ul>
+<li>ONIX-BAP and ONIX-BPP deployed on GCP (Docker on Cloud Run or
+GKE)</li>
+<li>BAP and BPP registered on DeDi Registry testnet with keys, callback
+URIs, subscriber IDs</li>
+<li>4 generic extension schemas registered with Beckn Catalog
+Service</li>
+<li>Signed request / verified response working end-to-end in testnet
+(manual Postman-driven <code>ping</code> crossing the network)</li>
+<li>Operational runbook for registry and ONIX</li>
+</ul>
+<hr />
+<h2 id="phase-3-core-platform-services">Phase 3: Core Platform
+Services</h2>
+<h3 id="goal-3">Goal</h3>
+<p>Build the Flow Engine, BAP, and BPP — the platform “heart”.</p>
+<h3 id="inputs-required-3">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1 outputs (data model live)</td>
+<td>Dependency</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td>Phase 2 outputs (ONIX deployed and registered)</td>
+<td>Dependency</td>
+<td>Kuza</td>
+</tr>
+<tr>
+<td>Flow Template Spec — YAML schema for declaring a flow template</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+<tr>
+<td>Initial Flow Templates List (which templates needed for pilot,
+naming convention)</td>
+<td>List</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>Cascade Rules Catalogue (which outcome triggers which cascade — text
+spec)</td>
+<td>List per vertical</td>
+<td>Kuza + domain SMEs</td>
+</tr>
+<tr>
+<td>Batch Rules Catalogue (when batches are created, who can close
+them)</td>
+<td>List</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>SLA Targets (max latency for <code>discover</code> /
+<code>confirm</code>; max queue depth)</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+<tr>
+<td>Capacity Sizing Estimate (peak concurrent flows for pilot)</td>
+<td>Estimate</td>
+<td>Kuza ops</td>
+</tr>
+<tr>
+<td>Internal API Naming Convention (Channel Handler ↔︎ Flow Engine ↔︎ BAP
+/ BPP)</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+<tr>
+<td>Logging / Observability Standard (log format, trace IDs, metrics
+taxonomy)</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs-3">Expected Outputs</h3>
+<ul>
+<li>Flow Engine service: 7-step state machine, flow-template loader,
+initiation-mode handling, cascade logic, batch management</li>
+<li>BAP service: receives requests from Channel Handlers, constructs
+Beckn messages, handles async callbacks</li>
+<li>BPP service: receives Beckn messages from ONIX, queries platform for
+provider catalog, constructs responses</li>
+<li>Unit tests for state transitions, cascade rules, batch
+lifecycle</li>
+<li>Internal API contracts (Channel → Flow Engine → BAP; Platform →
+BPP)</li>
+<li>Flow Engine admin tool (read-only, for support / ops)</li>
+</ul>
+<hr />
+<h2 id="phase-4-channel-integration-whatsapp-web-app-google-ai">Phase 4:
+Channel Integration — WhatsApp, Web App, Google AI</h2>
+<h3 id="goal-4">Goal</h3>
+<p>Connect the platform to the user-facing surfaces (WhatsApp, Provider
+Web App, Google AI).</p>
+<h3 id="inputs-required-4">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WhatsApp Business Account ID + API token</td>
+<td>Credential</td>
+<td>Kuza (Meta-issued)</td>
+</tr>
+<tr>
+<td>Trigger Word List (which words / phrases route to which
+handler)</td>
+<td>List</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>Read-only access to existing <code>webhook.php</code> source</td>
+<td>Repo access</td>
+<td>Kuza platform team</td>
+</tr>
+<tr>
+<td>WhatsApp Outbound Template Content — drafted in EN + SW for each
+notification scenario</td>
+<td>Content (table)</td>
+<td>Kuza product team + content writer</td>
+</tr>
+<tr>
+<td>WhatsApp Template Approval from Meta (per template)</td>
+<td>Approval</td>
+<td>Meta (via Kuza)</td>
+</tr>
+<tr>
+<td>Provider Web App UI Mockups (catalog mgmt, order list, order detail,
+batch view, profile)</td>
+<td>Mockups</td>
+<td>Kuza UX</td>
+</tr>
+<tr>
+<td>Brand Assets (logo, colour palette, typography, iconography)</td>
+<td>Asset bundle</td>
+<td>Kuza brand team</td>
+</tr>
+<tr>
+<td>Web App Authentication Mechanism (WhatsApp link with token / OTP /
+phone-based)</td>
+<td>Decision</td>
+<td>Kuza product + security</td>
+</tr>
+<tr>
+<td>Google Content API Endpoint URLs + credentials</td>
+<td>Credentials + URLs</td>
+<td>Google</td>
+</tr>
+<tr>
+<td>Google AI Interface (Vertex AI / Gemini) credentials + model
+selection</td>
+<td>Credentials + decision</td>
+<td>Google + Kuza tech lead</td>
+</tr>
+<tr>
+<td>Location Normalisation Acceptance Criteria (when does AI output get
+auto-confirmed vs ask user)</td>
+<td>Decision</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>Messaging Queue Tooling Decision (Pub/Sub vs Cloud Tasks vs
+cron)</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+<tr>
+<td>Provider Notification SLA (how fast after order confirmed)</td>
+<td>Decision</td>
+<td>Kuza product team</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs-4">Expected Outputs</h3>
+<ul>
+<li>Channel Webhook router (PHP module in the existing platform) with
+trigger-word / message-ID-based branching</li>
+<li>Domain-specific Flow Handlers (Local Services handler, Health
+Services handler) — PHP modules, each consuming Flow Engine APIs</li>
+<li>Provider outbound notification worker (messaging queue + cron)
+decoupled from the inbound webhook</li>
+<li>Kuza Web App v1 — responsive, no native install — with:
+<ul>
+<li>Provider onboarding and catalog management</li>
+<li>Order / flow inbox + details views</li>
+<li>Role-specific views (Facilitator / Provider / Coordinator)</li>
+</ul></li>
+<li>Google AI integration library: location normalisation (from Channel
+Webhook), Content API adapter (from BPP for Advisory)</li>
+<li>WhatsApp template library (registered with Meta) for all outbound
+patterns</li>
+</ul>
+<hr />
+<h2 id="phase-5-vertical-rollout-local-services-domain">Phase 5:
+Vertical Rollout — Local Services Domain</h2>
+<h3 id="goal-5">Goal</h3>
+<p>Ship the 4 local-services flows end-to-end, covering the
+<code>SEEKER_INITIATED</code> pattern.</p>
+<h3 id="inputs-required-5">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Provider Onboarding List — agripreneurs (name, phone, type, service
+area, services offered, pricing, capacity, availability)</td>
+<td>Dataset (CSV per provider type)</td>
+<td>Kuza field team</td>
+</tr>
+<tr>
+<td>Service Catalog Per Provider (services this provider sells, at what
+unit prices)</td>
+<td>Dataset</td>
+<td>Kuza field team</td>
+</tr>
+<tr>
+<td>Service Area Mapping (which provider serves which county /
+sub-county)</td>
+<td>Dataset</td>
+<td>Kuza field team</td>
+</tr>
+<tr>
+<td>Buyer / Aggregator List for Market-Produce (name, location, what
+they buy, buying prices, collection mode)</td>
+<td>Dataset</td>
+<td>Kuza field team</td>
+</tr>
+<tr>
+<td>Vertical Configuration per local-services vertical (default values,
+dropdown content)</td>
+<td>Per-vertical config</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>Predefined Feedback Options Lists (per category)</td>
+<td>Lists</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>Cancellation Policy Defaults per vertical (window hours, reasons
+enum)</td>
+<td>Decision per vertical</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>Sample Seeker (Farmer) Profile Set (≥10 test farmers across pilot
+geography)</td>
+<td>Dataset</td>
+<td>Kuza field team</td>
+</tr>
+<tr>
+<td>Vertical-Specific WhatsApp Conversation Scripts (numbered text +
+button labels in EN + SW)</td>
+<td>Per-vertical script</td>
+<td>Kuza product team + content writer</td>
+</tr>
+<tr>
+<td>Test Cases Per Vertical (happy-path + edge cases)</td>
+<td>Test plan</td>
+<td>Kuza QA</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs-5">Expected Outputs</h3>
+<ul>
+<li>Flow templates defined (YAML / config) for each vertical:
+<ul>
+<li><code>agri-livelihood-poultry</code> (vaccination, feed, brooding,
+incubation, etc.)</li>
+<li><code>household-education</code>, <code>household-health</code></li>
+<li><code>market-livestock-products</code> (reversed economics)</li>
+<li><code>advisory-agri</code></li>
+</ul></li>
+<li><code>verticalAttributes</code> schemas documented per vertical</li>
+<li>Vertical-specific flow-handler logic in the Local Services Flow
+Handler</li>
+<li>WhatsApp message content (farmer conversations, provider
+notifications)</li>
+<li>End-to-end integration tests per vertical</li>
+<li>Pilot-ready for the 4 local-services flows</li>
+</ul>
+<hr />
+<h2 id="phase-6-vertical-rollout-health-services-domain">Phase 6:
+Vertical Rollout — Health Services Domain</h2>
+<h3 id="goal-6">Goal</h3>
+<p>Ship the health flows, introducing the
+<code>PROVIDER_INITIATED</code>, <code>SYSTEM_INITIATED</code>, cascade,
+and batch primitives.</p>
+<h3 id="inputs-required-6">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Health Facility Master List (name, type, location, capabilities,
+operating hours, credential ID)</td>
+<td>Dataset (CSV)</td>
+<td>Health partner / disease-programme</td>
+</tr>
+<tr>
+<td>Facility Capability Tags per Facility (GeneXpert, X-ray, Spirometry,
+DRTB-certified, etc.)</td>
+<td>Mapping</td>
+<td>Health partner</td>
+</tr>
+<tr>
+<td>CHP Roster (name, phone, assigned villages / sub-county, credential
+ID, supervisor)</td>
+<td>Dataset</td>
+<td>Health partner</td>
+</tr>
+<tr>
+<td>SCTLC / CTLC Roster (name, phone, assigned geography, supervisor,
+payment-claim ID)</td>
+<td>Dataset</td>
+<td>Health partner</td>
+</tr>
+<tr>
+<td>Clinical Staff Roster per Facility (clinician, nurse, lab, pharmacy
+— name, role, credential)</td>
+<td>Dataset</td>
+<td>Health partner</td>
+</tr>
+<tr>
+<td>Disease-Programme Register Integration Credentials (read + write API
+access)</td>
+<td>Credentials + endpoint URLs</td>
+<td>Health partner</td>
+</tr>
+<tr>
+<td>Patient UUID Generation / Reconciliation Rules (how UUIDs map to
+register IDs)</td>
+<td>Decision</td>
+<td>Health partner + Kuza</td>
+</tr>
+<tr>
+<td>Symptom-Screening Checklist Content (questions, scoring rules) per
+disease</td>
+<td>Per-disease content</td>
+<td>Health partner clinical team</td>
+</tr>
+<tr>
+<td>Contact-Tracing Rules — which contact relationships trigger
+cascades, exposure window defaults</td>
+<td>Rules per disease</td>
+<td>Health partner clinical team</td>
+</tr>
+<tr>
+<td>Cascade Triggers per Outcome (e.g., TB_POSITIVE → which cascades
+fire)</td>
+<td>Mapping</td>
+<td>Health partner + Kuza</td>
+</tr>
+<tr>
+<td>Outbound Notification Templates for Passive Seekers
+(contact-tracing, post-TB recall) — EN + SW + content-team-reviewed for
+stigma mitigation</td>
+<td>Content</td>
+<td>Kuza content + health-partner sign-off</td>
+</tr>
+<tr>
+<td>Consent Text Content (DPDP / data-sharing wording) — EN + SW</td>
+<td>Content</td>
+<td>Health partner legal + content writer</td>
+</tr>
+<tr>
+<td>Campaign Plan Templates (CTLC’s view of how to plan an ACF
+campaign)</td>
+<td>Template</td>
+<td>Kuza product + health partner</td>
+</tr>
+<tr>
+<td>Clinical SLAs (lab turnaround, follow-up windows)</td>
+<td>Per-disease decisions</td>
+<td>Health partner</td>
+</tr>
+<tr>
+<td>Test Cases per Health Vertical including cascade scenarios</td>
+<td>Test plan</td>
+<td>Kuza QA + health-partner clinical reviewer</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs-6">Expected Outputs</h3>
+<ul>
+<li>Flow templates for each health vertical:
+<ul>
+<li><code>health-tb-screening</code> (CHP-facilitated primary path)</li>
+<li><code>health-tb-acf</code> (campaign-style)</li>
+<li><code>health-tb-contact-tracing</code> (cascaded)</li>
+<li><code>health-tb-treatment</code></li>
+<li><code>health-tb-supervision</code></li>
+<li><code>advisory-health-tb</code></li>
+</ul></li>
+<li>CHP-specific Web App views (batch start / close, household visit
+list, symptom checklist, referral creation)</li>
+<li>Cascade engine rules loaded (positive TB → treatment flow +
+contact-tracing batch)</li>
+<li>Batch-management UI (CHP daily batch, CTLC campaign batch)</li>
+<li>Outbound WhatsApp notification templates for passive seekers</li>
+<li>Disease-programme register bidirectional sync (read on
+<code>discover</code>, write on <code>record</code>)</li>
+<li>End-to-end integration tests per flow, including cascade
+scenarios</li>
+<li>Pilot-ready for the 6 health-services flows</li>
+</ul>
+<hr />
+<h2 id="phase-7-pilot-launch">Phase 7: Pilot Launch</h2>
+<h3 id="goal-7">Goal</h3>
+<p>Put real households, facilitators, and providers on the system.</p>
+<h3 id="inputs-required-7">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pilot Geography Confirmation (which Counties + Sub-Counties for
+go-live)</td>
+<td>Decision</td>
+<td>Steering Committee</td>
+</tr>
+<tr>
+<td>Pilot Cohort Targets (N farmers, N households, N CHPs, N facilities,
+N agripreneurs)</td>
+<td>Number per category</td>
+<td>Steering Committee</td>
+</tr>
+<tr>
+<td>Onboarding Schedule (per cohort, by date)</td>
+<td>Calendar</td>
+<td>Kuza pilot manager</td>
+</tr>
+<tr>
+<td>Training Material — Facilitator Guide</td>
+<td>Document (slide deck + quick-reference)</td>
+<td>Kuza training team</td>
+</tr>
+<tr>
+<td>Training Material — Provider Guide</td>
+<td>Document</td>
+<td>Kuza training team</td>
+</tr>
+<tr>
+<td>Training Material — Coordinator Guide</td>
+<td>Document</td>
+<td>Kuza training team</td>
+</tr>
+<tr>
+<td>Training Trainer Roster (who delivers training, where, when)</td>
+<td>List + schedule</td>
+<td>Kuza pilot manager</td>
+</tr>
+<tr>
+<td>Support Team Roster + Escalation Path</td>
+<td>List</td>
+<td>Kuza pilot manager</td>
+</tr>
+<tr>
+<td>Go / No-Go Checklist (sign-offs needed before launch)</td>
+<td>Checklist</td>
+<td>Kuza PM</td>
+</tr>
+<tr>
+<td>Pilot Communication Plan (announcements, partner messaging,
+expectation-setting)</td>
+<td>Plan</td>
+<td>Kuza + partners</td>
+</tr>
+<tr>
+<td>Monitoring Dashboard URLs (for ops visibility on day 1)</td>
+<td>URLs</td>
+<td>Kuza ops</td>
+</tr>
+<tr>
+<td>Incident Response Playbook</td>
+<td>Playbook</td>
+<td>Kuza ops</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs-7">Expected Outputs</h3>
+<ul>
+<li>Training completed for Facilitators, Providers, Coordinators</li>
+<li>Providers onboarded with catalog (services, pricing, service areas,
+capabilities)</li>
+<li>Farmers / households registered (Seeker profiles)</li>
+<li>Monitoring dashboards live (flow volumes, error rates, latency)</li>
+<li>Support channel active (WhatsApp / phone) for early-user issues</li>
+<li>Go-live communication sent to pilot cohort</li>
+<li>First live flows executed and closed end-to-end across all
+domains</li>
+</ul>
+<hr />
+<h2 id="phase-8-stabilisation-analytics">Phase 8: Stabilisation &amp;
+Analytics</h2>
+<h3 id="goal-8">Goal</h3>
+<p>Move from “it works” to “we know how well it works and can improve
+it.”</p>
+<h3 id="inputs-required-8">Inputs Required</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Input</th>
+<th>Type</th>
+<th>Provider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KPI List with Definitions (conversion rate, lead time, outcome
+distribution per vertical, etc.)</td>
+<td>Document</td>
+<td>Kuza product team</td>
+</tr>
+<tr>
+<td>Pilot Evaluation Criteria (what defines pilot success)</td>
+<td>Document</td>
+<td>Steering Committee</td>
+</tr>
+<tr>
+<td>Analytics Tooling Decision (Looker / Data Studio / custom)</td>
+<td>Decision</td>
+<td>Kuza tech lead</td>
+</tr>
+<tr>
+<td>Data Access Roles (who sees what)</td>
+<td>Matrix</td>
+<td>Kuza + partners</td>
+</tr>
+<tr>
+<td>Reporting Cadence (weekly ops report, monthly steering report)</td>
+<td>Schedule</td>
+<td>Kuza PM</td>
+</tr>
+<tr>
+<td>Feedback Collection Mechanism for Pilot Users</td>
+<td>Decision (survey / interview / in-app)</td>
+<td>Kuza product team</td>
+</tr>
+</tbody>
+</table>
+<h3 id="expected-outputs-8">Expected Outputs</h3>
+<ul>
+<li>Descriptive analytics dashboards (Phase 1 of the Analytics Roadmap):
+flow conversion funnels, provider performance, facilitator productivity,
+outcome rates per vertical, geographic heat-maps</li>
+<li>Data-quality monitoring (completeness, referential integrity,
+cascade closure rates)</li>
+<li>Operational KPIs defined and tracked</li>
+<li>Feedback loop into product backlog (what to fix, what to
+extend)</li>
+<li>Foundation laid for later predictive and surveillance analytics (not
+built yet — data is being collected correctly)</li>
+</ul>
+<hr />
+<h2 id="critical-path-items">Critical-Path Items</h2>
+<p>Inputs that most often delay pilots of this shape. Flagging them here
+so owners can start these earlier than the phase in which they are
+strictly required:</p>
+<ol type="1">
+<li><strong>Master-data lists</strong> (Phase 1) — geography is usually
+fine; <strong>vertical taxonomies and sub-categories</strong> can stall
+waiting on SMEs. Start SME conversations during Phase 0.</li>
+<li><strong>WhatsApp template approvals</strong> (Phase 4) — Meta’s
+approval can take days per template; batch-submit templates early, even
+if Phase 4 has not formally begun.</li>
+<li><strong>Facility capability + CHP roster data</strong> (Phase 6) —
+these usually live in spreadsheets across partner organisations and need
+reconciliation. Kick off data-cleanup with the health partner during
+Phases 1–2.</li>
+<li><strong>Predefined feedback-option lists per vertical</strong>
+(Phase 5) — easy to defer, hard to retrofit. Capture these during Phase
+1 master-data work if possible.</li>
+<li><strong>Cascade trigger rules</strong> (Phase 6) — require clinical
+sign-off and often get stuck in review. Start clinical review
+conversations during Phase 3 even though the rules are consumed in Phase
+6.</li>
+</ol>
+<hr />
+<h2 id="next-steps">Next Steps</h2>
+<ol type="1">
+<li>Review this high-level plan with the steering committee.</li>
+<li>Confirm phase ordering, scope, and the critical-path items.</li>
+<li>Upon sign-off, move to <strong>detailed planning</strong>, breaking
+each phase into tasks, owners, durations, and dependencies (task-level
+Gantt / programme plan).</li>
+<li>In parallel, kick off the critical-path items flagged above so they
+do not block the phases in which they are formally required.</li>
+</ol>
+<hr />
+<p><em>End of document.</em></p>
+</body>
+</html>
